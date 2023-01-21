@@ -1,0 +1,42 @@
+pipeline {
+    options {
+        overrideIndexTriggers(false)
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+    agent {label 'Ubuntu'}
+    triggers { 
+        cron('H 10,19 * * 1-5') 
+    }
+    stages {
+        stage('Native check') {
+            steps {
+               sh "grep -rn 'import com.google.gwt' web-common/src retex/*/src web-dev/src gwtutil/src/ | sed 's/\\([0-9]:\\)/\\1 warning:/' "
+               recordIssues tool:java()
+            }
+        }
+
+        stage('Get Web JS'){
+            steps {
+                dir('uitest') {
+                    sh "bash get-from-autotest.sh ${env.GIT_BRANCH}"
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                   sh 'docker run --ipc=host --shm-size=1gb -u $(id -u):$(id -g) -e HOME=/work -w /work -v $PWD/uitest:/work -v $PWD/common:/common cypress/base:16.13.0 sh runtest.sh'
+            }
+            post {
+                always {
+                    junit '**/ui-tests.*.xml' 
+                    archiveArtifacts artifacts: 'uitest/cypress/videos/**', allowEmptyArchive: true
+                }
+            }
+        }
+    }
+
+    post {
+        always { cleanAndNotify() }
+    }
+}

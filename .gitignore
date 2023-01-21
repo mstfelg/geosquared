@@ -1,0 +1,28 @@
+.DS_Store
+build/
+**/build
+web/war
+web/extras
+/.gradle/
+# non-standard file location in SASS https://github.com/EtienneMiret/sass-gradle-plugin/pull/24#issuecomment-1377513773
+web/.gradle
+
+# InteliJ specific
+!.idea/
+.idea/*
+# Share code styles between members
+!.idea/codeStyles
+*.iml
+**/out
+
+# Eclipse specific
+.project
+.settings
+**/.classpath
+**/bin
+**/src/main/javacc/**/*.java
+/web/gradle.properties
+/uitest/cypress/snapshots
+/uitest/cypress/videos
+/retex/editor-web/dist
+/retex/renderer-web/dist

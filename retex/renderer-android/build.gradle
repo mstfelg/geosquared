@@ -1,0 +1,51 @@
+buildscript {
+    dependencies {
+        classpath "com.android.tools.build:gradle:$rootProject.androidPluginVersion"
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
+
+group 'com.himamis.retex'
+version '0.1'
+
+publishing {
+    publications {
+        library(MavenPublication) {
+            artifact "${project.buildDir}/outputs/aar/${project.name}-${project.version}.aar"
+
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+
+                configurations.compile.allDependencies.each {
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', it.group)
+                    dependencyNode.appendNode('artifactId', it.name)
+                    dependencyNode.appendNode('version', it.version)
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    api project(':renderer-base')
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.9'
+}
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
+
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        targetSdkVersion rootProject.targetSdkVersion
+        minSdkVersion rootProject.minSdkVersion
+    }
+}

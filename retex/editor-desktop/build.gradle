@@ -1,0 +1,14 @@
+plugins {
+	id 'java-library'
+	id 'application'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+	api project(':renderer-desktop')
+	api project(':editor-base')
+}
+
+mainClassName = 'com.himamis.retex.editor.desktop.Test'

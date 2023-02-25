@@ -24,7 +24,7 @@ public class EuclidianStyleConstants {
 	/**
 	 * size for draggable points ie free points and point on path/region
 	 */
-	public static final int DEFAULT_POINT_SIZE = 5;
+	public static final int DEFAULT_POINT_SIZE = 2;
 
 	/**
 	 * max size for points
@@ -59,14 +59,14 @@ public class EuclidianStyleConstants {
 	/* default size of dependent point in Graphing Calculator */
 	public static final int DEFAULT_POINT_SIZE_DEPENDENT_GRAPHING = 5;
 
-	public static final int DEFAULT_LINE_THICKNESS = 5;
+	public static final int DEFAULT_LINE_THICKNESS = 2;
 	
-	public static final int AXES_THICKNESS = 3;
+	public static final int AXES_THICKNESS = 4;
 
-	public static final int OBJSTYLE_DEFAULT_LINE_THICKNESS = 5;
+	public static final int OBJSTYLE_DEFAULT_LINE_THICKNESS = 2;
 
 	/* default line thickness of angle on Geometry app */
-	public static final int OBJSTYLE_DEFAULT_LINE_THICKNESS_ANGLE_GEOMETRY = 4;
+	public static final int OBJSTYLE_DEFAULT_LINE_THICKNESS_ANGLE_GEOMETRY = 2;
 
 	public static final double OBJSTYLE_DEFAULT_ALPHA = 178;
 	public static final int OBJSTYLE_DEFAULT_LINE_OPACITY = 178; // 0.7 * 255;

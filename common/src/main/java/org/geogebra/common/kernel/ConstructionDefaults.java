@@ -62,7 +62,7 @@ import com.google.j2objc.annotations.Weak;
  */
 public class ConstructionDefaults implements SettingListener {
 	/** default alpha for polygons */
-	public static final float DEFAULT_POLYGON_ALPHA = 0.1f;
+	public static final float DEFAULT_POLYGON_ALPHA = 0.05f;
 
 	// DEFAULT GeoElement types
 	/** not a default geo */
@@ -142,17 +142,16 @@ public class ConstructionDefaults implements SettingListener {
 	// DEFAULT COLORs
 	// points
 	/** default color for points */
-	public static final GColor colPoint = GColor.BLUE;
+	public static final GColor colPoint = GColor.BLACK;
 
 	/** default color for points with alpha GGB-1916 */
-	public static final GColor colPointAlpha = GColor.newColor(
-			77, 77, 255);
+	public static final GColor colPointAlpha = GColor.BLACK;
 
 	/** default color for dependent points */
-	public static final GColor colDepPoint = GColor.DARK_GRAY;
+	public static final GColor colDepPoint = GColor.BLACK;
 
 	/** default color for points on path */
-	public static final GColor colPathPoint = GeoGebraColorConstants.LIGHTBLUE;
+	public static final GColor colPathPoint = GColor.BLACK;
 
 	/** default color for points in region */
 	public static final GColor colRegionPoint = colPathPoint;
@@ -191,9 +190,9 @@ public class ConstructionDefaults implements SettingListener {
 
 	// polygons
 	/** default color for polygons */
-	public static final GColor colPolygon = GeoGebraColorConstants.GGB_BROWN;
+	public static final GColor colPolygon = GColor.DARK_BLUE;
 	/** new default color for polygons */
-	public static final GColor colPolygonG = GeoGebraColorConstants.GEOGEBRA_OBJECT_BLUE;
+	public static final GColor colPolygonG = GColor.DARK_BLUE;
 
 	/** default color for pyramids and cones */
 	public static final GColor colPyramidAndCone = GeoGebraColorConstants.GEOGEBRA_OBJECT_ORANGE;

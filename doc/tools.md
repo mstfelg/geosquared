@@ -1,6 +1,6 @@
 # How to add a new Mode to GeoGebra
  
-* in `geogebra.euclidian.EuclidianConstants.java` define a onstant
+* in `geogebra.euclidian.EuclidianConstants.java` define a constant
   ```
   public static final int MODE_MIRROR_AT_CIRCLE = 54;
   ```
@@ -30,7 +30,9 @@
   ```
   Similar changes are needed in the unbundled apps, e.g. `common.gui.toolcategorization.impl.GraphingToolCollectionFactory`
  
-* Add the name and help to translation system (for local testing you can also add them to `menu.properties` for Android and Classic5 and `properties_keys_en.js` for web)
+* Add the name and help to translation system (for local testing you can also
+add them to `menu.properties` for Android and Classic5 and
+`properties_keys_en.js` for web)
   ```
   MirrorAtCircle=Mirror point at circle
   MirrorAtCircle.Help=Point and Circle
@@ -38,6 +40,9 @@
 
 * Make a new icon: 
   * SVG needed for web (see `ToolbarSvgResources` for list of SVGs and `GGWToolbar` for ID -> SVG mapping)
-  * 32x32px and 64x64px PNGs needed for desktop/Android/iOS. If you don't want to add the tool to Classic 5, an exception in `ResourceAvailability` test is needed.
+  * 32x32px and 64x64px PNGs needed for desktop/Android/iOS. If you don't want
+  to add the tool to Classic 5, an exception in `ResourceAvailability` test is
+  needed.
 
-**Note:** when testing with Classic5, don't forget Options -> Restore Default Settings so that you can see the new Tool :)
+**Note:** when testing with Classic5, don't forget Options -> Restore Default
+Settings so that you can see the new Tool :)

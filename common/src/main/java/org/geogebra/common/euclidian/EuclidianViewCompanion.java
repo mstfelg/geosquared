@@ -252,7 +252,7 @@ public class EuclidianViewCompanion {
 		}
 		int viewDim = view.getDimension();
 		for (int i = 0; i < viewDim; i++) {
-			view.setShowAxis(i, evs.getShowAxis(i), true);
+			view.setShowAxis(i, evs.getShowAxis(i), false);
 		}
 		String[] tempAxesLabels = evs.getAxesLabels();
 

@@ -83,7 +83,7 @@ public class EuclidianSettings extends AbstractSettings {
 	private GDimension sizeFromFile;
 	private GDimension size;
 
-	protected boolean[] showAxes = { true, true, true };
+	protected boolean[] showAxes = { false, false, false };
 	protected boolean[] selectionAllowed = { true, true, true };
 	protected boolean[] showAxesNumbers = { true, true, true };
 	protected boolean[] logAxes = { false, false, false };
@@ -224,7 +224,7 @@ public class EuclidianSettings extends AbstractSettings {
 		Arrays.fill(axisCross, 0);
 		Arrays.fill(positiveAxes, false);
 		Arrays.fill(selectionAllowed, true);
-		Arrays.fill(showAxes, true);
+		Arrays.fill(showAxes, false);
 
 		showGrid = false;
 

@@ -358,7 +358,7 @@ public abstract class EuclidianView implements EuclidianViewInterfaceCommon,
 	/** number formats for axes */
 	protected NumberFormatAdapter[] axesNumberFormat;
 	/** Flags for axis visibility */
-	protected boolean[] showAxes = { true, true };
+	protected boolean[] showAxes = { false, false };
 	/** Flags for logarithmic axes */
 	protected boolean[] logAxes = { false, false };
 
@@ -371,7 +371,7 @@ public abstract class EuclidianView implements EuclidianViewInterfaceCommon,
 	/** bit mask for axis style, see EuclidianStyleConstants.AXES_BOLD */
 	int axesLineType;
 	/** whether grid is bold */
-	protected boolean gridIsBold = false;
+	protected boolean gridIsBold = true;
 	/** tooltip mode in this view */
 	protected int tooltipsInThisView = EuclidianStyleConstants.TOOLTIPS_AUTOMATIC;
 
@@ -416,7 +416,7 @@ public abstract class EuclidianView implements EuclidianViewInterfaceCommon,
 	/** point capturing mode */
 	protected int pointCapturingMode;
 	/** show coords of view corners */
-	private boolean showAxesCornerCoords = true;
+	private boolean showAxesCornerCoords = false;
 
 	private boolean animationButtonSelected = false;
 	/**
@@ -5640,8 +5640,8 @@ public abstract class EuclidianView implements EuclidianViewInterfaceCommon,
 
 		pointCapturingMode = EuclidianStyleConstants.POINT_CAPTURING_AUTOMATIC;
 
-		showAxesNumbers[0] = true;
-		showAxesNumbers[1] = true;
+		showAxesNumbers[0] = false;
+		showAxesNumbers[1] = false;
 		axesLabels[0] = null;
 		axesLabels[1] = null;
 		axesUnitLabels[0] = null;

@@ -1218,7 +1218,12 @@ public enum Commands implements CommandsConstants,
 
 	IsVertexForm(TABLE_FUNCTION),
 
-	TableToChart(TABLE_ENGLISH);
+	TableToChart(TABLE_ENGLISH),
+	
+	/* Geosquared Commands */
+	Foot(TABLE_GEOMETRY)
+	
+	;
 
 	private static final Commands[] RENAMED = {
 			Commands.Binomial, Commands.BinomialCoefficient, Commands.Mean,

@@ -496,7 +496,7 @@ public abstract class EuclidianView3D extends EuclidianView
 		// plane
 		xOyPlane = (GeoPlane3DConstant) cons.getXOYPlane();
 		xOyPlane.setEuclidianVisible(true);
-		xOyPlane.setGridVisible(true);
+		xOyPlane.setGridVisible(false);
 		xOyPlane.setPlateVisible(true);
 		// xOyPlane.setFading(0);
 		xOyPlaneDrawable = (DrawPlane3D) createDrawable(xOyPlane);

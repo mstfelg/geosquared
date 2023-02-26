@@ -157,7 +157,7 @@ public class EuclidianSettings extends AbstractSettings {
 	private double fileYScale;
 
 	// Defaults to points-only labeling
-	private int defaultLabelingStyle = ConstructionDefaults.LABEL_VISIBLE_POINTS_ONLY;
+	private int defaultLabelingStyle = ConstructionDefaults.LABEL_VISIBLE_NOT_SET;
 
 	private GColor lastSelectedPenColor = GColor.BLACK;
 	private GColor lastSelectedHighlighterColor = GColor.MOW_GREEN;

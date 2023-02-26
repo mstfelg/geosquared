@@ -168,7 +168,7 @@ public abstract class GeoElement extends ConstructionElement implements GeoEleme
 	/** fixed (cannot be moved or deleted) */
 	protected boolean fixed = false;
 	/** label, value, caption, label+value */
-	public int labelMode = LABEL_CAPTION;
+	public int labelMode = LABEL_DEFAULT;
 	/** cartesian, polar or complex */
 	protected int toStringMode = Kernel.COORD_CARTESIAN;
 	/** default (foreground) color */
@@ -565,7 +565,7 @@ public abstract class GeoElement extends ConstructionElement implements GeoEleme
 	 * set label mode to default mode
 	 */
 	protected void setLabelModeDefault() {
-		labelMode = LABEL_NAME;
+		labelMode = LABEL_CAPTION;
 	}
 
 	@Override

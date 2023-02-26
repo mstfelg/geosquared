@@ -211,9 +211,7 @@ public class AutoCompleteTextFieldC implements AutoCompleteTextField {
 	 * Notify all handlers about Enter key release
 	 */
 	public void onEnter() {
-		for (KeyHandler listener : new ArrayList<>(keyHandlers)) {
-			listener.keyReleased(new KeyEventC(KeyCodes.ENTER));
-		}
+		return; // disabled
 	}
 
 	@Override

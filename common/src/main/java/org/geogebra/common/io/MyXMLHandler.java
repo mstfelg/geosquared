@@ -2361,9 +2361,6 @@ public class MyXMLHandler implements DocHandler {
 		boolean ok = true;
 
 		switch (eName) {
-		case "dockBar":
-			ok = handleDockBar(attrs);
-			break;
 		case "input":
 			ok = handleAlgebraInput(attrs);
 			break;
@@ -2399,18 +2396,6 @@ public class MyXMLHandler implements DocHandler {
 					: ("false".equals(attrs.get("top")) ? InputPosition.bottom
 							: InputPosition.algebraView);
 			tmp_perspective.setInputPosition(ip);
-
-			return true;
-		} catch (RuntimeException e) {
-			logError(e);
-			return false;
-		}
-	}
-
-	private boolean handleDockBar(LinkedHashMap<String, String> attrs) {
-		try {
-			tmp_perspective.setShowDockBar(!attrs.get("show").equals("false"));
-			tmp_perspective.setDockBarEast(!attrs.get("east").equals("false"));
 
 			return true;
 		} catch (RuntimeException e) {

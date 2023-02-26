@@ -168,7 +168,7 @@ public abstract class GeoElement extends ConstructionElement implements GeoEleme
 	/** fixed (cannot be moved or deleted) */
 	protected boolean fixed = false;
 	/** label, value, caption, label+value */
-	public int labelMode = LABEL_DEFAULT;
+	public int labelMode = LABEL_CAPTION;
 	/** cartesian, polar or complex */
 	protected int toStringMode = Kernel.COORD_CARTESIAN;
 	/** default (foreground) color */
@@ -1178,7 +1178,7 @@ public abstract class GeoElement extends ConstructionElement implements GeoEleme
 		algebraVisible = geo.algebraVisible;
 		labelOffsetX = geo.labelOffsetX;
 		labelOffsetY = geo.labelOffsetY;
-		caption = geo.caption;
+		caption = "$%n$";
 		inverseFill = geo.inverseFill;
 		if (isTraceable() && geo.isTraceable()) {
 			((Traceable) this).setTrace(((Traceable) geo).getTrace());
@@ -2486,9 +2486,8 @@ public abstract class GeoElement extends ConstructionElement implements GeoEleme
 
 	@Override
 	public String getRawCaption() {
-		if (caption == null) {
+		if (caption == null)
 			return "";
-		}
 		return caption;
 	}
 

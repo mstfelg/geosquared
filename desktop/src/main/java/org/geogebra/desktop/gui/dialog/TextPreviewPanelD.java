@@ -118,8 +118,8 @@ public class TextPreviewPanelD extends TextPreviewer {
 
 	@Override
 	protected EuclidianViewD getEuclidianView() {
-		boolean[] showAxes = { false, false };
-		boolean showGrid = false;
+		boolean[] showAxes = { true, true };
+		boolean showGrid = true;
 		if (ev == null) {
 			ev = new EuclidianViewTextPreview(new EuclidianControllerD(kernel),
 					showAxes, showGrid, EuclidianView.EVNO_GENERAL, null);

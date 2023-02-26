@@ -294,8 +294,6 @@ public class OptionsMenuD extends BaseMenu
 				app.setToolbarPosition(SwingConstants.NORTH, false);
 				app.setShowToolBarNoUpdate(true);
 				app.setShowToolBarHelpNoUpdate(false);
-				app.setShowDockBar(true, false);
-				app.setDockBarEast(true);
 				app.updateContentPane();
 
 			}

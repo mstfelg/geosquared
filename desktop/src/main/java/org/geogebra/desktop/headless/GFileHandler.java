@@ -24,7 +24,11 @@ public class GFileHandler {
 	 * @throws Exception
 	 *             for invalid XML; MyErrors are ignored
 	 */
-	public static boolean loadXML(App app, InputStream is, boolean isMacroFile)
+
+	public static boolean loadXML(App app, InputStream is, boolean isMacroFile) throws Exception {
+		return loadXML(app, is, isMacroFile, false);
+	}
+	public static boolean loadXML(App app, InputStream is, boolean isMacroFile, boolean isGsq)
 			throws Exception {
 		try {
 			if (!isMacroFile) {
@@ -41,38 +45,10 @@ public class GFileHandler {
 			app.resetUniqueId();
 
 			BufferedInputStream bis = new BufferedInputStream(is);
-
-			if (bis.markSupported()) {
-				bis.mark(Integer.MAX_VALUE);
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(bis, Charsets.getUtf8()));
-				String str = reader.readLine();
-
-				// check if .ggb file is actually a base64 file from 4.2 Chrome
-				// App
-				if (str != null && str.startsWith("UEs")) {
-
-					StringBuilder sb = new StringBuilder(str);
-					sb.append("\n");
-
-					while ((str = reader.readLine()) != null) {
-						sb.append(str).append('\n');
-					}
-
-					reader.close();
-					is.close();
-					bis.close();
-
-					byte[] zipFile = Base64.decode(sb.toString());
-
-					return app.loadXML(zipFile);
-				}
-
-				bis.reset();
-			}
-
-			((MyXMLioJre) app.getXMLio()).readZipFromInputStream(bis,
-					isMacroFile);
+			if (isGsq)
+				((MyXMLioJre) app.getXMLio()).readFromInputStream(bis);
+			else
+				((MyXMLioJre) app.getXMLio()).readZipFromInputStream(bis, isMacroFile);
 
 			is.close();
 			bis.close();
@@ -85,8 +61,6 @@ public class GFileHandler {
 
 			// command list may have changed due to macros
 			app.updateCommandDictionary();
-
-			((AppDI) app).hideDockBarPopup();
 
 			return true;
 		} catch (MyError err) {

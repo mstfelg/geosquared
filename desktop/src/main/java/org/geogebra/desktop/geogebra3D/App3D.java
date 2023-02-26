@@ -264,13 +264,6 @@ public class App3D extends AppD {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				frame.setVisible(false);
-				if (tubeLoginHasToBeShown) {
-					perspectivePopupHasToBeShown = perspectivePopupHasToBeShown
-							&& superShowTubeLogin();
-				}
-				if (perspectivePopupHasToBeShown) {
-					superShowPerspectivePopup();
-				}
 			}
 		});
 		JPanel closePanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -300,7 +293,6 @@ public class App3D extends AppD {
 	boolean input3DPopupShowing = false;
 	boolean tubeLoginHasToBeShown = false;
 	private boolean tubeLoginIsShowing = false;
-	boolean perspectivePopupHasToBeShown = false;
 
 	@Override
 	protected boolean showTubeLogin() {
@@ -322,20 +314,6 @@ public class App3D extends AppD {
 	public void isShowingLogInDialog() {
 		tubeLoginIsShowing = true;
 		runThreadForCheckInput3D();
-	}
-
-	@Override
-	protected void showPerspectivePopup() {
-		if (input3DPopupShowing) {
-			perspectivePopupHasToBeShown = true;
-		} else {
-			superShowPerspectivePopup();
-		}
-	}
-
-	void superShowPerspectivePopup() {
-		perspectivePopupHasToBeShown = false;
-		super.showPerspectivePopup();
 	}
 
 	/**

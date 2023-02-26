@@ -249,7 +249,7 @@ public abstract class App implements UpdateSelection, AppInterface, EuclidianHos
 	 * whether axes should be visible when EV is created first element of this
 	 * array is for x-axis, second for y-axis
 	 */
-	protected final boolean[] showAxes = { false, false };
+	protected final boolean[] showAxes = { true, true };
 	/** whether axes should be logarithmic when EV is created */
 	protected final boolean[] logAxes = { false, false };
 

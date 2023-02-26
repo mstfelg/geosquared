@@ -304,16 +304,12 @@ public class OptionsLayoutD
 		ckAllowStyleBar.setSelected(settings.getLayout().isAllowingStyleBar());
 
 		ckShowSideBar.removeActionListener(this);
-		ckShowSideBar.setSelected(app.isShowDockBar());
 		ckShowSideBar.addActionListener(this);
 
 		rbSidebarEast.removeActionListener(this);
 		rbSidebarWest.removeActionListener(this);
 		rbButtonSidebar.removeActionListener(this);
 		rbPespectiveSidebar.removeActionListener(this);
-
-		rbSidebarEast.setSelected(app.getDockBar().isEastOrientation());
-		rbButtonSidebar.setSelected(app.getDockBar().isShowButtonBar());
 
 		rbSidebarEast.addActionListener(this);
 		rbSidebarWest.addActionListener(this);
@@ -366,15 +362,6 @@ public class OptionsLayoutD
 			app.setShowAlgebraInput(ckShowInputBar.isSelected(), true);
 		} else if (source == ckShowInputHelp) {
 			app.setShowInputHelpToggle(ckShowInputHelp.isSelected());
-		}
-		// sidebar settings
-		else if (source == ckShowSideBar) {
-			app.setShowDockBar(ckShowSideBar.isSelected());
-		} else if (source == rbButtonSidebar || source == rbPespectiveSidebar) {
-			app.getDockBar().setShowButtonBar(rbButtonSidebar.isSelected());
-		} else if (source == rbSidebarEast || source == rbSidebarWest) {
-			app.setDockBarEast(rbSidebarEast.isSelected());
-			app.setShowDockBar(ckShowSideBar.isSelected());
 		}
 
 		wrappedPanel.requestFocus();

@@ -83,7 +83,7 @@ public class EuclidianSettings extends AbstractSettings {
 	private GDimension sizeFromFile;
 	private GDimension size;
 
-	protected boolean[] showAxes = { false, false, false };
+	protected boolean[] showAxes = { true, true, true };
 	protected boolean[] selectionAllowed = { true, true, true };
 	protected boolean[] showAxesNumbers = { true, true, true };
 	protected boolean[] logAxes = { false, false, false };
@@ -156,7 +156,8 @@ public class EuclidianSettings extends AbstractSettings {
 	private double fileXScale;
 	private double fileYScale;
 
-	private int defaultLabelingStyle = ConstructionDefaults.LABEL_VISIBLE_NOT_SET;
+	// Defaults to points-only labeling
+	private int defaultLabelingStyle = ConstructionDefaults.LABEL_VISIBLE_POINTS_ONLY;
 
 	private GColor lastSelectedPenColor = GColor.BLACK;
 	private GColor lastSelectedHighlighterColor = GColor.MOW_GREEN;

@@ -74,11 +74,7 @@ public class Perspective {
 
 	private boolean showToolBarHelp;
 
-	private boolean showDockBar;
-
-	private boolean isDockBarEast;
-
-	private int labelingStyle = ConstructionDefaults.LABEL_VISIBLE_NOT_SET;
+	private int labelingStyle = ConstructionDefaults.LABEL_VISIBLE_POINTS_ONLY;
 
 	private final int defaultID;
 	/** translation keys for perspective names */
@@ -165,8 +161,6 @@ public class Perspective {
 		this.setShowToolBar(true);
 		this.setShowToolBarHelp(false);
 		this.setToolBarPosition(SwingConstants.NORTH);
-		this.setDockBarEast(true);
-		this.setShowDockBar(true);
 	}
 
 	/**
@@ -260,9 +254,10 @@ public class Perspective {
 
 	/**
 	 * @return If the grid should be displayed.
+	 * TODO: Hacky solution to get grids and axes hidden by default
 	 */
 	public boolean getShowGrid() {
-		return showGrid;
+		return false;
 	}
 
 	/**
@@ -277,7 +272,7 @@ public class Perspective {
 	 * @return If the axes should be displayed.
 	 */
 	public boolean getShowAxes() {
-		return showAxes;
+		return false;
 	}
 
 	/**
@@ -354,36 +349,6 @@ public class Perspective {
 	 */
 	public void setShowToolBarHelp(boolean showToolBarHelp) {
 		this.showToolBarHelp = showToolBarHelp;
-	}
-
-	/**
-	 * @return whether dockbar is shown
-	 */
-	public boolean getShowDockBar() {
-		return showDockBar;
-	}
-
-	/**
-	 * @param showDockBar
-	 *            whether dockbar is shown
-	 */
-	public void setShowDockBar(boolean showDockBar) {
-		this.showDockBar = showDockBar;
-	}
-
-	/**
-	 * @return true for dockbar on eastern side
-	 */
-	public boolean isDockBarEast() {
-		return isDockBarEast;
-	}
-
-	/**
-	 * @param isDockBarEast
-	 *            true to place the dockbar east, false for west
-	 */
-	public void setDockBarEast(boolean isDockBarEast) {
-		this.isDockBarEast = isDockBarEast;
 	}
 
 	// *********************************************************
@@ -469,9 +434,7 @@ public class Perspective {
 	private void getDockbarXML(StringBuilder sb) {
 		// dockbar
 		sb.append("\t<dockBar show=\"");
-		sb.append(getShowDockBar());
 		sb.append("\" east=\"");
-		sb.append(isDockBarEast());
 		sb.append("\" />\n");
 
 	}

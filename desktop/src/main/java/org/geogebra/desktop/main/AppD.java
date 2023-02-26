@@ -196,7 +196,6 @@ import org.geogebra.desktop.gui.dialog.DecorationListRenderer;
 import org.geogebra.desktop.gui.dialog.PointStyleListRenderer;
 import org.geogebra.desktop.gui.dialog.options.OptionsAdvancedD;
 import org.geogebra.desktop.gui.inputbar.AlgebraInputD;
-import org.geogebra.desktop.gui.layout.DockBar;
 import org.geogebra.desktop.gui.layout.DockPanelD;
 import org.geogebra.desktop.gui.layout.LayoutD;
 import org.geogebra.desktop.gui.menubar.OptionsMenuController;
@@ -305,10 +304,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	 * help panel for the input bar.
 	 */
 	private JSplitPane applicationSplitPane;
-
-	private DockBarInterface dockBar;
-	private boolean showDockBar = true;
-	private boolean isDockBarEast = true;
 
 	protected boolean showAlgebraView = true;
 
@@ -2321,11 +2316,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 				westPanel = new JPanel(new BorderLayout(0, 0));
 			}
 
-			if (dockBar == null) {
-				dockBar = newDockBar(this);
-				dockBar.setEastOrientation(isDockBarEast);
-			}
-
 			// clear the panels
 			northPanel.removeAll();
 			southPanel.removeAll();
@@ -2361,16 +2351,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 			mainPanel.add(westPanel, getLocalization().borderWest());
 
 			applicationPanel.add(mainPanel, BorderLayout.CENTER);
-
-			if (showDockBar) {
-				if (dockBar.isEastOrientation()) {
-					applicationPanel.add((Component) dockBar,
-							getLocalization().borderEast());
-				} else {
-					applicationPanel.add((Component) dockBar,
-							getLocalization().borderWest());
-				}
-			}
 
 			// configure the panel components (adds toolbar, input bar, dockbar)
 			updateApplicationLayout();
@@ -2631,48 +2611,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	@Override
 	public boolean showMenuBar() {
 		return showMenuBar;
-	}
-
-	@Override
-	public void hideDockBarPopup() {
-		if (getDockBar() != null) {
-			getDockBar().hidePopup();
-		}
-	}
-
-	public DockBarInterface getDockBar() {
-		return dockBar;
-	}
-
-	public boolean isShowDockBar() {
-		return showDockBar;
-	}
-
-	public boolean isDockBarEast() {
-		return isDockBarEast;
-	}
-
-	public void setDockBarEast(boolean isDockBarEast) {
-		this.isDockBarEast = isDockBarEast;
-		if (getDockBar() != null) {
-			dockBar.setEastOrientation(isDockBarEast);
-		}
-	}
-
-	/**
-	 * Set show dockBar with GUI update
-	 * 
-	 * @param showDockBar whether to show the dockbar
-	 */
-	public void setShowDockBar(boolean showDockBar) {
-		setShowDockBar(showDockBar, true);
-	}
-
-	public void setShowDockBar(boolean showDockBar, boolean update) {
-		this.showDockBar = showDockBar;
-		if (update) {
-			updateContentPane();
-		}
 	}
 
 	// ***************************************************************************
@@ -3124,7 +3062,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 			// command list may have changed due to macros
 			updateCommandDictionary();
 
-			hideDockBarPopup();
 
 			return true;
 		} catch (Exception err) {
@@ -4502,9 +4439,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 						showDockPopup = showTubeLogin();
 					}
 
-					if (showDockPopup && isShowDockBar()) {
-						showPerspectivePopup();
-					}
 				});
 			}
 		}
@@ -4531,10 +4465,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		}
 
 		return showDockPopup;
-	}
-
-	protected void showPerspectivePopup() {
-		getDockBar().showPopup();
 	}
 
 	/**
@@ -4717,10 +4647,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 
 	public static void newLayout(AppD app) {
 		app.guiManager.setLayout(new LayoutD(app));
-	}
-
-	public static DockBarInterface newDockBar(AppD app) {
-		return new DockBar(app);
 	}
 
 	@Override

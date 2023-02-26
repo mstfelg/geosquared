@@ -17,7 +17,7 @@ public class LabelSettings extends AbstractSettings {
 
 	private void initLabelVisibility() {
 		labelVisibility = LabelVisibility.PointsOnly;
-		labelVisibilityForMenu = LabelVisibility.NotSet;
+		labelVisibilityForMenu = LabelVisibility.PointsOnly;
 	}
 
 	public LabelVisibility getLabelVisibility() {
@@ -42,7 +42,7 @@ public class LabelSettings extends AbstractSettings {
 	 * Sets the labelVisibilityForMenu to NotSet and notifies listeners.
 	 */
 	public void resetDefaultForMenu() {
-		labelVisibilityForMenu = LabelVisibility.NotSet;
+		labelVisibilityForMenu = LabelVisibility.PointsOnly;
 		notifyListeners();
 	}
 

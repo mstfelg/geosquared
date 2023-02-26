@@ -148,9 +148,8 @@ public class OptionsMenuController {
 	 * Update the selected item in the labeling capturing menu.
 	 */
 	public void updateMenuLabeling() {
-		if (menuLabeling == null) {
+		if (menuLabeling == null)
 			return;
-		}
 
 		LabelVisibility labelVisibility =
 				app.getSettings().getLabelSettings().getLabelVisibilityForMenu();

@@ -131,25 +131,27 @@ public class GlobalKeyDispatcherD extends GlobalKeyDispatcher
 		AlgebraInputD algIn = (AlgebraInputD)(((GuiManagerD) app.getGuiManager()).getAlgebraInput());
 		String cmd = null;
 
-		if (ch == 'a') cmd = "anglebisector";
-		if (ch == 'm') cmd = "center";
-		if (ch == 'k') cmd = "circle";
-		if (ch == 'h') cmd = "dilate";
-		if (ch == 'f') cmd = "foot";
-		if (ch == 'i') cmd = "intersect";
-		if (ch == 'l') cmd = "line";
-		if (ch == 'b') cmd = "perpendicularbisector";
-		if (ch == 'p') cmd = "perpendicularline";
-		if (ch == '.') cmd = "point";
-		if (ch == ',') cmd = "polar";
-		if (ch == 'g') cmd = "polygon";
-		if (ch == 'r') cmd = "reflect";
-		if (ch == 'o') cmd = "rotate";
-		if (ch == 's') cmd = "segment";
-		if (ch == 't') cmd = "tangent";
-		if (ch == 'y') cmd = "translate";
-		if (ch == 'c') cmd = "trianglecenter";
-		if (ch == 'v') cmd = "vector";
+		if (ch == 'a') cmd = "AngleBisector";
+		if (ch == 'm') cmd = "Center";
+		if (ch == 'k') cmd = "Circle";
+		if (ch == 'h') cmd = "Dilate";
+		if (ch == 'f') cmd = "Foot";
+		if (ch == '\'') cmd = "SetColor";
+		if (ch == '"') cmd = "SetLineStyle";
+		if (ch == 'i') cmd = "Intersect";
+		if (ch == 'l') cmd = "Line";
+		if (ch == 'b') cmd = "PerpendicularBisector";
+		if (ch == 'p') cmd = "PerpendicularLine";
+		if (ch == '.') cmd = "Point";
+		if (ch == ',') cmd = "Polar";
+		if (ch == 'g') cmd = "Polygon";
+		if (ch == 'r') cmd = "Reflect";
+		if (ch == 'o') cmd = "Rotate";
+		if (ch == 's') cmd = "Segment";
+		if (ch == 't') cmd = "Tangent";
+		if (ch == 'y') cmd = "Translate";
+		if (ch == 'c') cmd = "TriangleCenter";
+		if (ch == 'v') cmd = "Vector";
 
 		if (cmd != null) {
 			algIn.insertCommand(cmd);

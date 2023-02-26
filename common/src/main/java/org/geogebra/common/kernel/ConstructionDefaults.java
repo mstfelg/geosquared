@@ -296,7 +296,7 @@ public class ConstructionDefaults implements SettingListener {
 
 	private int lineThickness = EuclidianStyleConstants.DEFAULT_LINE_THICKNESS;
 	private int pointSize = EuclidianStyleConstants.DEFAULT_POINT_SIZE;
-	private int dependentPointSize;
+	private int dependentPointSize = pointSize;
 	private int angleSize = EuclidianStyleConstants.DEFAULT_ANGLE_SIZE;
 	private float filling = DEFAULT_POLYGON_ALPHA;
 
@@ -345,9 +345,7 @@ public class ConstructionDefaults implements SettingListener {
 	}
 
 	private int getDependentPointSize() {
-		return (cons.getApplication().isUnbundledGraphing())
-						? EuclidianStyleConstants.DEFAULT_POINT_SIZE_DEPENDENT_GRAPHING
-						: EuclidianStyleConstants.DEFAULT_POINT_SIZE_DEPENDENT;
+		return pointSize;
 	}
 
 	/**
@@ -980,7 +978,7 @@ public class ConstructionDefaults implements SettingListener {
 
 		if (defaultLabelMode) {
 			// label visibility
-			int labelingStyle = app == null ? LABEL_VISIBLE_USE_DEFAULTS
+			int labelingStyle = app == null ? LABEL_VISIBLE_POINTS_ONLY
 					: app.getCurrentLabelingStyle();
 
 			// automatic labelling:

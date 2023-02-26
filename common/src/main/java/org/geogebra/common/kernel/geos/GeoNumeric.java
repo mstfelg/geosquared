@@ -1744,7 +1744,7 @@ public class GeoNumeric extends GeoElement
 		// label visibility
 		App app = getKernel().getApplication();
 		int labelingStyle = app == null
-				? ConstructionDefaults.LABEL_VISIBLE_USE_DEFAULTS
+				? ConstructionDefaults.LABEL_VISIBLE_POINTS_ONLY
 				: app.getCurrentLabelingStyle();
 
 		// automatic labelling:

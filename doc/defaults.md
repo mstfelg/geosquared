@@ -14,3 +14,6 @@
 
 
 Defaults labels are in `EuclidianSettings.java`, `GeoElement.setLabelModeFromStylebar`
+
+* General labeling rule is set by `GeoElement.setLabelModeDefault`
+* Settings set from Options > Labeling is in `App.getCurrentLabelingStyle`

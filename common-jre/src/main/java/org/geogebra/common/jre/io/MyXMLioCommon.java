@@ -2,6 +2,7 @@ package org.geogebra.common.jre.io;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.InputStream;
 import java.util.zip.ZipInputStream;
 
 import org.geogebra.common.jre.gui.MyImageJre;
@@ -18,6 +19,11 @@ public final class MyXMLioCommon extends MyXMLioJre {
 			throws Exception {
 		// TODO Auto-generated method stub
 
+	}
+	@Override
+	public void readFromInputStream(InputStream is)
+			throws Exception {
+		
 	}
 
 	@Override

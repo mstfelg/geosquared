@@ -129,6 +129,9 @@ public abstract class MyXMLioJre extends MyXMLio {
 	protected abstract void readZip(ZipInputStream zip, boolean isGGTfile)
 			throws Exception;
 
+	public abstract void readFromInputStream(InputStream is)
+			throws Exception;
+
 	/**
 	 * Handles the XML file stored in buffer.
 	 * 
@@ -213,73 +216,16 @@ public abstract class MyXMLioJre extends MyXMLio {
 	 * @throws IOException
 	 *             on write error
 	 */
-	final public void writeGeoGebraFile(OutputStream os,
-			boolean includeThumbail) throws IOException {
+	final public void writeGeoGebraFile(OutputStream os, boolean includeThumbail) throws IOException {
 		boolean isSaving = kernel.isSaving();
 		kernel.setSaving(true);
 
 		try {
-			// zip stream
-			ZipOutputStream zip = new ZipOutputStream(os);
-			OutputStreamWriter osw = new OutputStreamWriter(zip,
-					Charsets.getUtf8());
-
-			// write construction images
-			writeConstructionImages(kernel.getConstruction(), zip);
-
-			// write construction thumbnails
-			if (includeThumbail) {
-				writeThumbnail(zip, XML_FILE_THUMBNAIL);
-			}
-
-			// save macros
-			if (kernel.hasMacros()) {
-				// get all registered macros from kernel
-				ArrayList<Macro> macros = kernel.getAllMacros();
-
-				// write all images used by macros
-				writeMacroImages(macros, zip);
-
-				// write all macros to one special XML file in zip
-				zip.putNextEntry(new ZipEntry(XML_FILE_MACRO));
-				osw.write(getFullMacroXML(macros));
-				osw.flush();
-				zip.closeEntry();
-			}
-
-			// write library JavaScript to one special file in zip
-			zip.putNextEntry(new ZipEntry(JAVASCRIPT_FILE));
-			osw.write(kernel.getLibraryJavaScript());
-			osw.flush();
-			zip.closeEntry();
-
-			// write XML file for defaults
-			StringBuilder sb2d = new StringBuilder();
-			StringBuilder sb3d = null;
-			if (app.is3D()) {
-				sb3d = new StringBuilder();
-			}
-			cons.getConstructionDefaults().getDefaultsXML(sb2d, sb3d);
-
-			zip.putNextEntry(new ZipEntry(XML_FILE_DEFAULTS_2D));
-			osw.write(sb2d.toString());
-			osw.flush();
-			zip.closeEntry();
-			if (app.is3D()) {
-				zip.putNextEntry(new ZipEntry(XML_FILE_DEFAULTS_3D));
-				osw.write(sb3d.toString());
-				osw.flush();
-				zip.closeEntry();
-			}
-
-			// write XML file for construction
-			zip.putNextEntry(new ZipEntry(XML_FILE));
+			OutputStreamWriter osw = new OutputStreamWriter(os, Charsets.getUtf8());
 			osw.write(getFullXML());
 			osw.flush();
-			zip.closeEntry();
-
 			osw.close();
-			zip.close();
+
 		} catch (IOException e) {
 			throw e;
 		} finally {

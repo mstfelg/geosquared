@@ -45,15 +45,14 @@ public class GeoGebraPreferencesD {
 
 	// Windows -> APPDATA, space in "GeoGebra 5.0"
 	// Mac / Linux -> user.home, hidden folder, no space in ".GeoGebra5.0"
-	public static final String PREFS_PATH = AppD.WINDOWS
-			? (System.getenv("APPDATA") + "/GeoGebra "
-					+ GeoGebraConstants.SHORT_VERSION_STRING + "/prefs/")
-			: (System.getProperty("user.home") + "/.GeoGebra"
-					+ GeoGebraConstants.SHORT_VERSION_STRING + "/prefs/");
+	public static final String PREFS_PATH = System.getProperty("user.home") + "/.config/geogebra/";
+
+	public static final String USERS_PREFS = PREFS_PATH + "prefs.xml";
+	public static final String OBJECTS_PREFS = PREFS_PATH + "defaults.xml";
+	public static final String MACROS_PREFS = PREFS_PATH + "macros.ggt";
 
 	public static final String WINDOWS_USERS_PREFS = PREFS_PATH + "prefs.xml";
-	public static final String WINDOWS_OBJECTS_PREFS = PREFS_PATH
-			+ "defaults.xml";
+	public static final String WINDOWS_OBJECTS_PREFS = PREFS_PATH + "defaults.xml";
 	public static final String WINDOWS_MACROS_PREFS = PREFS_PATH + "macros.ggt";
 
 	public static final String AUTHOR = "author";
@@ -377,7 +376,6 @@ public class GeoGebraPreferencesD {
 	 * Saves preferences by taking the application's current values.
 	 */
 	public void saveXMLPreferences(AppD app) {
-
 		String userPrefsXML = app.getPreferencesXML();
 		StringBuilder sb = new StringBuilder();
 		app.getKernel().getConstruction().getConstructionDefaults()
@@ -385,38 +383,24 @@ public class GeoGebraPreferencesD {
 		String objectPrefsXML = sb.toString();
 		byte[] macros = app.getMacroFileAsByteArray();
 
-		if (isSaveSettingsToFile()) {
+		// make sure folder exists
+		UtilD.mkdirs(new File(PREFS_PATH));
 
-			// make sure folder exists
-			UtilD.mkdirs(new File(PREFS_PATH));
+		UtilD.writeStringToFile(userPrefsXML, USERS_PREFS);
+		UtilD.writeStringToFile(objectPrefsXML, OBJECTS_PREFS);
+		UtilD.writeByteArrayToFile(macros, MACROS_PREFS);
+		return;
 
-			UtilD.writeStringToFile(userPrefsXML, WINDOWS_USERS_PREFS);
-			UtilD.writeStringToFile(objectPrefsXML, WINDOWS_OBJECTS_PREFS);
-
-			UtilD.writeByteArrayToFile(macros, WINDOWS_MACROS_PREFS);
-
-			return;
-
-		}
-
-		ggbPrefs.put(GeoGebraPreferences.XML_USER_PREFERENCES, userPrefsXML);
-
-		try {
-			getPref().savePreference(GeoGebraPreferences.XML_DEFAULT_OBJECT_PREFERENCES,
-					objectPrefsXML);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Log.error("object defaults too long");
-		}
+		// ggbPrefs.put(GeoGebraPreferences.XML_USER_PREFERENCES, userPrefsXML);
 
 		// store current tools including icon images as ggt file (byte array)
-		putByteArray(TOOLS_FILE_GGT, app.getMacroFileAsByteArray());
-
-		try {
-			ggbPrefs.flush();
-		} catch (Exception e) {
-			Log.debug(e + "");
-		}
+		// putByteArray(TOOLS_FILE_GGT, app.getMacroFileAsByteArray());
+		//
+		// try {
+		// 	ggbPrefs.flush();
+		// } catch (Exception e) {
+		// 	Log.debug(e + "");
+		// }
 	}
 
 	/**
@@ -536,82 +520,76 @@ public class GeoGebraPreferencesD {
 	 * for ggb files.
 	 */
 	public void loadXMLPreferences(AppD app) {
+
 		app.setWaitCursor();
 
-		if (isSaveSettingsToFile()) {
-			Log.debug("Preferences loaded from " + WINDOWS_USERS_PREFS);
-			String userPrefsXML = UtilD.loadFileIntoString(WINDOWS_USERS_PREFS);
-			String objectPrefsXML = UtilD
-					.loadFileIntoString(WINDOWS_OBJECTS_PREFS);
+		Log.debug("Preferences loaded from " + USERS_PREFS);
+		String userPrefsXML = UtilD.loadFileIntoString(USERS_PREFS);
+		String objectPrefsXML = UtilD
+				.loadFileIntoString(OBJECTS_PREFS);
 
-			byte[] ggtFile = UtilD.loadFileIntoByteArray(WINDOWS_MACROS_PREFS);
+		byte[] ggtFile = UtilD.loadFileIntoByteArray(MACROS_PREFS);
 
-			if (ggtFile != null) {
-				app.loadMacroFileFromByteArray(ggtFile, true);
-			}
-
-			if (userPrefsXML != null) {
-				app.setXML(userPrefsXML, false);
-			} else {
-				app.setXML(factoryDefaultXml, false);
-			}
-
-			if (objectPrefsXML != null
-					&& !objectPrefsXML.equals(factoryDefaultXml)) {
-				boolean eda = app.getKernel().getElementDefaultAllowed();
-				app.getKernel().setElementDefaultAllowed(true);
-				app.getKernel().getConstruction().setIgnoringNewTypes(true);
-				app.setXML(objectPrefsXML, false);
-				app.getKernel().getConstruction().setIgnoringNewTypes(false);
-				app.getKernel().setElementDefaultAllowed(eda);
-			}
-
-			app.updateToolBar();
-			app.setDefaultCursor();
-			return;
-
+		if (ggtFile != null) {
+			app.loadMacroFileFromByteArray(ggtFile, true);
 		}
+
+		if (userPrefsXML != null) {
+			app.setXML(userPrefsXML, false);
+		} else {
+			app.setXML(factoryDefaultXml, false);
+		}
+
+		if (objectPrefsXML != null
+				&& !objectPrefsXML.equals(factoryDefaultXml)) {
+			boolean eda = app.getKernel().getElementDefaultAllowed();
+			app.getKernel().setElementDefaultAllowed(true);
+			app.getKernel().getConstruction().setIgnoringNewTypes(true);
+			app.setXML(objectPrefsXML, false);
+			app.getKernel().getConstruction().setIgnoringNewTypes(false);
+			app.getKernel().setElementDefaultAllowed(eda);
+		}
+
+		app.updateToolBar();
+		app.setDefaultCursor();
 
 		// load this preferences xml file in application
-		try {
-			// load tools from ggt file (byte array)
-			byte[] ggtFile = getByteArray(TOOLS_FILE_GGT, null);
-			app.loadMacroFileFromByteArray(ggtFile, true);
-
-			// load preferences xml
-			String xml = getPref().loadPreference(GeoGebraPreferences.XML_USER_PREFERENCES,
-					factoryDefaultXml);
-			app.setXML(xml, false);
-
-			String xmlDef = getPref().loadPreference(
-					GeoGebraPreferences.XML_DEFAULT_OBJECT_PREFERENCES, factoryDefaultXml);
-			if (!xmlDef.equals(factoryDefaultXml)) {
-				boolean eda = app.getKernel().getElementDefaultAllowed();
-				app.getKernel().setElementDefaultAllowed(true);
-				app.setXML(xmlDef, false);
-				app.getKernel().setElementDefaultAllowed(eda);
-			}
-			app.updateToolBar();
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-
-		app.setDefaultCursor();
+		// try {
+		// 	// load tools from ggt file (byte array)
+		// 	byte[] ggtFile = getByteArray(TOOLS_FILE_GGT, null);
+		// 	app.loadMacroFileFromByteArray(ggtFile, true);
+		//
+		// 	// load preferences xml
+		// 	String xml = getPref().loadPreference(GeoGebraPreferences.XML_USER_PREFERENCES,
+		// 			factoryDefaultXml);
+		// 	app.setXML(xml, false);
+		//
+		// 	String xmlDef = getPref().loadPreference(
+		// 			GeoGebraPreferences.XML_DEFAULT_OBJECT_PREFERENCES, factoryDefaultXml);
+		// 	if (!xmlDef.equals(factoryDefaultXml)) {
+		// 		boolean eda = app.getKernel().getElementDefaultAllowed();
+		// 		app.getKernel().setElementDefaultAllowed(true);
+		// 		app.setXML(xmlDef, false);
+		// 		app.getKernel().setElementDefaultAllowed(eda);
+		// 	}
+		// 	app.updateToolBar();
+		// } catch (Throwable e) {
+		// 	e.printStackTrace();
+		// }
+		//
+		// app.setDefaultCursor();
 	}
 
 	/**
 	 * Clears all user preferences.
 	 */
 	public void clearPreferences(App app) {
-
-		if (isSaveSettingsToFile()) {
-			try {
-				UtilD.delete(new File(WINDOWS_OBJECTS_PREFS));
-				UtilD.delete(new File(WINDOWS_USERS_PREFS));
-				UtilD.delete(new File(WINDOWS_MACROS_PREFS));
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		try {
+			UtilD.delete(new File(OBJECTS_PREFS));
+			UtilD.delete(new File(USERS_PREFS));
+			UtilD.delete(new File(MACROS_PREFS));
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		try {
 			ggbPrefs.clear();
@@ -619,10 +597,6 @@ public class GeoGebraPreferencesD {
 		} catch (Exception e) {
 			Log.debug(e + "");
 		}
-	}
-
-	private boolean isSaveSettingsToFile() {
-		return AppD.WINDOWS || AppD.MAC_OS;
 	}
 
 	/**

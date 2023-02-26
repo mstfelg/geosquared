@@ -889,10 +889,6 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 
 		dialogManager.setLabels();
 
-		if (getApp().getDockBar() != null) {
-			getApp().getDockBar().setLabels();
-		}
-
 	}
 
 	@Override

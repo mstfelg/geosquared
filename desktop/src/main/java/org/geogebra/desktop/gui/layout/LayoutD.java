@@ -87,9 +87,6 @@ public class LayoutD extends Layout implements SettingListener {
 		app.setShowAlgebraInput(perspective.getShowInputPanel(), false);
 		app.setInputPosition(perspective.getInputPosition(), false);
 
-		app.setDockBarEast(perspective.isDockBarEast());
-		app.setShowDockBar(perspective.getShowDockBar(), false);
-
 		// change the dock panel layout
 		dockManager.applyPerspective(perspective.getSplitPaneData(),
 				perspective.getDockPanelData());
@@ -174,8 +171,6 @@ public class LayoutD extends Layout implements SettingListener {
 
 		perspective.setToolBarPosition(app.getToolbarPosition());
 		perspective.setShowToolBarHelp(app.showToolBarHelp());
-		perspective.setShowDockBar(app.isShowDockBar());
-		perspective.setDockBarEast(app.isDockBarEast());
 
 		return perspective;
 	}

@@ -358,7 +358,7 @@ public abstract class EuclidianView implements EuclidianViewInterfaceCommon,
 	/** number formats for axes */
 	protected NumberFormatAdapter[] axesNumberFormat;
 	/** Flags for axis visibility */
-	protected boolean[] showAxes = { false, false };
+	protected boolean[] showAxes = { true, true };
 	/** Flags for logarithmic axes */
 	protected boolean[] logAxes = { false, false };
 

@@ -300,18 +300,7 @@ public abstract class MyXMLio {
 		StringBuilder sb = new StringBuilder();
 		addXMLHeader(sb);
 		addGeoGebraHeader(sb, app);
-		// sb.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
-		// sb.append("<geogebra format=\"" + GeoGebra.XML_FILE_FORMAT + "\"");
-		// sb.append("
-		// xsi:noNamespaceSchemaLocation=\"http://www.geogebra.org/");
-		// sb.append(GeoGebra.GGB_XSD_FILENAME); //eg ggb.xsd
-		// sb.append("\" xmlns=\"\"
-		// xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" >\n");
 
-		// save gui settings
-		sb.append(app.getCompleteUserInterfaceXML(false));
-
-		// save construction
 		cons.getConstructionXML(sb, false);
 
 		sb.append("</geogebra>");

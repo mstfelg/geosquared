@@ -46,6 +46,8 @@ public enum FileExtensions {
 
 	GEOGEBRA("ggb", false, false),
 
+	GEOSQUARED("gsq", false, false),
+
 	GEOGEBRA_TOOL("ggt", false, false);
 
 	final private boolean allowedImage;

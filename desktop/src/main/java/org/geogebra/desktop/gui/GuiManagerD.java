@@ -1602,7 +1602,7 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 
 		FileExtensions[] fileExtensions;
 		String[] fileDescriptions;
-		fileExtensions = new FileExtensions[] { FileExtensions.GEOGEBRA };
+		fileExtensions = new FileExtensions[] { FileExtensions.GEOSQUARED };
 		fileDescriptions = new String[] { GeoGebraConstants.APPLICATION_NAME
 				+ " " + loc.getMenu("Files") };
 		getApp().needThumbnailFor3D();
@@ -1902,6 +1902,7 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 
 					return ext.equals(FileExtensions.GEOGEBRA)
 							|| ext.equals(FileExtensions.GEOGEBRA_TOOL)
+							|| ext.equals(FileExtensions.GEOSQUARED)
 							|| ext.equals(FileExtensions.HTML)
 							|| ext.equals(FileExtensions.HTM)
 							|| ext.equals(FileExtensions.OFF);
@@ -1940,6 +1941,7 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 			// GeoGebra File Filter
 			MyFileFilter fileFilter = new MyFileFilter();
 			fileFilter.addExtension(FileExtensions.GEOGEBRA);
+			fileFilter.addExtension(FileExtensions.GEOSQUARED);
 			fileFilter.addExtension(FileExtensions.GEOGEBRA_TOOL);
 			fileFilter.addExtension(FileExtensions.HTML);
 			fileFilter.addExtension(FileExtensions.HTM);

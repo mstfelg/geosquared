@@ -21,6 +21,7 @@ package org.geogebra.desktop.io;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.ZipEntry;
@@ -52,6 +53,23 @@ public class MyXMLioD extends MyXMLioJre {
 	 */
 	public MyXMLioD(Kernel kernel, Construction cons) {
 		super(kernel, cons);
+	}
+
+	public final void readFromInputStream(InputStream is) throws Exception {
+		byte[] xmlFileBuffer = null;
+		xmlFileBuffer = UtilD.loadIntoMemory(is);
+		handler = getGGBHandler();
+
+		// ggb file: remove all macros from kernel before processing
+		kernel.removeAllMacros();
+
+		// process construction
+		if (xmlFileBuffer == null) return;
+
+		kernel.getConstruction().setFileLoading(true);
+		app.getCompanion().resetEuclidianViewForPlaneIds();
+		processXMLBuffer(xmlFileBuffer, false, false);
+		kernel.getConstruction().setFileLoading(false);
 	}
 
 	@Override

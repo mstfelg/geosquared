@@ -2,16 +2,25 @@
 
 GeoGebra done right.
 
+
 ## Features
 
-1. Many keybindings for every tool.
-2. Without unnecessary dependencies and code.
-3. More geometry functions.
-3. xdg base directory support.
-3. Better integration with Asymptote.
+1. Extra tool keybindings.
+2. Extra geometry functions.
+3. Removed unnecessary dependencies and code.
+4. XDG base directory support.
+5. `.gsq` text/xml format. Reduced size. Easily searchable.
+6. Modular macros.
 
-## Run
+## Work in progress
+Expect things to break.
+
+1. Better integration with Asymptote.
+2. Better commandline interface
+
+## Build
 
 ```
 ./gradlew :desktop:run
+./gradlew :desktop:distTar
 ```

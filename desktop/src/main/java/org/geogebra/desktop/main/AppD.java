@@ -696,6 +696,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 					+ "  --showAxes=BOOLEAN\tshow/hide coordinate axes\n"
 					+ "  --showGrid=BOOLEAN\tshow/hide grid\n"
 					+ "  --settingsFile=PATH|FILENAME\tload/save settings from/in a local file\n"
+					+ "  --config=PATH|FILENAME\tread settings from another file\n"
 					+ "  --resetSettings\treset current settings\n"
 					+ "  --regressionFile=FILENAME"
 							+ "\texport textual representations of dependent objects, then exit\n"
@@ -2957,7 +2958,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	}
 
 	public boolean loadExistingFile(File file, boolean isMacroFile) {
-
 		setWaitCursor();
 		if (!isMacroFile) {
 			// hide navigation bar for construction steps if visible
@@ -2974,6 +2974,9 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	 */
 	final public boolean loadXML(File file, boolean isMacroFile) {
 		FileInputStream fis = null;
+		FileExtensions ext = StringUtil.getFileExtension(file.getName());
+		Boolean isGsq = FileExtensions.GEOSQUARED.equals(ext);
+
 		try {
 			fis = new FileInputStream(file);
 
@@ -2983,10 +2986,10 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 			// update
 			if (!initing) {
 				initing = true;
-				success = GFileHandler.loadXML(this, fis, isMacroFile);
+				success = GFileHandler.loadXML(this, fis, isMacroFile, isGsq);
 				initing = false;
 			} else {
-				success = GFileHandler.loadXML(this, fis, isMacroFile);
+				success = GFileHandler.loadXML(this, fis, isMacroFile, isGsq);
 			}
 
 			if (success && !isMacroFile) {

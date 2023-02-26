@@ -1451,7 +1451,7 @@ public abstract class App implements UpdateSelection, AppInterface, EuclidianHos
 	 *
 	 * @return labeling style; AUTOMATIC is resolved either to
 	 *         USE_DEFAULTS/POINTS_ONLY (for 3D) or OFF depending on visibility
-	 *         of AV
+	 *         of AV (Algebra View)
 	 */
 	public int getCurrentLabelingStyle() {
 		if (getLabelingStyle() == ConstructionDefaults.LABEL_VISIBLE_AUTOMATIC) {
@@ -1459,7 +1459,7 @@ public abstract class App implements UpdateSelection, AppInterface, EuclidianHos
 					&& getGuiManager().hasAlgebraViewShowing()
 					&& getAlgebraView().isVisible()) {
 					// default behaviour for other views
-					return ConstructionDefaults.LABEL_VISIBLE_USE_DEFAULTS;
+					return ConstructionDefaults.LABEL_VISIBLE_POINTS_ONLY;
 			}
 			// no AV: no label
 			return ConstructionDefaults.LABEL_VISIBLE_ALWAYS_OFF;

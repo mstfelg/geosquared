@@ -119,26 +119,6 @@ class FileMenuD extends BaseMenu implements EventRenderable {
 
 		}
 
-		// recent SubMenu
-		JMenu submenuRecent = new JMenu(loc.getMenu("Recent"));
-		submenuRecent.setIcon(app.getEmptyIcon());
-		add(submenuRecent);
-
-		// Recent files list
-		int size = AppD.getFileListSize();
-		if (size > 0) {
-			for (int i = 0; i < AppD.MAX_RECENT_FILES; i++) {
-				File file = AppD.getFromFileList(i);
-				if (file != null) {
-					mi = new JMenuItem(file.getName());
-					mi.setIcon(app.getMenuIcon(GuiResourcesD.GEOGEBRA));
-					ActionListener al = new LoadFileListener(app, file);
-					mi.addActionListener(al);
-					submenuRecent.add(mi);
-				}
-			}
-		}
-
 		addSeparator();
 		mi = add(saveAction);
 		setMenuShortCutAccelerator(mi, 'S');

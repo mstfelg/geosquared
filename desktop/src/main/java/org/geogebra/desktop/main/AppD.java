@@ -3,12 +3,10 @@ GeoGebra - Dynamic Mathematics for Everyone
 http://www.geogebra.org
 
 This file is part of GeoGebra.
-
 This program is free software; you can redistribute it and/or modify it 
 under the terms of the GNU General Public License as published by 
 the Free Software Foundation.
-
- */
+*/
 
 package org.geogebra.desktop.main;
 
@@ -234,33 +232,10 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 @SuppressWarnings("javadoc")
 public class AppD extends App implements KeyEventDispatcher, AppDI {
-
-	/**
-	 * License file
-	 */
 	public static final String LICENSE_FILE = "/org/geogebra/desktop/_license.txt";
 
-	/**
-	 * Command line arguments
-	 */
 	protected CommandLineArguments cmdArgs;
-
 	private DefaultSettings defaultSettings;
-
-	// ==============================================================
-	// JAR fields
-	// ==============================================================
-
-	/**
-	 * Possible alternative names for geogebra.jar. Used for 3D webstart at the
-	 * moment.
-	 */
-	public final static String[] GEOGEBRA_JAR_ALT = { "geogebra.jar",
-			"geogebra-jogl2.jar" };
-
-	// ==============================================================
-	// LOCALE fields
-	// ==============================================================
 
 	// ==============================================================
 	// FILE fields
@@ -270,12 +245,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	protected File currentPath;
 	protected File currentImagePath;
 	protected File currentFile = null;
-
-	/**
-	 * maximum number of files to (save &amp;) show in File &rarr; Recent
-	 * submenu
-	 */
-	public static final int MAX_RECENT_FILES = 8;
 
 	// ==============================================================
 	// RESOURCE fields
@@ -3287,15 +3256,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 			// http://jars.geogebra.org/webstart/4.2/jnlp/geogebra.jar.pack.gz
 			if (path.endsWith(packgz)) {
 				path = path.substring(0, path.length() - packgz.length());
-			}
-
-			// remove "geogebra.jar" from end of codebase string
-			for (int i = 0; i < GEOGEBRA_JAR_ALT.length; ++i) {
-				if (path.endsWith(GEOGEBRA_JAR_ALT[i])) {
-					runningFromJar = true;
-					path = path.substring(0,
-							path.length() - GEOGEBRA_JAR_ALT[i].length());
-				}
 			}
 
 			// set codebase

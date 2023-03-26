@@ -212,7 +212,6 @@ public class GeoGebraFrame extends JFrame
 			}
 
 			instances.remove(this);
-			GeoGebraPreferencesD.getPref().saveFileList();
 
 			if (instances.size() == 0) {
 				super.setVisible(false);
@@ -315,9 +314,6 @@ public class GeoGebraFrame extends JFrame
 		if (settingsFile.length() > 0) {
 			GeoGebraPreferencesD.setPropertyFileName(settingsFile);
 		}
-
-		// load list of previously used files
-		GeoGebraPreferencesD.getPref().loadFileList();
 
 		// create first window and show it
 		createNewWindow(args, wnd);

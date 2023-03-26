@@ -303,38 +303,6 @@ public class GeoGebraPreferencesD {
 	}
 
 	/**
-	 * Loads the names of the eight last used files from the preferences backing
-	 * store.
-	 */
-	public void loadFileList() {
-		// load last eight files
-		for (int i = AppD.MAX_RECENT_FILES; i >= 1; i--) {
-			File file = new File(getPref().loadPreference(APP_FILE_ + i, ""));
-			AppD.addToFileList(file);
-		}
-	}
-
-	/**
-	 * Saves the names of the eight last used files.
-	 */
-	public void saveFileList() {
-		try {
-			// save last four files
-			for (int i = 1; i <= AppD.MAX_RECENT_FILES; i++) {
-				File file = AppD.getFromFileList(i - 1);
-				if (file != null) {
-					getPref().savePreference(APP_FILE_ + i,
-							file.getCanonicalPath());
-				} else {
-					getPref().savePreference(APP_FILE_ + i, "");
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
 	 * Inits factory default XML if there are no old preferences or if the
 	 * version number changed. The default XML is the preferences XML of this
 	 * virgin application.

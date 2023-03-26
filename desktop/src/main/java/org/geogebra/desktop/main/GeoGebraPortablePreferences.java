@@ -185,45 +185,6 @@ public class GeoGebraPortablePreferences extends GeoGebraPreferencesD {
 	}
 
 	/**
-	 * Loads the names of the eight last used files from the preferences backing
-	 * store.
-	 */
-	@Override
-	public void loadFileList() {
-		// load last used files
-		for (int i = AppD.MAX_RECENT_FILES; i >= 1; i--) {
-			File file = new File(get(APP_FILE_ + i, ""));
-			AppD.addToFileList(file);
-		}
-	}
-
-	/**
-	 * Saves the names of the four last used files.
-	 */
-	@Override
-	public void saveFileList() {
-		String path;
-		try {
-			// save last used files
-			for (int i = 1; i <= AppD.MAX_RECENT_FILES; i++) {
-				File file = AppD.getFromFileList(i - 1);
-				if (file != null) {
-					path = file.getCanonicalPath();
-					set(APP_FILE_ + i, path);
-				} else {
-					set(APP_FILE_ + i, "");
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		// If this is the last call to the pref system and is always done on
-		// exit
-		// this should be enough: (??)
-		storePreferences();
-	}
-
-	/**
 	 * Saves preferences by taking the application's current values. Apparently
 	 * no limit on property length! (# preferences: 8192), so no need to split
 	 * up in pieces :-) But we have to convert byte[]&rarr;b64&rarr;String

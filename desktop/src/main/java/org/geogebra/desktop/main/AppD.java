@@ -559,34 +559,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	}
 
 	/**
-	 * Sets the look and feel.
-	 * 
-	 * @param isSystemLAF
-	 *            true &rarr; set system LAF, false &rarr; set cross-platform
-	 *            LAF
-	 */
-	public static void setLAF(boolean isSystemLAF) {
-		try {
-			if (isSystemLAF) {
-				UIManager.setLookAndFeel(
-						UIManager.getSystemLookAndFeelClassName());
-			} else {
-				UIManager.setLookAndFeel(
-						UIManager.getCrossPlatformLookAndFeelClassName());
-			}
-		} catch (Exception e) {
-			Log.debug(e + "");
-		}
-	}
-
-	/**
-	 * Toggles between the system LAF and the cross-platform LAF
-	 */
-	public static void toggleCrossPlatformLAF() {
-		setLAF(!UIManager.getLookAndFeel().isNativeLookAndFeel());
-	}
-
-	/**
 	 * init factories
 	 */
 	protected void initFactories() {

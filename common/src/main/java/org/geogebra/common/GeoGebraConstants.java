@@ -145,12 +145,6 @@ public interface GeoGebraConstants {
 
 	String SUITE_URL_NAME = "calculator";
 
-	/**
-	 * used by version checker, so that sys admins can disable version checking
-	 * for *all* ggb versions with
-	 * HKEY_LOCAL_MACHINE/Software/JavaSoft/Prefs/geogebra/version_check_allow =
-	 * false
-	 */
 	public static final String PREFERENCES_ROOT_GLOBAL = "/geogebra";
 
 	/** eg HKEY_CURRENT_USER/Software/JavaSoft/Prefs/geogebra42/ */

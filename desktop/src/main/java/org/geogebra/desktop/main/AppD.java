@@ -636,7 +636,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 					+ "  --showCAS=BOOLEAN\tshow/hide CAS window\n"
 					// here "disable" is also accepted
 					+ "  --show3D=BOOLEAN\tshow/hide 3D window\n"
-					+ "  --showSplash=BOOLEAN\tenable/disable the splash screen\n"
 					+ "  --enableUndo=BOOLEAN\tenable/disable Undo\n"
 					+ "  --fontSize=NUMBER\tset default font size\n"
 					+ "  --showAxes=BOOLEAN\tshow/hide coordinate axes\n"
@@ -3409,9 +3408,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 					}
 					Log.trace("" + msg);
 
-					// make sure splash screen not showing (will be in front)
-					GeoGebra.hideSplash();
-
 					isErrorDialogShowing = true;
 					final String msgDisplay = msg.substring(0,
 							Math.min(msg.length(), 1000));
@@ -3446,9 +3442,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 
 				@Override
 				public void showCommandError(String command, String message) {
-
-					// make sure splash screen not showing (will be in front)
-					GeoGebra.hideSplash();
 
 					Object[] options = { getLocalization().getMenu("OK"),
 							getLocalization().getMenu("ShowOnlineHelp") };

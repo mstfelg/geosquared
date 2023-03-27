@@ -170,8 +170,6 @@ public interface GeoGebraConstants {
 
 	public static final String INSTALLERS_URL = "https://www.geogebra.org/download";
 
-	/** Splash filename -- used for online */
-	public static final String SPLASH_STRING = "splash.png";
 	// archive
 	/** short version, for online archive */
 	public static final String SHORT_VERSION_STRING = "5.0";
@@ -222,9 +220,6 @@ public interface GeoGebraConstants {
 	public static final String GGM_CLASS_NAME = "geogebraweb";
 	/** mimetype of GGB files */
 	public static final String GGW_MIME_TYPE = "application/vnd.geogebra.file";
-
-	/** Splash timeout in miliseconds */
-	public static final int SPLASH_DIALOG_DELAY = 1000;
 
 	/** license URL */
 	public static final String GGB_LICENSE_URL = "https://www.geogebra.org/license";

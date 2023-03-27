@@ -92,17 +92,13 @@ public class GeoGebraFrame extends JFrame
 
 	private static final long serialVersionUID = 1L;
 
+	private static List<NewInstanceListener> instanceListener = new ArrayList<>();
 	private static ArrayList<GeoGebraFrame> instances = new ArrayList<>();
-
 	private static GeoGebraFrame activeInstance;
 	private static Object lock = new Object();
 
 	private static FileDropTargetListener dropTargetListener;
-
-	private static List<NewInstanceListener> instanceListener = new ArrayList<>();
-
 	protected AppD app;
-
 	private Timer timer;
 	private long born;
 
@@ -169,7 +165,6 @@ public class GeoGebraFrame extends JFrame
 	@Override
 	public Locale getLocale() {
 		Locale defLocale = GeoGebraPreferencesD.getPref().getDefaultLocale();
-
 		if (defLocale == null) {
 			return super.getLocale();
 		}
@@ -269,12 +264,7 @@ public class GeoGebraFrame extends JFrame
 	 *            file name parameter
 	 */
 	public static synchronized void main(CommandLineArguments args) {
-
-		init(args, new GeoGebraFrame());
-	}
-
-	protected static synchronized void init(CommandLineArguments args,
-			GeoGebraFrame wnd) {
+		GeoGebraFrame wnd = new GeoGebraFrame();
 
 		// Set GeoGebraPreferences mode (system properties or property file)
 		// before it is called for the first time
@@ -285,7 +275,6 @@ public class GeoGebraFrame extends JFrame
 
 		// create first window and show it
 		createNewWindow(args, wnd);
-
 	}
 
 	/**
@@ -355,10 +344,6 @@ public class GeoGebraFrame extends JFrame
 		// set Application's size, position and font size
 
 		final AppD app = wnd.createApplication(args, wnd);
-		// app.openPopUps(true);
-
-		// app.getApplicationGUImanager().setMenubar(new
-		// geogebra.gui.menubar.GeoGebraMenuBar(app));
 		app.getGuiManager().initMenubar();
 
 		// init GUI
@@ -370,29 +355,6 @@ public class GeoGebraFrame extends JFrame
 		wnd.setDropTarget(new DropTarget(wnd, dropTargetListener));
 		wnd.addWindowFocusListener(wnd);
 		updateAllTitles();
-
-		// handle application args visible
-		if (args != null) {
-			if (args.containsArg("showAlgebraWindow")) {
-				boolean showAlgebraWindow = args
-						.getBooleanValue("showAlgebraWindow", true);
-				app.getGuiManager().setShowView(showAlgebraWindow,
-						App.VIEW_ALGEBRA);
-			}
-
-			if (args.containsArg("showSpreadsheet")) {
-				boolean showSpreadsheet = args
-						.getBooleanValue("showSpreadsheet", true);
-				app.getGuiManager().setShowView(showSpreadsheet,
-						App.VIEW_SPREADSHEET);
-			}
-
-			if (args.containsArg("showCAS") && app.supportsView(App.VIEW_CAS)) {
-				boolean showCAS = args.getBooleanValue("showCAS", true);
-				app.getGuiManager().setShowView(showCAS, App.VIEW_CAS);
-			}
-
-		}
 
 		app.updateMenubar();
 
@@ -465,8 +427,11 @@ public class GeoGebraFrame extends JFrame
 
 	private static void updateAllTitles() {
 		for (int i = 0; i < instances.size(); i++) {
+			if (instances.get(i) == null)
+				continue;
 			AppD app = instances.get(i).app;
-			app.updateTitle();
+			if (app != null)
+				app.updateTitle();
 		}
 	}
 

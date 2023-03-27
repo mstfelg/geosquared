@@ -157,7 +157,6 @@ public class KeyboardSettings extends AbstractSettings {
 				return;
 			}
 		}
-		Log.debug("Unsupported keyboard locale: " + string);
 	}
 
 	public static int getLocaleCount() {

@@ -3589,30 +3589,6 @@ public class Kernel implements SpecialPointsListener, ConstructionStepper {
 		if (view instanceof EuclidianView) {
 			lastAttachedEV = (EuclidianView) view;
 		}
-
-		printAttachedViews();
-	}
-
-	private void printAttachedViews() {
-
-		// can give java.util.ConcurrentModificationException
-		try {
-			if (!notifyViewsActive) {
-				Log.debug("Number of registered views = 0");
-			} else {
-				StringBuilder sb = new StringBuilder();
-				sb.append("Number of registered views = ");
-				sb.append(views.size());
-				for (View view : views) {
-					sb.append("\n * ");
-					sb.append(view.getClass());
-				}
-
-				Log.debug(sb.toString());
-			}
-		} catch (Exception e) {
-			Log.debug(e.getMessage());
-		}
 	}
 
 	/**
@@ -3623,8 +3599,6 @@ public class Kernel implements SpecialPointsListener, ConstructionStepper {
 	 */
 	public void detach(View view) {
 		views.remove(view);
-		printAttachedViews();
-
 	}
 
 	/**

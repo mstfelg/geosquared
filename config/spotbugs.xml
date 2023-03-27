@@ -45,7 +45,6 @@
         <Package name="org.geogebra.desktop.gui.editor" />
     </Match>
     <Match>
-        <Class name="~org.geogebra.desktop.SplashWindow.*" />
         <Or>
             <Bug pattern="MWN_MISMATCHED_NOTIFY" />
             <Bug pattern="NN_NAKED_NOTIFY" />

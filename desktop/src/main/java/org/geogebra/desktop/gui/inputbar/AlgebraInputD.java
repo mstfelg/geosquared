@@ -305,16 +305,6 @@ public class AlgebraInputD extends JPanel implements ActionListener,
 
 		if (source == btnHelpToggle) {
 
-			// ==========================================
-			// hidden switch to toggle native/crossPlatform LAF
-			if (app.getControlDown() && app.getShiftDown()) {
-				AppD.toggleCrossPlatformLAF();
-				SwingUtilities.updateComponentTreeUI(app.getFrame());
-				app.getFrame().pack();
-				return;
-			}
-			// =========================================
-
 			if (btnHelpToggle.isSelected()) {
 				InputBarHelpPanelD helpPanel = (InputBarHelpPanelD) app
 						.getGuiManager().getInputHelpPanel();

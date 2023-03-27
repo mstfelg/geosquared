@@ -92,11 +92,6 @@ public class GeoGebraFrame extends JFrame
 
 	private static final long serialVersionUID = 1L;
 
-	private static final int VERSION_CHECK_DAYS = 1;
-	// This works only for subversion numbers <= 999 (change 1000 to 10000 for
-	// 9999):
-	private static final int VERSION_TO_LONG_MULTIPLIER = 1000;
-
 	private static ArrayList<GeoGebraFrame> instances = new ArrayList<>();
 
 	private static GeoGebraFrame activeInstance;
@@ -244,7 +239,7 @@ public class GeoGebraFrame extends JFrame
 	}
 
 	String getPreferredTitle() {
-		return app.getCurrentFile() == null ? "GeoGebra Classic 5"
+		return app.getCurrentFile() == null ? "GeoSqured"
 				: app.getCurrentFile().getName();
 	}
 
@@ -281,33 +276,6 @@ public class GeoGebraFrame extends JFrame
 	protected static synchronized void init(CommandLineArguments args,
 			GeoGebraFrame wnd) {
 
-		// Fixing #3772. TODO: This could be moved to somewhat later (to have
-		// proper logging), but *before* any GUI operations.
-		if (AppD.WINDOWS_VISTA_OR_LATER) {
-			try {
-				AppId.setCurrentProcessExplicitAppUserModelID("geogebra.AppId");
-				System.out.println("AppID = "
-						+ AppId.getCurrentProcessExplicitAppUserModelID());
-			} catch (Throwable t) {
-				System.err.println("problem setting AppId: " + t.getMessage());
-			}
-		}
-
-		if (AppD.MAC_OS) {
-			initMacSpecifics();
-		}
-
-		// set look and feel
-		if (args.containsArg("laf")) {
-			AppD.setLAF(args.getStringValue("laf").equals("system"));
-		} else {
-			// system LAF for Windows and Mac; cross-platform for LINUX, others
-			AppD.setLAF(AppD.MAC_OS || AppD.WINDOWS);
-		}
-
-		if (args.containsArg("resetSettings")) {
-			GeoGebraPreferencesD.getPref().clearPreferences(wnd.app);
-		}
 		// Set GeoGebraPreferences mode (system properties or property file)
 		// before it is called for the first time
 		String settingsFile = args.getStringValue("settingsfile");
@@ -337,23 +305,6 @@ public class GeoGebraFrame extends JFrame
 
 	private static void addNewInstanceListener(NewInstanceListener l) {
 		instanceListener.add(l);
-	}
-
-	/**
-	 * MacOS X specific initialization. Note: this method can only be run on a
-	 * Mac!
-	 */
-	public static void initMacSpecifics() {
-		try {
-			// init mac application listener
-			MacApplicationListener.initMacApplicationListener();
-
-			// mac menu bar
-			// System.setProperty("com.apple.macos.useScreenMenuBar", "true");
-			System.setProperty("apple.laf.useScreenMenuBar", "true");
-		} catch (Exception e) {
-			Log.debug(e + "");
-		}
 	}
 
 	public static synchronized GeoGebraFrame createNewWindow(
@@ -453,12 +404,6 @@ public class GeoGebraFrame extends JFrame
 
 		checkCommandLineExport(app);
 
-		// open the sign-in and/or sidebar popup once the GUI has initialized
-		if (args != null && args.getNoOfFiles() == args.getNoOfTools()) {
-			app.setAllowPopups(true);
-			app.showPopUps();
-		}
-
 		for (NewInstanceListener l : instanceListener) {
 			l.newInstance(wnd);
 		}
@@ -484,8 +429,6 @@ public class GeoGebraFrame extends JFrame
 			// init file chooser
 			((DialogManagerD) this.app.getDialogManager())
 					.initFileChooser();
-			// check if newer version is available
-			// must be done last as internet may not be available
 		}
 	}
 
@@ -503,7 +446,7 @@ public class GeoGebraFrame extends JFrame
 		int l = subversions.length;
 		for (int i = 0; i < l; ++i) {
 			String c = subversions[i];
-			n = n * VERSION_TO_LONG_MULTIPLIER + Integer.parseInt(c);
+			n = n * 1000 + Integer.parseInt(c);
 		}
 		return n;
 	}

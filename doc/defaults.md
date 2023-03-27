@@ -1,5 +1,10 @@
+---
+title: Geogebra defaults
+date: 2023-03-26
+---
 
-##
+## Style
+
 * Style in
 `common/src/main/geogebra/common/plugin/EuclideanStyleConstants.java`
 * Other defaults:
@@ -17,8 +22,3 @@ Defaults labels are in `EuclidianSettings.java`, `GeoElement.setLabelModeFromSty
 
 * General labeling rule is set by `GeoElement.setLabelModeDefault`
 * Settings set from Options > Labeling is in `App.getCurrentLabelingStyle`
-
-## File format
-```
-MyXMLioJre.writeGeoGebraFile()
-```

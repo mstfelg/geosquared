@@ -35,7 +35,6 @@ import org.geogebra.common.move.events.BaseEvent;
 import org.geogebra.common.move.ggtapi.TubeAvailabilityCheckEvent;
 import org.geogebra.common.move.views.EventRenderable;
 import org.geogebra.common.util.Charsets;
-import org.geogebra.common.util.debug.Log;
 import org.geogebra.desktop.export.PrintPreviewD;
 import org.geogebra.desktop.gui.GuiManagerD;
 import org.geogebra.desktop.gui.layout.DockManagerD;
@@ -159,7 +158,6 @@ public class GeoGebraMenuBar extends JMenuBar implements EventRenderable {
 	 * Update the menubar.
 	 */
 	public void updateMenubar() {
-		Log.debug("update menu");
 		fileMenu.update();
 		editMenu.update();
 		viewMenu.update();
@@ -275,7 +273,6 @@ public class GeoGebraMenuBar extends JMenuBar implements EventRenderable {
 				pre.setVisible(true);
 			} catch (Exception e) {
 				e.printStackTrace();
-				Log.debug("Print preview not available");
 			} finally {
 				app.setDefaultCursor();
 			}
@@ -395,13 +392,6 @@ public class GeoGebraMenuBar extends JMenuBar implements EventRenderable {
 			sb.append("\nGL Version: " + glVersion);
 		}
 		sb.append("\n\n");
-
-		if (Log.getLogger() != null) {
-			// copy the entire log to systemInfo (maybe not required at all)
-			sb.append("GeoGebraLogger log:\n");
-			sb.append(Log.getEntireLog());
-			sb.append("\n");
-		}
 
 		// copy file log
 		if (app.logFile != null) {

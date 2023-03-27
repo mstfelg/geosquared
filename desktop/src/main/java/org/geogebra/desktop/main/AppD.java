@@ -364,28 +364,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		loc.setApp(this);
 		this.cmdArgs = args;
 		this.prerelease = args != null && args.containsArg("prerelease");
-		if (args != null && !args.containsArg("silent")) {
-			LoggerD logger = new LoggerD();
-			logger.setReading(true);
-			Log.setLogger(logger);
-			Log.setLogDestination(LogDestination.CONSOLE);
-			if (args.containsArg("logLevel")) {
-				Log.setLogLevel(args.getStringValue("logLevel"));
-			}
-			if (args.containsArg("logFile")) {
-				Log.setLogDestination(LogDestination.FILE);
-				logger.setLogFileImpl(args.getStringValue("logFile"));
-			}
-			if (args.containsArg("logShowCaller")) {
-				Log.setCallerShown(args.getBooleanValue("logShowCaller", true));
-			}
-			if (args.containsArg("logShowTime")) {
-				LoggerD.setTimeShown(args.getBooleanValue("logShowTime", true));
-			}
-			if (args.containsArg("logShowLevel")) {
-				Log.setLevelShown(args.getBooleanValue("logShowLevel", true));
-			}
-		}
 
 		setFileVersion(GeoGebraConstants.VERSION_STRING,
 				getConfig().getAppCode());
@@ -3492,90 +3470,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	// **************************************************************************
 
 	LogManager logManager;
-	// String logFile = DownloadManager.getTempDir()+"GeoGebraLog.txt";
-	// public String logFile = "c:\\GeoGebraLog.txt";
 	public StringBuilder logFile = null;
-
-	/*
-	 * code from
-	 * http://blogs.sun.com/nickstephen/entry/java_redirecting_system_out_and
-	 */
-	private void setUpLogging() {
-		Log.debug("Setting up logging");
-		if (Log.getLogDestination() == LogDestination.FILE) {
-			// File logging already set up, don't override:
-			Log.debug(
-					"Logging into explicitly defined file, not using LogManager");
-			return;
-		}
-
-		// initialize logging to go to rolling log file
-		logManager = LogManager.getLogManager();
-		logManager.reset();
-
-		logFile = new StringBuilder(30);
-
-		logFile.append(UtilD.getTempDir());
-		logFile.append("GeoGebraLog_");
-		// randomize filename
-		for (int i = 0; i < 10; i++) {
-			logFile.append((char) ('a' + Math.round(Math.random() * 25)));
-		}
-		logFile.append(".txt");
-
-		Log.debug("Logging is redirected to " + logFile.toString());
-		LoggerD.setTimeShown(false); // do not print the time twice
-
-		// log file max size 10K, 1 file, append-on-open
-		Handler fileHandler;
-		try {
-			fileHandler = new FileHandler(logFile.toString(),
-					Log.LOGFILE_MAXLENGTH, 1, false);
-		} catch (Exception e) {
-			logFile = null;
-			return;
-
-		}
-		fileHandler.setFormatter(new SimpleFormatter());
-		Logger.getLogger("").addHandler(fileHandler);
-
-		// preserve old stdout/stderr streams in case they might be useful
-		// PrintStream stdout = System.out;
-		// PrintStream stderr = System.err;
-
-		// now rebind stdout/stderr to logger
-		Logger logger;
-		LoggingOutputStream los;
-
-		logger = Logger.getLogger("stdout");
-		los = new LoggingOutputStream(logger, StdOutErrLevel.STDOUT);
-
-		try {
-			System.setOut(new PrintStream(los, true, Charsets.UTF_8));
-			logger = Logger.getLogger("stderr");
-			los = new LoggingOutputStream(logger, StdOutErrLevel.STDERR);
-			System.setErr(new PrintStream(los, true, Charsets.UTF_8));
-		} catch (UnsupportedEncodingException e) {
-			// do nothing
-		}
-
-		// show stdout going to logger
-		// System.out.println("Hello world!");
-
-		// now log a message using a normal logger
-		// logger = Logger.getLogger("test");
-		// logger.info("This is a test log message");
-
-		// now show stderr stack trace going to logger
-		// try {
-		// throw new RuntimeException("Test");
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
-
-		// and output on the original stdout
-		// stdout.println("Hello on old stdout");
-	}
 
 	/*
 	 * gets a String from the clipboard

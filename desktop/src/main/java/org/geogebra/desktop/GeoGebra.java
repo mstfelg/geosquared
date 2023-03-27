@@ -25,75 +25,8 @@ import org.geogebra.desktop.main.AppD;
 import org.geogebra.desktop.main.GeoGebraServer;
 
 public class GeoGebra {
-
-	protected GeoGebra() {
-	}
-
 	public static void main(String[] cmdArgs) {
-		(new GeoGebra()).doMain(cmdArgs);
-	}
-
-	/**
-	 * calculate the default font size and according to some heuristics
-	 * 
-	 * @param screenDPI
-	 *            eg 96 for regular screen
-	 *            https://technet.microsoft.com/en-GB/library/dn528846.aspx
-	 * @param screenResX
-	 *            horizontal screen size
-	 * @param screenResY
-	 *            vertical screen size
-	 */
-	public static void setDefaults(int screenDPI, int screenResX,
-			int screenResY) {
-
-		int fontSize = (int) Math.round(screenDPI / 8.0);
-
-		GeoGebraPreferencesXML
-				.setDefaultFontSize(Util.getValidFontSize(fontSize));
-
-		// 96 corresponds to 100%
-		// 192 to 200%
-		double sf = screenDPI / 96.0;
-		GeoGebraPreferencesXML.setDefaultWindowX((int) (800.0 * sf));
-		GeoGebraPreferencesXML.setDefaultWindowY((int) (600.0 * sf));
-	}
-
-	protected void doMain(String[] cmdArgs) {
-
 		CommandLineArguments args = new CommandLineArguments(cmdArgs);
-
-		if (args.containsArg("screenDPI") && args.containsArg("screenX")
-				&& args.containsArg("screenY")) {
-			int screenDPI = Integer.parseInt(args.getStringValue("screenDPI"));
-			int screenX = Integer.parseInt(args.getStringValue("screenX"));
-			int screenY = Integer.parseInt(args.getStringValue("screenY"));
-
-			setDefaults(screenDPI, screenX, screenY);
-		}
-
-		if (args.containsArg("startHttpServer")) {
-			Log.error("startHttpServer");
-			new GeoGebraServer().start();
-			return;
-		}
-		if (args.containsArg("help") || args.containsArg("proverhelp")
-				|| args.containsArg("v")
-				|| args.containsArg("regressionFile")) {
-		}
-
-		// Start GeoGebra
-		try {
-			startGeoGebra(args);
-		} catch (Throwable e) {
-			e.printStackTrace();
-			System.err.flush();
-			AppD.exit(10);
-		}
-	}
-
-	protected void startGeoGebra(CommandLineArguments args) {
-		// create and open first GeoGebra window
 		GeoGebraFrame.main(args);
 	}
 }

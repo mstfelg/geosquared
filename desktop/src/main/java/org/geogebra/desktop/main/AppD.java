@@ -319,8 +319,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 
 	protected boolean isErrorDialogShowing = false;
 
-	public boolean macsandbox = false;
-
 	private CopyPasteD copyPaste;
 	private int centerX;
 	private int centerY;
@@ -389,12 +387,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 			}
 		}
 
-		if (prerelease) {
-			Log.error("*********************************");
-			Log.error("*** Running with --prerelease ***");
-			Log.error("*********************************");
-		}
-
 		setFileVersion(GeoGebraConstants.VERSION_STRING,
 				getConfig().getAppCode());
 
@@ -409,18 +401,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		}
 
 		useFullGui = true;
-
-		// don't want to redirect System.out and System.err when running as
-		// Applet
-		// or eg from Eclipse
-		getCodeBase(); // initialize runningFromJar
-
-		Log.debug("runningFromJar=" + runningFromJar);
-		if (runningFromJar) {
-			setUpLogging();
-		} else {
-			Log.debug("Not setting up logging via LogManager");
-		}
 
 		// needed for JavaScript getCommandName(), getValueString() to work
 		// (security problem running non-locally)
@@ -512,9 +492,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		}
 
 		setUndoActive(undoActive);
-
-		// applet/command line options
-		handleOptionArgs(args);
 
 		initing = false;
 
@@ -638,14 +615,14 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 
 	private static void handleHelpVersionArgs(CommandLineArguments args) {
 
-		System.out.println("GeoGebra " + GeoGebraConstants.VERSION_STRING + " "
+		System.out.println("GeoSquared " + GeoGebraConstants.VERSION_STRING + " "
 				+ GeoGebraConstants.BUILD_DATE + " Java " + getJavaVersion()
 				+ "\n");
 
 		if (args.containsArg("help")) {
 			// help message
 			System.out.println("Usage: java -jar geogebra.jar [OPTION] [FILE]\n"
-					+ "Start GeoGebra with the specified OPTIONs and open the given FILE.\n"
+					+ "Start GeoSquared with the specified OPTIONs and open the given FILE.\n"
 					+ "  --help\t\tprint this message\n"
 					+ "  --v\t\tprint version\n"
 					+ "  --language=LANGUAGE_CODE"
@@ -669,8 +646,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 					+ "  --resetSettings\treset current settings\n"
 					+ "  --regressionFile=FILENAME"
 							+ "\texport textual representations of dependent objects, then exit\n"
-					+ "  --versionCheckAllow=SETTING"
-							+ "\tallow version check (on/off or true/false for single launch)\n"
 					+ "  --logLevel=LEVEL\tset logging level "
 							+ "(EMERGENCY|ALERT|CRITICAL|ERROR|WARN|NOTICE|INFO|DEBUG|TRACE)\n"
 					+ "  --logFile=FILENAME\tset log file\n"
@@ -767,106 +742,9 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		UIManager.put("PopupMenu.consumeEventOnClose", Boolean.FALSE);
 	}
 
-	// **************************************************************************
-	// COMMAND LINE ARGUMENTS
-	// **************************************************************************
-
-	/**
-	 * Handles command line options
-	 */
-	private void handleOptionArgs(CommandLineArguments args) {
-		// args.containsArg("help");
-		if (args == null) {
-			return;
-		}
-
-		if (args.containsArg("showAlgebraInput")) {
-			boolean showInputBar = args.getBooleanValue("showAlgebraInput",
-					true);
-			if (!showInputBar) {
-				setShowAlgebraInput(false, false);
-			}
-		}
-
-		if (args.containsArg("showAlgebraInputTop")) {
-			boolean showAlgebraInputTop = args
-					.getBooleanValue("showAlgebraInputTop", true);
-			if (showAlgebraInputTop) {
-				setInputPosition(InputPosition.top, false);
-			}
-		}
-
-		String fontSize = args.getStringValue("fontSize");
-		if (fontSize.length() > 0) {
-			setFontSize(Util.getValidFontSize(Integer.parseInt(fontSize)),
-					true);
-		}
-
-		boolean enableUndo = args.getBooleanValue("enableUndo", true);
-		if (!enableUndo) {
-			setUndoActive(false);
-		}
-
-		if (args.containsArg("showAxes")) {
-			boolean showAxesParam = args.getBooleanValue("showAxes", true);
-			this.showAxes[0] = showAxesParam;
-			this.showAxes[1] = showAxesParam;
-			this.getSettings().getEuclidian(1).setShowAxes(showAxesParam,
-					showAxesParam);
-			this.getSettings().getEuclidian(2).setShowAxes(showAxesParam,
-					showAxesParam);
-		}
-
-		if (args.containsArg("showGrid")) {
-			boolean showGridParam = args.getBooleanValue("showGrid", false);
-			this.showGrid = showGridParam;
-			this.getSettings().getEuclidian(1).showGrid(showGridParam);
-			this.getSettings().getEuclidian(2).showGrid(showGridParam);
-		}
-
-		boolean macSandbox = args.getBooleanValue("macSandbox", false);
-		if (macSandbox) {
-			this.macsandbox = true;
-		}
-
-		setVersionCheckAllowed(args.getStringValue("versionCheckAllow"));
-
-	}
-
 	@SuppressFBWarnings({ "DM_EXIT", "" })
 	public static void exit(int i) {
 		System.exit(i);
-	}
-
-	private static boolean versionCheckAllowed = true;
-
-	private void setVersionCheckAllowed(String versionCheckAllow) {
-		if (versionCheckAllow != null) {
-			if ("off".equals(versionCheckAllow)) {
-				GeoGebraPreferencesD.getPref().saveVersionCheckAllow("false");
-				versionCheckAllowed = false;
-				return;
-			}
-			if ("on".equals(versionCheckAllow)) {
-				GeoGebraPreferencesD.getPref().saveVersionCheckAllow("true");
-				versionCheckAllowed = true;
-				return;
-			}
-			if ("false".equals(versionCheckAllow)) {
-				versionCheckAllowed = false;
-				return;
-			}
-			if ("true".equals(versionCheckAllow)) {
-				versionCheckAllowed = true;
-				return;
-			}
-			Log.warn("Option versionCheckAllow not recognized : "
-					.concat(versionCheckAllow));
-		}
-
-		versionCheckAllowed = GeoGebraPreferencesD.getPref()
-				.loadVersionCheckAllow("true");
-
 	}
 
 	private static void setProverOption(String option) {
@@ -939,31 +817,9 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		Log.warn("Prover option not recognized: ".concat(option));
 	}
 
-	/**
-	 * Reports if GeoGebra version check is allowed. The version_check_allowed
-	 * preference is read to decide this, which can be set by the command line
-	 * option --versionCheckAllow (off/on). For changing the behavior for a
-	 * single run, the same command line option must be used with false/true
-	 * parameters.
-	 * 
-	 * @return if the check is allowed
-	 * @author Zoltan Kovacs
-	 */
-	public boolean getVersionCheckAllowed() {
-		return versionCheckAllowed;
-	}
-
 	protected void handleOptionArgsEarly(CommandLineArguments args) {
 		if (args == null) {
 			return;
-		}
-
-		if (args.containsArg("showCAS")) {
-			String showCASs = args.getStringValue("showCAS");
-			if (showCASs.equalsIgnoreCase("disable")) {
-				disableCASView();
-				getSettings().getCasSettings().setEnabled(false);
-			}
 		}
 
 		if (args.containsArg("show3D")) {
@@ -973,15 +829,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 			}
 		}
 
-		String language = args.getStringValue("language");
-		if (language.length() > 0) {
-			if ("Auto".equalsIgnoreCase(language)) {
-				Locale systemLocale = Locale.getDefault();
-				setLocale(systemLocale);
-			} else {
-				setLocale(getLocale(language));
-			}
-		}
 		if (args.containsArg("prover")) {
 			String[] proverOptions = args.getStringValue("prover").split(",");
 			for (int i = 0; i < proverOptions.length; i++) {

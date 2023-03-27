@@ -1983,8 +1983,6 @@ public class Construction {
 	 *            empty construction.
 	 */
 	public void setStep(int s) {
-		// Log.debug("setStep"+step+" "+s);
-		Log.debug(step + " to" + s);
 		if (s == step || s < -1 || s >= ceList.size()) {
 			return;
 		}

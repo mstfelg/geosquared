@@ -50,10 +50,6 @@ public enum GuiResourcesD implements ImageResourceD {
 
 	DELETE_SMALL("/gui/images/64px/delete_small.gif"),
 
-	DOCKBAR_TRIANGLE_RIGHT("/gui/images/64px/dockbar-triangle-right.png"),
-
-	DOCKBAR_TRIANGLE_LEFT("/gui/images/64px/dockbar-triangle-left.png"),
-
 	LIST_ADD("/gui/images/64px/list-add.png"),
 
 	LIST_REMOVE("/gui/images/64px/list-remove.png"),

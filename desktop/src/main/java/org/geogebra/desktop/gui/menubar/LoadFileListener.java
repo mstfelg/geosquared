@@ -28,16 +28,10 @@ public class LoadFileListener implements ActionListener {
 			// standard GeoGebra file
 			GeoGebraFrame inst = GeoGebraFrame.getInstanceWithFile(file);
 			if (inst == null) {
-				if (app.macsandbox) {
-					// show the file dialog window and open file in application
-					// window
-					((GuiManagerD) app.getGuiManager()).openFile(file);
-				} else {
-					if (app.isSaved() || app.saveCurrentFile()) {
-						// open file in application window
-						((GuiManagerD) app.getGuiManager()).loadFile(file,
-								false);
-					}
+				if (app.isSaved() || app.saveCurrentFile()) {
+					// open file in application window
+					((GuiManagerD) app.getGuiManager()).loadFile(file,
+							false);
 				}
 			} else {
 				// there is an instance with this file opened

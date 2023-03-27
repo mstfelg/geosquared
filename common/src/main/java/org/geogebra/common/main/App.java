@@ -4225,7 +4225,6 @@ public abstract class App implements UpdateSelection, AppInterface, EuclidianHos
 			// command list may have changed due to macros
 			updateCommandDictionary();
 
-			hideDockBarPopup();
 			return true;
 		} catch (Exception err) {
 			resetCurrentFile();
@@ -4236,13 +4235,6 @@ public abstract class App implements UpdateSelection, AppInterface, EuclidianHos
 
 	public void resetCurrentFile() {
 		//
-	}
-
-	/**
-	 * Hide desktop dockbar.
-	 */
-	public void hideDockBarPopup() {
-		// only used in desktop
 	}
 
 	/**

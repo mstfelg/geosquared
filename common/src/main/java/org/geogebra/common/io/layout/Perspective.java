@@ -380,8 +380,6 @@ public class Perspective {
 						: "algebra"));
 		sb.append("\" />\n");
 
-		getDockbarXML(sb);
-
 		sb.append("</perspective>\n");
 
 		return sb.toString();
@@ -428,14 +426,6 @@ public class Perspective {
 			}
 		}
 		sb.append("\t</views>\n");
-
-	}
-
-	private void getDockbarXML(StringBuilder sb) {
-		// dockbar
-		sb.append("\t<dockBar show=\"");
-		sb.append("\" east=\"");
-		sb.append("\" />\n");
 
 	}
 

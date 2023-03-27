@@ -6,8 +6,6 @@ public interface AppDI {
 
 	void addExternalImage(String name, MyImageJre img);
 
-	void hideDockBarPopup();
-
 	void storeFrameCenter();
 
 	MyImageJre getExportImage(double thumbnailPixelsX, double thumbnailPixelsY);

@@ -19,7 +19,6 @@ import org.geogebra.common.main.settings.EuclidianSettings3D;
 import org.geogebra.common.main.settings.LayoutSettings;
 import org.geogebra.common.main.settings.SettingListener;
 import org.geogebra.common.main.settings.Settings;
-import org.geogebra.common.util.debug.Log;
 
 /**
  * @author gabor
@@ -71,7 +70,6 @@ public abstract class Layout implements SettingListener {
 		perspectives.add(spreadsheet);
 
 		boolean supportsCas = app.supportsView(App.VIEW_CAS);
-		Log.debug("CAS support: " + supportsCas);
 		Perspective cas = supportsCas ? createCasPerspective(spData, defToolbar) : null;
 		perspectives.add(cas);
 

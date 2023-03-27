@@ -1340,41 +1340,6 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 		try {
 			getApp().setWaitCursor();
 			if (imageFile == null) {
-				if (getApp().macsandbox) {
-					// Mac OS X related code to work around JFileChooser problem
-					// on sandboxing. See http://intransitione.com/blog/take-java-to-app-store/
-					FileDialog fd = new FileDialog(getApp().getFrame());
-					fd.setModal(true);
-					File currentPath = getApp().getCurrentPath();
-					fd.setMode(FileDialog.LOAD);
-					if (currentPath != null) {
-						fd.setDirectory(currentPath.toString());
-					}
-					fd.setFilenameFilter((dir, name) -> name.endsWith(".jpg")
-							|| name.endsWith(".jpeg")
-							|| name.endsWith(".png")
-							|| name.endsWith(".bmp")
-							|| name.endsWith(".gif"));
-					fd.setTitle(loc.getMenu("Load"));
-
-					fd.toFront();
-					fd.setVisible(true);
-					// FIXME: find a better place for this, we need to
-					// change the
-					// cursor back before NPE when file loading was
-					// unsuccessful:
-					getApp().setDefaultCursor();
-
-					if (fd.getFile() != null) {
-						imageFile = new File(
-								fd.getDirectory() + "/" + fd.getFile());
-					}
-
-					getApp()
-							.setCurrentPath(new File(fd.getDirectory()));
-
-				} else { // not running on Mac
-
 					((DialogManagerD) getDialogManager()).initFileChooser();
 					GeoGebraFileChooser fileChooser = ((DialogManagerD) getDialogManager())
 							.getFileChooser();
@@ -1407,7 +1372,6 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 											.getCurrentImagePath());
 						}
 					}
-				}
 			}
 
 			if (imageFile == null) {
@@ -1448,36 +1412,6 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 
 		try {
 			getApp().setWaitCursor();
-			if (getApp().macsandbox) {
-				// Mac OS X related code to work around JFileChooser problem on
-				// sandboxing. See http://intransitione.com/blog/take-java-to-app-store/
-				FileDialog fd = new FileDialog(getApp().getFrame());
-				fd.setModal(true);
-				File currentPath = getApp().getCurrentPath();
-				fd.setMode(FileDialog.LOAD);
-				if (currentPath != null) {
-					fd.setDirectory(currentPath.toString());
-				}
-				fd.setFilenameFilter((dir, name) ->
-						name.endsWith(".txt") || name.endsWith(".csv")
-						|| name.endsWith(".dat"));
-
-				fd.setTitle(loc.getMenu("Load"));
-
-				fd.toFront();
-				fd.setVisible(true);
-				// FIXME: find a better place for this, we need to change the
-				// cursor back before NPE when file loading was unsuccessful:
-				getApp().setDefaultCursor();
-
-				if (fd.getFile() != null) {
-					dataFile = new File(fd.getDirectory() + "/" + fd.getFile());
-				}
-
-				getApp().setCurrentPath(new File(fd.getDirectory()));
-
-				return dataFile;
-			}
 
 			((DialogManagerD) getDialogManager()).initFileChooser();
 			GeoGebraFileChooser fileChooser = ((DialogManagerD) getDialogManager())
@@ -1645,20 +1579,6 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 			return null;
 		}
 		FileExtensions fileExtension = fileExtensions[0];
-
-		if (getApp().macsandbox) {
-			 // Mac OS X related code to work around JFileChooser problem on
-			 // sandboxing. See http://intransitione.com/blog/take-java-to-app-store/
-			while (!done) {
-
-				NSSavePanel panel = new NSSavePanel();
-				String result = panel.saveDialog(loc.getMenu("Save"),
-						fileExtension.toString());
-				file = new File(result);
-				done = true;
-			}
-			return file;
-		}
 
 		((DialogManagerD) getDialogManager()).initFileChooser();
 		GeoGebraFileChooser fileChooser = ((DialogManagerD) getDialogManager())
@@ -1879,54 +1799,6 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 	public void openFile(File file) {
 		if ((getApp()).isSaved() || saveCurrentFile()) {
 			getApp().setWaitCursor();
-
-			if (getApp().macsandbox) {
-				 // Mac OS X related code to work around JFileChooser problem on
-				 // sandboxing. See http://intransitione.com/blog/take-java-to-app-store/
-				FileDialog fd = new FileDialog(getApp().getFrame());
-				fd.setModal(true);
-				File currentPath;
-				if (file == null) {
-					currentPath = getApp().getCurrentPath();
-				} else {
-					currentPath = file.getParentFile();
-					fd.setFile(file.getName());
-				}
-				fd.setMode(FileDialog.LOAD);
-				if (currentPath != null) {
-					fd.setDirectory(currentPath.toString());
-				}
-				fd.setFilenameFilter((dir, name) -> {
-
-					FileExtensions ext = StringUtil.getFileExtension(name);
-
-					return ext.equals(FileExtensions.GEOGEBRA)
-							|| ext.equals(FileExtensions.GEOGEBRA_TOOL)
-							|| ext.equals(FileExtensions.GEOSQUARED)
-							|| ext.equals(FileExtensions.HTML)
-							|| ext.equals(FileExtensions.HTM)
-							|| ext.equals(FileExtensions.OFF);
-
-				});
-				fd.setTitle(loc.getMenu("Load"));
-
-				fd.toFront();
-				fd.setVisible(true);
-				// FIXME: find a better place for this, we need to change the
-				// cursor back before NPE when file loading was unsuccessful:
-				getApp().setDefaultCursor();
-
-				File[] files = new File[1];
-				if (fd.getFile() != null) {
-					files[0] = new File(fd.getDirectory() + "/" + fd.getFile());
-				}
-
-				getApp().setCurrentPath(new File(fd.getDirectory()));
-
-				getApp().setDefaultCursor();
-				doOpenFiles(files, true);
-				return;
-			}
 
 			File oldCurrentFile = getApp().getCurrentFile();
 			((DialogManagerD) getDialogManager()).initFileChooser();

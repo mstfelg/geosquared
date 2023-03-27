@@ -15,7 +15,6 @@ public class MouseEventD extends AbstractEvent implements MouseEventND {
 	private MouseEvent event;
 
 	private MouseEventD(MouseEvent e) {
-		Log.debug("possible missing release()");
 		this.event = e;
 	}
 

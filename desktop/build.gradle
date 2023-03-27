@@ -51,6 +51,7 @@ compileTestJava {
 }
 
 dependencies {
+    implementation 'gnu.getopt:java-getopt:1.0.13'
     implementation project(':common')
     implementation project(':common-jre')
     implementation project(':editor-desktop')

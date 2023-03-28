@@ -664,6 +664,13 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 		return algebraInput;
 	}
 
+	public AlgebraInputD getFullAlgebraInput() {
+		if (algebraInput == null) {
+			algebraInput = new AlgebraInputD(getApp());
+		}
+		return algebraInput;
+	}
+
 	/**
 	 * use Application.getDialogManager() instead
 	 */

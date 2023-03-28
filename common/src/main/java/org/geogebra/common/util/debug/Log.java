@@ -33,7 +33,7 @@ public abstract class Log {
 	public static final int LOGFILE_MAXLENGTH = 10000;
 
 	protected final StringBuilder memoryLog = new StringBuilder();
-	protected Level logLevel = Level.DEBUG; // default
+	protected Level logLevel = Level.CRITICAL; // default
 	protected LogDestination logDestination = LogDestination.CONSOLE; // default;
 	protected boolean callerShown = true; // default
 	protected boolean levelShown = true; // default

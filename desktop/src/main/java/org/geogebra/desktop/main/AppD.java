@@ -4046,6 +4046,10 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		}
 	}
 
+	public GuiManagerD getFullGuiManager() {
+		return (GuiManagerD) guiManager;
+	}
+
 	private static GuiManagerD getGuiManager(AppD app) {
 		return (GuiManagerD) app.getGuiManager();
 	}

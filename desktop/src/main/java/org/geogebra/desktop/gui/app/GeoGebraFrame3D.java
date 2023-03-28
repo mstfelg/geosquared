@@ -16,7 +16,7 @@ import org.geogebra.desktop.main.GeoGebraPreferencesD;
 public class GeoGebraFrame3D extends GeoGebraFrame {
 
 	private static final long serialVersionUID = 1L;
-
+	
 	public static synchronized void main(CommandLineArguments args) {
 		GeoGebraFrame wnd = new GeoGebraFrame();
 

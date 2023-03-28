@@ -22,10 +22,10 @@ public class GeoGebraFrame3D extends GeoGebraFrame {
 
 		// Set GeoGebraPreferences mode (system properties or property file)
 		// before it is called for the first time
-		String settingsFile = args.getStringValue("settingsfile");
-		if (settingsFile.length() > 0) {
-			GeoGebraPreferencesD.setPropertyFileName(settingsFile);
-		}
+		// String settingsFile = args.getStringValue("settingsfile");
+		// if (settingsFile.length() > 0) {
+		// 	GeoGebraPreferencesD.setPropertyFileName(settingsFile);
+		// }
 
 		// create first window and show it
 		createNewWindow3D(args);

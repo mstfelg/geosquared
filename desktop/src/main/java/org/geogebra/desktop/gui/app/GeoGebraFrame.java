@@ -111,6 +111,10 @@ public class GeoGebraFrame extends JFrame
 		born = System.currentTimeMillis();
 		this.addComponentListener(this);
 	}
+	
+	public GeoGebraFrame(CommandLineArguments args) {
+		createNewWindow(args, this);
+	}
 
 	/**
 	 * Disposes this frame and removes it from the static instance list.

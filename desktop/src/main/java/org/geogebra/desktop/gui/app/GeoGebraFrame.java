@@ -264,71 +264,17 @@ public class GeoGebraFrame extends JFrame
 	 *            file name parameter
 	 */
 	public static synchronized void main(CommandLineArguments args) {
-		GeoGebraFrame wnd = new GeoGebraFrame();
-
-		// Set GeoGebraPreferences mode (system properties or property file)
-		// before it is called for the first time
-		String settingsFile = args.getStringValue("settingsfile");
-		if (settingsFile.length() > 0) {
-			GeoGebraPreferencesD.setPropertyFileName(settingsFile);
-		}
-
-		// create first window and show it
-		createNewWindow(args, wnd);
+		createNewWindow(args, new GeoGebraFrame());
 	}
 
-	/**
-	 * Returns the active GeoGebra window.
-	 * 
-	 * @return the active GeoGebra window.
-	 */
-	public static synchronized GeoGebraFrame getActiveInstance() {
-		return activeInstance;
-	}
-
-	private static void setActiveInstance(GeoGebraFrame frame) {
-		synchronized (lock) {
-			activeInstance = frame;
-		}
-	}
-
-	private static void addNewInstanceListener(NewInstanceListener l) {
-		instanceListener.add(l);
-	}
-
-	public static synchronized GeoGebraFrame createNewWindow(
-			CommandLineArguments args) {
+	public static synchronized GeoGebraFrame
+		createNewWindow(CommandLineArguments args) {
 		return createNewWindow(args, new GeoGebraFrame());
 	}
 
-	/**
-	 * Creates new GeoGebra window
-	 * 
-	 * @param args
-	 *            Command line arguments
-	 * @param wnd
-	 * @return the new window
-	 */
-	// public abstract GeoGebra buildGeoGebra();
-
-	/**
-	 * return the application running geogebra
-	 * 
-	 * @param args command line args
-	 * @param frame frame
-	 * @return the application running geogebra
-	 */
-	protected AppD createApplication(CommandLineArguments args, JFrame frame) {
-		return new AppD(args, frame, true);
-	}
-
-	public synchronized GeoGebraFrame createNewWindow(CommandLineArguments args,
-			Macro macro) {
+	public synchronized GeoGebraFrame
+		createNewWindow(CommandLineArguments args, Macro macro) {
 		return createNewWindow(args, copy());
-	}
-
-	protected GeoGebraFrame copy() {
-		return new GeoGebraFrame();
 	}
 
 	/**
@@ -339,8 +285,8 @@ public class GeoGebraFrame extends JFrame
 	 * @param wnd frame
 	 * @return the new window
 	 */
-	public static synchronized GeoGebraFrame createNewWindow(
-			final CommandLineArguments args, GeoGebraFrame wnd) {
+	public static synchronized GeoGebraFrame
+		createNewWindow(final CommandLineArguments args, GeoGebraFrame wnd) {
 		// set Application's size, position and font size
 
 		final AppD app = wnd.createApplication(args, wnd);
@@ -371,6 +317,40 @@ public class GeoGebraFrame extends JFrame
 		}
 
 		return wnd;
+	}
+
+	/**
+	 * Returns the active GeoGebra window.
+	 * 
+	 * @return the active GeoGebra window.
+	 */
+	public static synchronized GeoGebraFrame getActiveInstance() {
+		return activeInstance;
+	}
+
+	private static void setActiveInstance(GeoGebraFrame frame) {
+		synchronized (lock) {
+			activeInstance = frame;
+		}
+	}
+
+	private static void addNewInstanceListener(NewInstanceListener l) {
+		instanceListener.add(l);
+	}
+
+	/**
+	 * return the application running geogebra
+	 * 
+	 * @param args command line args
+	 * @param frame frame
+	 * @return the application running geogebra
+	 */
+	protected AppD createApplication(CommandLineArguments args, JFrame frame) {
+		return new AppD(args, frame, true);
+	}
+
+	protected GeoGebraFrame copy() {
+		return new GeoGebraFrame();
 	}
 
 	private static AppThread createAppThread(AppD app) {
@@ -443,25 +423,35 @@ public class GeoGebraFrame extends JFrame
 	 * @return GeoGebra instance with file open or null
 	 */
 	public static GeoGebraFrame getInstanceWithFile(File file) {
-		if (file == null) {
+		if (file == null)
 			return null;
-		}
 
+		String absPath = null;
 		try {
-			String absPath = file.getCanonicalPath();
-			for (int i = 0; i < instances.size(); i++) {
-				GeoGebraFrame inst = instances.get(i);
-				AppD app = inst.app;
-
-				File currFile = app.getCurrentFile();
-				if (currFile != null) {
-					if (absPath.equals(currFile.getCanonicalPath())) {
-						return inst;
-					}
-				}
-			}
+			absPath = file.getCanonicalPath();
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+		if (absPath == null)
+			return null;
+
+		for (GeoGebraFrame inst : instances) {
+			AppD app = inst.app;
+			if (app == null)
+				continue;
+			File currFile = app.getCurrentFile();
+			if (currFile == null)
+				continue;
+			
+			String currPath = null;
+			try {
+				currPath = currFile.getCanonicalPath();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			if (absPath.equals(currPath))
+				return inst;
 		}
 		return null;
 	}

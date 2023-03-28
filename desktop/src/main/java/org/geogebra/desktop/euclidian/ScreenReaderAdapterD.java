@@ -7,7 +7,6 @@ public class ScreenReaderAdapterD implements ScreenReaderAdapter {
 
 	@Override
 	public void readText(String text) {
-		Log.read("Reading text: " + text);
 	}
 
 	@Override

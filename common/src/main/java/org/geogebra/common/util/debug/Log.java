@@ -323,20 +323,6 @@ public abstract class Log {
 	}
 
 	/**
-	 * @param string
-	 *            send screen reader text to log
-	 */
-	public static void read(String string) {
-		logger.doRead(string);
-	}
-
-	private void doRead(String string) {
-		if (reading) {
-			error(string);
-		}
-	}
-
-	/**
 	 * @param b
 	 *            whether to print screen reader output
 	 */

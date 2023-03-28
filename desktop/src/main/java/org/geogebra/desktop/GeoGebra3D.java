@@ -20,6 +20,7 @@
 package org.geogebra.desktop;
 
 import java.util.logging.Logger;
+import java.util.Scanner;
 
 import org.geogebra.desktop.gui.app.GeoGebraFrame3D;
 import org.geogebra.desktop.util.LoggerD;
@@ -27,40 +28,47 @@ import org.geogebra.common.util.debug.Log;
 import org.geogebra.common.util.debug.Log.LogDestination;
 import org.geogebra.common.GeoGebraConstants;
 import org.geogebra.common.GeoGebraConstants.Platform;
+import org.geogebra.desktop.gui.inputbar.AlgebraInputD;
 
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
 
 public class GeoGebra3D extends GeoGebra {
+	
+	static boolean interactiveEh = true;
 
 	public static void main(String[] args) {
     	int c;
     	String arg;
     	LongOpt[] longopts = new LongOpt[] {
+    	    new LongOpt("interactive", LongOpt.NO_ARGUMENT, null, 'i'),
     	    new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h'),
     	    new LongOpt("version", LongOpt.NO_ARGUMENT, null, 'V'),
     	    new LongOpt("debug", LongOpt.REQUIRED_ARGUMENT, null, 'd'),
     	};
 
-    	Getopt g = new Getopt("GeoSquared", args, "vd", longopts);
+    	Getopt g = new Getopt("GeoSquared", args, "vhid:", longopts);
     	while ((c = g.getopt()) != -1) {
     	    switch (c) {
+    	        case 'i':
+					interactiveEh = true;
+    	        	break;
+    	        case 'd':
+					Log.setLogLevel(g.getOptarg());
+    	        	break;
     	        case 'h':
 					usage();
 					return;
     	        case 'V':
 					version();
 					return;
-    	        case 'd':
-					Log.setLogLevel(g.getOptarg());
-    	        	break;
     	        default:
-    	        	System.out.println("Unknown option: " + (char) c);
-    	        	break;
+    	        	System.out.println("Unknown option: " + g.getOptarg());
+    	        	return;
     	    }
     	}
 
-		// TODO: app breaks if removed
+		// App breaks if removed
 		LoggerD logger = new LoggerD();
 		logger.setReading(true);
 		Log.setLogger(logger);
@@ -68,10 +76,25 @@ public class GeoGebra3D extends GeoGebra {
 
 		// Positional arguments: file names
 		CommandLineArguments clArgs = new CommandLineArguments(null);
-		for (int i = g.getOptind(); i < args.length; i++)
-			clArgs.addFile(args[i]);
+		boolean readStdinEh = false;
+		for (int i = g.getOptind(); i < args.length; i++) {
+			String fileName = args[i];
+			readStdinEh = readStdinEh || fileName.equals("-");
+			clArgs.addFile(fileName);
+		}
 	
-		GeoGebraFrame3D.main(clArgs);
+		GeoGebraFrame3D wnd = new GeoGebraFrame3D(clArgs);
+
+		if (!interactiveEh)
+			return;
+
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            wnd.getApplication().getFullGuiManager()
+				.getFullAlgebraInput().sendCmd(line);
+        }
+        scanner.close();
 	}
 	
 	private static void version() {

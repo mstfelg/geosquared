@@ -343,6 +343,29 @@ public class AlgebraInputD extends JPanel implements ActionListener,
 																// ctrl-tab
 		}
 	}
+	
+	public boolean sendCmd(String input) {
+		app.getKernel().clearJustCreatedGeosInViews();
+
+		if (input == null || input.length() == 0)
+			return false;
+
+		try {
+			EvalInfo info = new EvalInfo(true, true).withSliders(true)
+					.addDegree(app.getKernel().getAngleUnitUsesDegrees()).withSymbolic(true);
+			AsyncOperation<GeoElementND[]> callback =
+					new InputBarCallback(app, inputField, input,
+							app.getKernel().getConstructionStep());
+			app.getKernel().getAlgebraProcessor()
+					.processAlgebraCommandNoExceptionHandling(input, true,
+							getErrorHandler(true, true), info, callback);
+
+		} catch (Exception ee) {
+			app.showGenericError(ee);
+			return false;
+		} 
+		return true;
+	}
 
 	private void onEnterPressed(boolean explicit) {
 		if (!explicit && autoInput != null

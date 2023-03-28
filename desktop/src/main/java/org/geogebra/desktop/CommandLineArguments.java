@@ -78,7 +78,7 @@ public class CommandLineArguments {
 	 * args.put(key, value); return args; }
 	 */
 
-	private void addFile(String string) {
+	public void addFile(String string) {
 		String filename = string.replaceAll("%20", " ");
 		args.put("file" + (noOfFiles++), filename);
 		if (filename.endsWith(".ggt")) {

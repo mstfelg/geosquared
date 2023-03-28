@@ -362,19 +362,13 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 
 		this.loc = loc;
 		loc.setApp(this);
-		this.cmdArgs = args;
-		this.prerelease = args != null && args.containsArg("prerelease");
+		this.cmdArgs = null;
 
 		setFileVersion(GeoGebraConstants.VERSION_STRING,
 				getConfig().getAppCode());
 
-		if (args != null) {
-			handleHelpVersionArgs(args);
-		}
-
-		if (frame != null) {
-			mainComp = frame;
-		} else {
+		mainComp = frame;
+		if (frame == null) {
 			mainComp = comp;
 		}
 
@@ -406,7 +400,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		// set flag to avoid multiple calls of setLabels() and
 		// updateContentPane()
 		initing = true;
-		// setFontSize(12);
 
 		// This is needed because otherwise Exception might come and
 		// GeoGebra may exit. (dockPanel not entirely defined)
@@ -420,9 +413,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		if (ggtloading) {
 			GeoGebraPreferencesD.getPref().loadXMLPreferences(this);
 		}
-
-		// open file given by startup parameter
-		handleOptionArgsEarly(args); // for --regressionFile=...
 
 		boolean fileLoaded = handleFileArg(args);
 
@@ -443,16 +433,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		if (!fileLoaded && !ggtloading) {
 			GeoGebraPreferencesD.getPref().loadXMLPreferences(this);
 			imageManager.setMaxIconSizeAsPt(getFontSize());
-		}
-
-		if (MAC_OS) {
-			String path = System.getProperty("user.home") + "/Documents";
-			if (currentPath == null) {
-				currentPath = new File(path);
-			}
-			if (currentImagePath == null) {
-				currentImagePath = new File(path);
-			}
 		}
 
 		if (isUsingFullGui()) {
@@ -561,85 +541,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 			StringUtil.setPrototypeIfNull(new StringUtilD());
 		}
 
-	}
-
-	private static void handleHelpVersionArgs(CommandLineArguments args) {
-
-		System.out.println("GeoSquared " + GeoGebraConstants.VERSION_STRING + " "
-				+ GeoGebraConstants.BUILD_DATE + " Java " + getJavaVersion()
-				+ "\n");
-
-		if (args.containsArg("help")) {
-			// help message
-			System.out.println("Usage: java -jar geogebra.jar [OPTION] [FILE]\n"
-					+ "Start GeoSquared with the specified OPTIONs and open the given FILE.\n"
-					+ "  --help\t\tprint this message\n"
-					+ "  --v\t\tprint version\n"
-					+ "  --language=LANGUAGE_CODE"
-					// here "auto" is also accepted
-					+ "\t\tset language using locale strings, e.g. en, de, de_AT, ...\n"
-					+ "  --showAlgebraInput=BOOLEAN\tshow/hide algebra input field\n"
-					+ "  --showAlgebraInputTop=BOOLEAN\tshow algebra input at top/bottom\n"
-					+ "  --showAlgebraWindow=BOOLEAN\tshow/hide algebra window\n"
-					+ "  --showSpreadsheet=BOOLEAN\tshow/hide spreadsheet\n"
-					// here "disable" is also accepted
-					+ "  --showCAS=BOOLEAN\tshow/hide CAS window\n"
-					// here "disable" is also accepted
-					+ "  --show3D=BOOLEAN\tshow/hide 3D window\n"
-					+ "  --enableUndo=BOOLEAN\tenable/disable Undo\n"
-					+ "  --fontSize=NUMBER\tset default font size\n"
-					+ "  --showAxes=BOOLEAN\tshow/hide coordinate axes\n"
-					+ "  --showGrid=BOOLEAN\tshow/hide grid\n"
-					+ "  --settingsFile=PATH|FILENAME\tload/save settings from/in a local file\n"
-					+ "  --config=PATH|FILENAME\tread settings from another file\n"
-					+ "  --resetSettings\treset current settings\n"
-					+ "  --regressionFile=FILENAME"
-							+ "\texport textual representations of dependent objects, then exit\n"
-					+ "  --logLevel=LEVEL\tset logging level "
-							+ "(EMERGENCY|ALERT|CRITICAL|ERROR|WARN|NOTICE|INFO|DEBUG|TRACE)\n"
-					+ "  --logFile=FILENAME\tset log file\n"
-					+ "  --silent\tCompletely mute logging\n"
-					+ "  --prover=OPTIONS\tSet options for the prover subsystem "
-							+ "(use --proverhelp for more information)\n"
-			);
-
-			AppD.exit(0);
-		}
-		if (args.containsArg("proverhelp")) {
-			ProverSettings proverSettings = ProverSettings.get();
-			// help message for the prover
-			System.out.println(
-					"  --prover=OPTIONS\tset options for the prover subsystem\n"
-							+ "    where OPTIONS is a comma separated list, formed with the "
-							+ "following available settings (defaults in brackets):\n"
-							+ "      engine:ENGINE\tset engine "
-							+ "(Auto|OpenGeoProver|Recio|Botana|PureSymbolic) ["
-							+ proverSettings.proverEngine + "]\n"
-							+ "      timeout:SECS\tset the maximum time attributed to the prover"
-							+ " (in seconds) ["
-							+ proverSettings.proverTimeout + "]\n"
-							+ "      maxterms:NUMBER\tset the maximal number of terms ["
-							+ proverSettings.getMaxTerms()
-							+ "] (OpenGeoProver only)\n"
-							+ "      method:METHOD\tset the method (Wu|Groebner|Area) ["
-							+ proverSettings.proverMethod
-							+ "] (OpenGeoProver/Recio only)\n"
-							+ "      usefixcoords:NUMBER1NUMBER2\tuse fix coordinates for the first"
-							+ " NUMBER1 for Prove and NUMBER2 for ProveDetails, maximum of 4 both ["
-							+ proverSettings.useFixCoordinatesProve
-							+ proverSettings.useFixCoordinatesProveDetails
-							+ "] (Botana only)\n"
-							+ "      captionalgebra:BOOLEAN\tshow algebraic debug information"
-							+ " in object captions ["
-							+ proverSettings.captionAlgebra
-							+ "] (Botana only)\n"
-							+ "  Example: --prover=engine:Botana,timeout:10,"
-							+ "fpnevercoll:true,usefixcoords:43\n");
-			AppD.exit(0);
-		}
-		if (args.containsArg("v")) {
-			AppD.exit(0);
-		}
 	}
 
 	@Override
@@ -764,26 +665,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 			return;
 		}
 		Log.warn("Prover option not recognized: ".concat(option));
-	}
-
-	protected void handleOptionArgsEarly(CommandLineArguments args) {
-		if (args == null) {
-			return;
-		}
-
-		if (args.containsArg("show3D")) {
-			String show3Ds = args.getStringValue("show3D");
-			if (show3Ds.equalsIgnoreCase("disable")) {
-				disable3DView();
-			}
-		}
-
-		if (args.containsArg("prover")) {
-			String[] proverOptions = args.getStringValue("prover").split(",");
-			for (int i = 0; i < proverOptions.length; i++) {
-				setProverOption(proverOptions[i]);
-			}
-		}
 	}
 
 	// **************************************************************************
@@ -958,80 +839,20 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	 * @return true if a file was loaded successfully
 	 */
 	private boolean handleFileArg(final CommandLineArguments args) {
-		if ((args == null) || (args.getNoOfFiles() == 0)) {
+		if (args == null || args.getNoOfFiles() == 0)
+			return false;
+
+		final String fileName = args.getStringValue("file0");
+		FileExtensions ext = StringUtil.getFileExtension(fileName);
+		boolean isMacroFile = ext.equals(FileExtensions.GEOGEBRA_TOOL);
+		File f = new File(fileName);
+		try {
+			f = f.getCanonicalFile();
+		} catch(Exception e) {
+			e.printStackTrace();
 			return false;
 		}
-
-		boolean successRet = true;
-
-		for (int i = 0; i < args.getNoOfFiles(); i++) {
-
-			final String fileArgument = args.getStringValue("file" + i);
-			final String key = "file0";
-
-			if (i > 0) { // load in new Window
-				CommandLineArguments windowArgs = args.getGlobalArguments().add(key, fileArgument);
-				SwingUtilities.invokeLater(() -> GeoGebraFrame.createNewWindow(windowArgs));
-			} else {
-
-				try {
-					boolean success;
-					String lowerCase = StringUtil.toLowerCaseUS(fileArgument);
-					FileExtensions ext = StringUtil.getFileExtension(lowerCase);
-
-					boolean isMacroFile = ext
-							.equals(FileExtensions.GEOGEBRA_TOOL);
-
-					if (lowerCase.startsWith("http:")
-							|| lowerCase.startsWith("https:")
-							|| lowerCase.startsWith("file:")) {
-						// replace all whitespace characters by %20 in URL
-						// string
-						String fileArgument2 = fileArgument.replaceAll("\\s",
-								"%20");
-						URL url = new URL(fileArgument2);
-						success = loadXML(url, isMacroFile);
-
-						// check if full GUI is necessary
-						if (success && !isMacroFile && !isUsingFullGui()) {
-							if (showConsProtNavigation()
-									|| !isJustEuclidianVisible()) {
-								useFullGui = true;
-							}
-						}
-					} else if (lowerCase.startsWith("base64://")) {
-
-						// substring to strip off base64://
-						byte[] zipFile = Base64
-								.decode(fileArgument.substring(9));
-						success = loadXML(zipFile);
-
-						if (success && !isMacroFile && !isUsingFullGui()) {
-							if (showConsProtNavigation()
-									|| !isJustEuclidianVisible()) {
-								useFullGui = true;
-							}
-						}
-					} else if (ext.equals(FileExtensions.HTM)
-							|| ext.equals(FileExtensions.HTML)) {
-						loadBase64File(new File(fileArgument));
-						success = true;
-					} else {
-						File f = new File(fileArgument);
-						f = f.getCanonicalFile();
-						success = loadFile(f, isMacroFile);
-
-					}
-
-					successRet = successRet && success;
-				} catch (Exception e) {
-					e.printStackTrace();
-					successRet = false;
-				}
-			}
-		}
-
-		return successRet;
+		return loadFile(f, isMacroFile);
 	}
 
 	/**

@@ -32,43 +32,17 @@ import org.geogebra.desktop.util.UtilD;
  * @version May 16, 2007
  */
 
-/*
- * Additions by Hans-Petter Ulven 6 Mars, 2010 Subclass
- * GeoGebraPortablePreferences, for saving prefs to propertyfile Added some
- * constants Small rewrite of getPref() to return subclass singleton instead of
- * this.singleton 7mars: Addition of setPropertyFile(filename) to fascilitate
- * cmdline option --settingsFile (Set in line 263 geogebra.gui.app.GeoGebraFrame
- * before getPref() is called first time.)
- */
-
 public class GeoGebraPreferencesD {
-
-	// Windows -> APPDATA, space in "GeoGebra 5.0"
-	// Mac / Linux -> user.home, hidden folder, no space in ".GeoGebra5.0"
-	public static final String PREFS_PATH = System.getProperty("user.home") + "/.config/geogebra/";
+	public static final String PREFS_PATH =
+		System.getProperty("user.home") + "/.config/gsq/";
 
 	public static final String USERS_PREFS = PREFS_PATH + "prefs.xml";
 	public static final String OBJECTS_PREFS = PREFS_PATH + "defaults.xml";
 	public static final String MACROS_PREFS = PREFS_PATH + "macros.ggt";
 
-	public static final String WINDOWS_USERS_PREFS = PREFS_PATH + "prefs.xml";
-	public static final String WINDOWS_OBJECTS_PREFS = PREFS_PATH + "defaults.xml";
-	public static final String WINDOWS_MACROS_PREFS = PREFS_PATH + "macros.ggt";
-
 	public static final String AUTHOR = "author";
-
 	public static final String VERSION = "version";
-	public static final String VERSION_LAST_CHECK = "version_last_check";
-	/**
-	 * Allow checking of availability of a newer version
-	 */
-	public static final String VERSION_CHECK_ALLOW = "version_check_allow";
-	/** Last version shown in download notification */
-	private static final String VERSION_LAST_NOTIFICATION_SHOWN = "version_notification_shown";
 
-	/**
-	 * save what kind of 3D input we use (if one)
-	 */
 	public static final String INPUT_3D = "input_3d";
 
 	// picture export dialog
@@ -80,16 +54,11 @@ public class GeoGebraPreferencesD {
 	public static final String PRINT_SHOW_SCALE = "print_show_scale";
 	public static final String PRINT_SHOW_SCALE2 = "print_show_scale_2";
 
-	// user data
-	public static final String USER_LOGIN_TOKEN = "user_login_token";
-	public static final String USER_LOGIN_SKIP = "user_login_skip";
-
 	// preferences node name for GeoGebra
 	private Preferences ggbPrefs;
 	private Preferences ggbPrefsSystem;
 
 	protected GeoGebraPreferencesD() {
-
 		try {
 			if (PROPERTY_FILEPATH == null) {
 				ggbPrefs = Preferences.userRoot()
@@ -99,52 +68,30 @@ public class GeoGebraPreferencesD {
 			// thrown when running unsigned JAR
 			ggbPrefs = null;
 		}
-
-		try {
-			if (PROPERTY_FILEPATH == null && Preferences.systemRoot()
-					.nodeExists(GeoGebraConstants.PREFERENCES_ROOT_GLOBAL)) {
-				ggbPrefsSystem = Preferences.systemRoot()
-						.node(GeoGebraConstants.PREFERENCES_ROOT_GLOBAL);
-			} else {
-				ggbPrefsSystem = null;
-			}
-		} catch (Exception e) {
-			// thrown when running unsigned JAR
-			ggbPrefsSystem = null;
-		}
-
 	}
 
-	// Ulven: changed to make available to subclass GeoGebraPortablePreferences
 	protected String factoryDefaultXml; // see loadPreferences()
-
 	protected static final String XML_FACTORY_DEFAULT = "xml_factory_default";
 	protected static final String TOOLS_FILE_GGT = "tools_file_ggt";
 	protected static final String APP_LOCALE = "app_locale";
 	protected static final String APP_CURRENT_IMAGE_PATH = "app_current_image_path";
 	protected static final String APP_FILE_ = "app_file_";
 
-	/* Ulven 06.03.10 */
-
-	private static String PROPERTY_FILEPATH = null; // full path, null: no
-														// property file set
-
+	private static String PROPERTY_FILEPATH = null;
 	private static GeoGebraPreferencesD singleton;
 
 	/** Set in geogebra.gui.app.GeoGebraFrame before first call to getPref() */
 	public static void setPropertyFileName(String pfname) {
 		PROPERTY_FILEPATH = pfname;
-		Log.debug("Prferences in: " + PROPERTY_FILEPATH);
+		Log.debug("Preferences in: " + PROPERTY_FILEPATH);
 	}
 
 	/**
 	 * @return preferences singleton
 	 */
 	public synchronized static GeoGebraPreferencesD getPref() {
-		if (singleton == null) {
-			if (PROPERTY_FILEPATH != null) {
-				singleton = GeoGebraPortablePreferences.getPref();
-			}
+		if (singleton == null && PROPERTY_FILEPATH != null) {
+			singleton = GeoGebraPortablePreferences.getPref();
 		}
 		if (singleton == null) {
 			singleton = new GeoGebraPreferencesD();
@@ -152,24 +99,9 @@ public class GeoGebraPreferencesD {
 		return singleton;
 	}
 
-	public static void setLastVersionNotification(long newestVersion) {
-		getPref().savePreference(VERSION_LAST_NOTIFICATION_SHOWN, String.valueOf(newestVersion));
-	}
-
-	/**
-	 * @return last version shown in update notification
-	 */
-	public static long getLastShownNotificationVersion() {
-		try {
-			String lastVersion = getPref().loadPreference(VERSION_LAST_NOTIFICATION_SHOWN, "0");
-			return Long.parseLong(lastVersion);
-		} catch (NumberFormatException e) {
-			Log.debug(e);
-		}
-		return 0;
-	}
-
 	public String loadPreference(String key, String defaultValue) {
+		if (ggbPrefs == null)
+			return null;
 		return ggbPrefs.get(key, defaultValue);
 	}
 
@@ -182,43 +114,6 @@ public class GeoGebraPreferencesD {
 		if (key != null && value != null) {
 			ggbPrefs.put(key, value);
 		}
-	}
-
-	/**
-	 * Check if system (local machine), then user, allows check version
-	 * 
-	 * @param defaultValue
-	 *            default value (if key doesn't exist)
-	 * @return true if system and user allows check version
-	 */
-	public boolean loadVersionCheckAllow(String defaultValue) {
-		// check if system (local machine) allows check version
-		boolean systemAllows;
-		if (ggbPrefsSystem == null) {
-			systemAllows = true;
-			Log.info("No system preferences");
-		} else {
-			systemAllows = Boolean.parseBoolean(ggbPrefsSystem.get(
-					GeoGebraPreferencesD.VERSION_CHECK_ALLOW, defaultValue));
-		}
-		// then check if user allows
-		if (systemAllows && ggbPrefs != null) {
-			return Boolean.parseBoolean(getPref().loadPreference(
-					GeoGebraPreferencesD.VERSION_CHECK_ALLOW, defaultValue));
-		}
-		// else don't allow
-		return false;
-	}
-
-	/**
-	 * save "versionCheckAllow" value to users preferences
-	 * 
-	 * @param value
-	 *            value
-	 */
-	public void saveVersionCheckAllow(String value) {
-		getPref().savePreference(GeoGebraPreferencesD.VERSION_CHECK_ALLOW,
-				value);
 	}
 
 	/**
@@ -244,8 +139,10 @@ public class GeoGebraPreferencesD {
 	 * @return the path of the first file in the file list
 	 */
 	public File getDefaultFilePath() {
+		if (getPref() == null)
+			return null;
 		File file = new File(getPref().loadPreference(APP_FILE_ + "1", ""));
-		if (file.exists()) {
+		if (file != null && file.exists()) {
 			return file.getParentFile();
 		}
 		return null;

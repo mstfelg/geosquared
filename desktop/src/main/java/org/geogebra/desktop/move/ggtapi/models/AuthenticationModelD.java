@@ -17,18 +17,11 @@ public class AuthenticationModelD extends AuthenticationModel {
 
 	@Override
 	public void storeLoginToken(String token) {
-		GeoGebraPreferencesD.getPref()
-				.savePreference(GeoGebraPreferencesD.USER_LOGIN_TOKEN, token);
 	}
 
 	@Override
 	public String getLoginToken() {
-		String token = GeoGebraPreferencesD.getPref().loadPreference(
-				GeoGebraPreferencesD.USER_LOGIN_TOKEN, TOKEN_NOT_AVAILABLE);
-		if (token.equals(TOKEN_NOT_AVAILABLE)) {
-			return null;
-		}
-		return token;
+		return null;
 	}
 
 	@Override

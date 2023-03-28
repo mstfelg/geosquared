@@ -29,6 +29,7 @@ import org.geogebra.common.util.debug.Log.LogDestination;
 import org.geogebra.common.GeoGebraConstants;
 import org.geogebra.common.GeoGebraConstants.Platform;
 import org.geogebra.desktop.gui.inputbar.AlgebraInputD;
+import org.geogebra.desktop.main.GeoGebraPreferencesD;
 
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
@@ -38,22 +39,35 @@ public class GeoGebra3D extends GeoGebra {
 	static boolean interactiveEh = true;
 
 	public static void main(String[] args) {
+		// App breaks if removed
+		LoggerD logger = new LoggerD();
+		logger.setReading(true);
+		Log.setLogger(logger);
+		Log.setLogDestination(LogDestination.CONSOLE);
+
+		// Argument parsing
     	int c;
     	String arg;
     	LongOpt[] longopts = new LongOpt[] {
+    	    new LongOpt("config", LongOpt.REQUIRED_ARGUMENT, null, 'c'),
     	    new LongOpt("interactive", LongOpt.NO_ARGUMENT, null, 'i'),
     	    new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h'),
     	    new LongOpt("version", LongOpt.NO_ARGUMENT, null, 'V'),
     	    new LongOpt("debug", LongOpt.REQUIRED_ARGUMENT, null, 'd'),
     	};
 
-    	Getopt g = new Getopt("GeoSquared", args, "vhid:", longopts);
+    	Getopt g = new Getopt("GeoSquared", args, "vhid:c:", longopts);
     	while ((c = g.getopt()) != -1) {
     	    switch (c) {
+    	        case 'c':
+					interactiveEh = true;
+					GeoGebraPreferencesD.setPropertyFileName(g.getOptarg());
+    	        	break;
     	        case 'i':
 					interactiveEh = true;
     	        	break;
     	        case 'd':
+					System.out.println("Debug level: " + g.getOptarg());
 					Log.setLogLevel(g.getOptarg());
     	        	break;
     	        case 'h':
@@ -67,12 +81,6 @@ public class GeoGebra3D extends GeoGebra {
     	        	return;
     	    }
     	}
-
-		// App breaks if removed
-		LoggerD logger = new LoggerD();
-		logger.setReading(true);
-		Log.setLogger(logger);
-		Log.setLogDestination(LogDestination.CONSOLE);
 
 		// Positional arguments: file names
 		CommandLineArguments clArgs = new CommandLineArguments(null);

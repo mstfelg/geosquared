@@ -3935,26 +3935,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	}
 
 	protected boolean showTubeLogin() {
-		// for debugging only
-		// force sign-in popup if not logged in
-		// GeoGebraPreferencesD.getPref().savePreference(
-		// GeoGebraPreferencesD.USER_LOGIN_SKIP,
-		// "false");
-
-		boolean showDockPopup = true;
-
-		String skipLogin = GeoGebraPreferencesD.getPref()
-				.loadPreference(GeoGebraPreferencesD.USER_LOGIN_SKIP, "false");
-
-		if (!"true".equals(skipLogin)) {
-			showDockPopup = false;
-			GeoGebraPreferencesD.getPref().savePreference(
-					GeoGebraPreferencesD.USER_LOGIN_SKIP, "true");
-
-			getGuiManager().login();
-		}
-
-		return showDockPopup;
+		return false;
 	}
 
 	/**

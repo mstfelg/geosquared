@@ -82,13 +82,14 @@ public abstract class Log {
 	 *            the logging level to set
 	 */
 	final public static void setLogLevel(String logLevel) {
+		if (logLevel == null || logger == null)
+			return;
 		logger.setLogLevelImpl(logLevel);
 	}
 
 	private void setLogLevelImpl(String logLevel) {
-		if (logLevel == null) {
+		if (logLevel == null)
 			return;
-		}
 
 		try {
 			this.logLevel = Level.valueOf(logLevel.toUpperCase(Locale.US));

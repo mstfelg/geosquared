@@ -414,7 +414,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 			GeoGebraPreferencesD.getPref().loadXMLPreferences(this);
 		}
 
-		boolean fileLoaded = handleFileArg(args);
+		boolean fileLoaded = handleFileArg(args.getStringValue("file0"));
 
 		// initialize GUI
 		if (isUsingFullGui()) {
@@ -838,11 +838,10 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	 * 
 	 * @return true if a file was loaded successfully
 	 */
-	private boolean handleFileArg(final CommandLineArguments args) {
-		if (args == null || args.getNoOfFiles() == 0)
+	private boolean handleFileArg(String fileName) {
+		if (fileName == null || fileName.equals(""))
 			return false;
 
-		final String fileName = args.getStringValue("file0");
 		FileExtensions ext = StringUtil.getFileExtension(fileName);
 		boolean isMacroFile = ext.equals(FileExtensions.GEOGEBRA_TOOL);
 		File f = new File(fileName);

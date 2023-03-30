@@ -64,7 +64,7 @@ public class GeoGebraPortablePreferences extends GeoGebraPreferencesD {
 	private final static String COMMENT = "GeoGebra Portable preferences (GeoGebra settings file)";
 
 	// / --- Properties --- ///
-	// use parent class PROPERTY_FILEPATH private static String path=null;
+	// use parent class propData private static String path=null;
 	private static final Properties properties = new Properties();
 
 	private static GeoGebraPortablePreferences singleton = null;

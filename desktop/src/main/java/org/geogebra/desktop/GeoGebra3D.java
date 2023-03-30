@@ -35,36 +35,42 @@ import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
 
 public class GeoGebra3D extends GeoGebra {
-	
+
+	// Defaults
 	static boolean interactiveEh = true;
+	static String logLevel = "debug";
 
 	public static void main(String[] args) {
-		// App breaks if removed
 		LoggerD logger = new LoggerD();
 		logger.setReading(true);
 		Log.setLogger(logger);
 		Log.setLogDestination(LogDestination.CONSOLE);
+		Log.setLogLevel(logLevel);
 
 		// Argument parsing
     	int c;
     	String arg;
     	LongOpt[] longopts = new LongOpt[] {
     	    new LongOpt("config", LongOpt.REQUIRED_ARGUMENT, null, 'c'),
+    	    new LongOpt("modules", LongOpt.REQUIRED_ARGUMENT, null, 'm'),
     	    new LongOpt("interactive", LongOpt.NO_ARGUMENT, null, 'i'),
     	    new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h'),
     	    new LongOpt("version", LongOpt.NO_ARGUMENT, null, 'V'),
     	    new LongOpt("debug", LongOpt.REQUIRED_ARGUMENT, null, 'd'),
     	};
 
-    	Getopt g = new Getopt("GeoSquared", args, "vhid:c:", longopts);
+    	Getopt g = new Getopt("GeoSquared", args, "Vhid:c:m:", longopts);
     	while ((c = g.getopt()) != -1) {
     	    switch (c) {
+    	        case 'm':
+					GeoGebraPreferencesD.macrosPrefs = g.getOptarg();
+    	        	break;
     	        case 'c':
-					interactiveEh = true;
-					GeoGebraPreferencesD.setPropertyFileName(g.getOptarg());
+					GeoGebraPreferencesD.objCfg = g.getOptarg();
     	        	break;
     	        case 'i':
 					interactiveEh = true;
+					Log.setLogLevel("critical");
     	        	break;
     	        case 'd':
 					System.out.println("Debug level: " + g.getOptarg());
@@ -115,12 +121,12 @@ public class GeoGebra3D extends GeoGebra {
 	private static void usage() {
 		System.out.println(""
 			+ "GeoSquared v" + GeoGebraConstants.VERSION_STRING + "\n"
-			+ "Usage: java -jar geogebra.jar [OPTION] [FILE]\n"
+			+ "Usage: gsq [OPTION] [FILE]\n"
 					+ "Start GeoSquared with the specified OPTIONs and open the given FILE.\n"
-					+ "  --help\t\tprint this message\n"
-					+ "  --v\t\tprint version\n"
-					+ "  --config=PATH|FILENAME\tread settings from another file\n"
-					+ "  --clean\tRun with default config\n"
+					+ "  -h --help\t\tprint this message\n"
+					+ "  -V --version\t\tprint version\n"
+					+ "  -c --config=FILENAME\tread settings FILENAME\n"
+					+ "  -m --modules=FILENAME\tread modules from FILENAME\n"
 					+ "  --debug=LEVEL\tset logging level "
 							+ "(EMERGENCY|ALERT|CRITICAL|ERROR|WARN|NOTICE|INFO|DEBUG|TRACE)\n"
 		);

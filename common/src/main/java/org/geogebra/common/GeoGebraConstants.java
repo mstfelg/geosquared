@@ -145,11 +145,6 @@ public interface GeoGebraConstants {
 
 	String SUITE_URL_NAME = "calculator";
 
-	public static final String PREFERENCES_ROOT_GLOBAL = "/geogebra";
-
-	/** eg HKEY_CURRENT_USER/Software/JavaSoft/Prefs/geogebra42/ */
-	/** root preferences node */
-	public static final String PREFERENCES_ROOT = "/geogebra50";
 	/** File format version */
 	public static final String XML_FILE_FORMAT = "5.0";
 

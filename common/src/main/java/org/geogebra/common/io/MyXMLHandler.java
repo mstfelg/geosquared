@@ -2376,6 +2376,9 @@ public class MyXMLHandler implements DocHandler {
 		case "views":
 			mode = MODE_GUI_PERSPECTIVE_VIEWS;
 			break;
+		// Backward compatibility
+		case "dockBar":
+			break;
 		default:
 			Log.debug("unknown tag in <perspective>: " + eName);
 		}

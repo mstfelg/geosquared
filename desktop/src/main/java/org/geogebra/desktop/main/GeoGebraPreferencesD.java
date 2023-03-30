@@ -14,6 +14,7 @@ package org.geogebra.desktop.main;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.prefs.Preferences;
 
@@ -33,42 +34,30 @@ import org.geogebra.desktop.util.UtilD;
  */
 
 public class GeoGebraPreferencesD {
-	public static final String PREFS_PATH =
-		System.getProperty("user.home") + "/.config/gsq/";
+	public static String configHome;
+	public static String layoutCfg;
+	public static String objCfg;
 
-	public static final String USERS_PREFS = PREFS_PATH + "prefs.xml";
-	public static final String OBJECTS_PREFS = PREFS_PATH + "defaults.xml";
-	public static final String MACROS_PREFS = PREFS_PATH + "macros.ggt";
+	public static String dataHome;
+	public static String macrosPrefs;
+	public static String propData;
 
-	public static final String AUTHOR = "author";
-	public static final String VERSION = "version";
-
-	public static final String INPUT_3D = "input_3d";
-
-	// picture export dialog
-	public static final String EXPORT_PIC_FORMAT = "export_pic_format";
-	public static final String EXPORT_PIC_DPI = "export_pic_dpi";
-
-	// print preview dialog
-	public static final String PRINT_ORIENTATION = "print_orientation";
-	public static final String PRINT_SHOW_SCALE = "print_show_scale";
-	public static final String PRINT_SHOW_SCALE2 = "print_show_scale_2";
-
-	// preferences node name for GeoGebra
+	// Java Preferences
+	public final static String PREF_ROOT = "/gsq";
 	private Preferences ggbPrefs;
 	private Preferences ggbPrefsSystem;
 
-	protected GeoGebraPreferencesD() {
-		try {
-			if (PROPERTY_FILEPATH == null) {
-				ggbPrefs = Preferences.userRoot()
-						.node(GeoGebraConstants.PREFERENCES_ROOT);
-			}
-		} catch (Exception e) {
-			// thrown when running unsigned JAR
-			ggbPrefs = null;
-		}
-	}
+	// Picture export dialog
+	public static String EXPORT_PIC_FORMAT = "export_pic_format";
+	public static String EXPORT_PIC_DPI = "export_pic_dpi";
+	// Print preview dialog
+	public static String PRINT_ORIENTATION = "print_orientation";
+	public static String PRINT_SHOW_SCALE = "print_show_scale";
+	public static String PRINT_SHOW_SCALE2 = "print_show_scale_2";
+	// Meta data
+	public static String AUTHOR = "author";
+	public static String VERSION = "version";
+	public static String INPUT_3D = "input_3d";
 
 	protected String factoryDefaultXml; // see loadPreferences()
 	protected static final String XML_FACTORY_DEFAULT = "xml_factory_default";
@@ -77,20 +66,56 @@ public class GeoGebraPreferencesD {
 	protected static final String APP_CURRENT_IMAGE_PATH = "app_current_image_path";
 	protected static final String APP_FILE_ = "app_file_";
 
-	private static String PROPERTY_FILEPATH = null;
 	private static GeoGebraPreferencesD singleton;
+
+	protected GeoGebraPreferencesD() {
+		if (configHome == null)
+			configHome = Paths.get(
+					System.getenv("XDG_CONFIG_HOME"), "gsq"
+				).toString();
+		if (configHome == null)
+			configHome = Paths.get(
+					System.getProperty("user.home"), ".config/gsq/"
+				).toString();
+		layoutCfg = Paths.get(configHome, "layout.xml").toString();
+		// objCfg might be given by --config
+		if (objCfg == null)
+			objCfg = Paths.get(configHome, "defaults.xml").toString();
+
+		if (dataHome == null)
+			dataHome = Paths.get(
+					System.getenv("XDG_DATA_HOME"), "gsq"
+				).toString();
+		if (dataHome == null)
+			dataHome = Paths.get(
+				System.getProperty("user.home"), ".local/share/gsq/"
+			).toString();
+		// macrosPrefs might be given by --modules
+		if (macrosPrefs == null)
+			macrosPrefs = Paths.get(dataHome, "macros.ggt").toString();
+		propData = Paths.get(dataHome, "gsq.properties").toString();
+
+		Log.debug("Reading config from " + configHome);
+		Log.debug("Reading modules from " + macrosPrefs);
+
+		try {
+			ggbPrefs = Preferences.userRoot().node(PREF_ROOT);
+		} catch (Exception e) {
+			// Thrown when running unsigned JAR
+			ggbPrefs = null;
+		}
+	}
 
 	/** Set in geogebra.gui.app.GeoGebraFrame before first call to getPref() */
 	public static void setPropertyFileName(String pfname) {
-		PROPERTY_FILEPATH = pfname;
-		Log.debug("Preferences in: " + PROPERTY_FILEPATH);
+		propData = pfname;
 	}
 
 	/**
 	 * @return preferences singleton
 	 */
 	public synchronized static GeoGebraPreferencesD getPref() {
-		if (singleton == null && PROPERTY_FILEPATH != null) {
+		if (singleton == null && propData != null) {
 			singleton = GeoGebraPortablePreferences.getPref();
 		}
 		if (singleton == null) {
@@ -140,12 +165,14 @@ public class GeoGebraPreferencesD {
 	 */
 	public File getDefaultFilePath() {
 		if (getPref() == null)
-			return null;
-		File file = new File(getPref().loadPreference(APP_FILE_ + "1", ""));
-		if (file != null && file.exists()) {
-			return file.getParentFile();
-		}
 		return null;
+		String fpath = getPref().loadPreference(APP_FILE_ + "1", "");
+		if (fpath == null)
+			return null;
+		File file = new File(fpath);
+		if (file == null || ! file.exists())
+			return null;
+		return file.getParentFile();
 	}
 
 	/**
@@ -249,11 +276,11 @@ public class GeoGebraPreferencesD {
 		byte[] macros = app.getMacroFileAsByteArray();
 
 		// make sure folder exists
-		UtilD.mkdirs(new File(PREFS_PATH));
+		UtilD.mkdirs(new File(configHome));
 
-		UtilD.writeStringToFile(userPrefsXML, USERS_PREFS);
-		UtilD.writeStringToFile(objectPrefsXML, OBJECTS_PREFS);
-		UtilD.writeByteArrayToFile(macros, MACROS_PREFS);
+		UtilD.writeStringToFile(userPrefsXML, layoutCfg);
+		UtilD.writeStringToFile(objectPrefsXML, objCfg);
+		UtilD.writeByteArrayToFile(macros, macrosPrefs);
 		return;
 
 		// ggbPrefs.put(GeoGebraPreferences.XML_USER_PREFERENCES, userPrefsXML);
@@ -387,13 +414,11 @@ public class GeoGebraPreferencesD {
 	public void loadXMLPreferences(AppD app) {
 
 		app.setWaitCursor();
-
-		Log.debug("Preferences loaded from " + USERS_PREFS);
-		String userPrefsXML = UtilD.loadFileIntoString(USERS_PREFS);
+		String userPrefsXML = UtilD.loadFileIntoString(layoutCfg);
 		String objectPrefsXML = UtilD
-				.loadFileIntoString(OBJECTS_PREFS);
+				.loadFileIntoString(objCfg);
 
-		byte[] ggtFile = UtilD.loadFileIntoByteArray(MACROS_PREFS);
+		byte[] ggtFile = UtilD.loadFileIntoByteArray(macrosPrefs);
 
 		if (ggtFile != null) {
 			app.loadMacroFileFromByteArray(ggtFile, true);
@@ -450,9 +475,9 @@ public class GeoGebraPreferencesD {
 	 */
 	public void clearPreferences(App app) {
 		try {
-			UtilD.delete(new File(OBJECTS_PREFS));
-			UtilD.delete(new File(USERS_PREFS));
-			UtilD.delete(new File(MACROS_PREFS));
+			UtilD.delete(new File(objCfg));
+			UtilD.delete(new File(layoutCfg));
+			UtilD.delete(new File(macrosPrefs));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -472,6 +497,8 @@ public class GeoGebraPreferencesD {
 	}
 
 	public static File getFile() {
-		return new File(GeoGebraPreferencesD.PROPERTY_FILEPATH);
+		if (propData == null)
+			return null;
+		return new File(GeoGebraPreferencesD.propData);
 	}
 }

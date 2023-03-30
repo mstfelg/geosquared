@@ -1,4 +1,7 @@
-## Geo²
+  <picture>
+    <img alt="GeoSquared" src="./doc/assets/geo2.svg" height=100px />
+  </picture>
+
 
 GeoGebra done right.
 

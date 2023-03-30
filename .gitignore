@@ -5,6 +5,7 @@ web/war
 web/extras
 /.gradle/
 # non-standard file location in SASS https://github.com/EtienneMiret/sass-gradle-plugin/pull/24#issuecomment-1377513773
+.vscode/
 web/.gradle
 
 # InteliJ specific

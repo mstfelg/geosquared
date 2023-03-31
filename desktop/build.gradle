@@ -19,10 +19,6 @@ sourceSets {
             }
         }
     }
-    e2eTest {
-        compileClasspath += main.output + test.output
-        runtimeClasspath += main.output
-    }
 }
 
 configurations {
@@ -149,9 +145,3 @@ task debugJars(type:Zip, dependsOn: 'jar') {
 }
 
 tasks['checkstyleMain'].setSource(files([]))
-
-task e2eTest(type: Test) {
-    description 'Run end-to-end tests'
-    testClassesDirs = sourceSets.e2eTest.output.classesDirs
-    classpath = sourceSets.e2eTest.runtimeClasspath
-}

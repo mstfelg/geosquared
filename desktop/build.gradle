@@ -26,8 +26,6 @@ sourceSets {
 }
 
 configurations {
-    e2eTestCompile.extendsFrom testCompile
-    e2eTestCompile.extendsFrom testRuntime
 }
 
 eclipse.classpath.sourceSets.removeAll { it.name == 'nonfree' || it.name == 'gpl'}

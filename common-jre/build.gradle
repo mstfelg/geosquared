@@ -2,7 +2,6 @@ plugins {
     id 'java-library'
     id 'pmd'
     id 'checkstyle'
-    id 'jacoco'
     id 'com.github.spotbugs' version '5.0.13'
 }
 
@@ -56,42 +55,4 @@ pmd {
 }
 test {
     ignoreFailures = true
-}
-
-// http://stackoverflow.com/questions/20638039/gradle-and-jacoco-instrument-classes-from-a-separate-subproject
-gradle.projectsEvaluated {
-    // include src from all dependent projects (compile dependency) in JaCoCo test report
-    jacocoTestReport {
-        // get all projects we have a (compile) dependency on
-        def projs = configurations.implementation.getAllDependencies().withType(ProjectDependency).collect{it.getDependencyProject()}
-        projs.each {
-            additionalSourceDirs files(it.sourceSets.main.java.srcDirs)
-            additionalClassDirs files(files(it.sourceSets.main['java'].outputDir).collect({
-                File f -> fileTree(dir: f, exclude: ['org/apache/**','edu/**','org/geogebra/common/kernel/barycentric/**'])
-            }))
-        }
-    }
-}
-
-jacocoTestReport {
-   afterEvaluate {
-       getClassDirectories().setFrom( files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: ['org/mozilla/**'])
-        }))
-    }
-    reports {
-        xml.enabled true
-        html.enabled false
-    }
-}
-
-configurations {
-    testArtifacts.extendsFrom testCompile
-}
-task testJar(type: Jar) {
-    classifier "test"
-    from sourceSets.test.output
-}
-artifacts {
-    testArtifacts testJar
 }

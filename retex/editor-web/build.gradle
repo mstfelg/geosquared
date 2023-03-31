@@ -36,7 +36,6 @@ dependencies {
 		project(':editor-base'),
 		files(project(':editor-base').sourceSets.main.allSource.srcDirs),
 		files(project(':renderer-web').sourceSets.main.allSource.srcDirs),
-		files(project(':gwtutil').sourceSets.main.allSource.srcDirs),
 		"org.gwtproject:gwt-dev:$gwtCompilerVersion",
 		"org.gwtproject:gwt-user:$gwtCompilerVersion"
 	testImplementation "org.gwtproject:gwt-user:$gwtCompilerVersion"

@@ -1,7 +1,6 @@
 include 'common'
 include 'ggbjdk'
 include 'common-jre'
-include 'xr-base'
 
 include 'desktop'
 include 'jogl2'

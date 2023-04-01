@@ -127,7 +127,7 @@ import org.geogebra.desktop.gui.view.spreadsheet.SpreadsheetViewD;
 import org.geogebra.desktop.gui.virtualkeyboard.VirtualKeyboardD;
 import org.geogebra.desktop.gui.virtualkeyboard.WindowsUnicodeKeyboard;
 import org.geogebra.desktop.main.AppD;
-import org.geogebra.desktop.main.GeoGebraPreferencesD;
+import org.geogebra.desktop.main.AppPrefs;
 import org.geogebra.desktop.main.GuiManagerInterfaceD;
 import org.geogebra.desktop.main.KeyboardSettings;
 import org.geogebra.desktop.main.LocalizationD;
@@ -1373,7 +1373,7 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 						if (imageFile != null) {
 							getApp().setCurrentImagePath(
 									imageFile.getParentFile());
-							GeoGebraPreferencesD.getPref()
+							AppPrefs.getPref()
 									.saveDefaultImagePath(getApp()
 											.getCurrentImagePath());
 						}
@@ -1441,7 +1441,7 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 				dataFile = fileChooser.getSelectedFile();
 				if (dataFile != null) {
 					getApp().setCurrentImagePath(dataFile.getParentFile());
-					GeoGebraPreferencesD.getPref().saveDefaultImagePath(
+					AppPrefs.getPref().saveDefaultImagePath(
 							getApp().getCurrentImagePath());
 				}
 			}

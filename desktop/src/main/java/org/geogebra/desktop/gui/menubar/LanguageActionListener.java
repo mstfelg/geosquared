@@ -4,7 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import org.geogebra.desktop.main.AppD;
-import org.geogebra.desktop.main.GeoGebraPreferencesD;
+import org.geogebra.desktop.main.AppPrefs;
 
 /**
  * Handle the change of the language.
@@ -25,6 +25,6 @@ public class LanguageActionListener implements ActionListener {
 		if (app.hasEuclidianView2EitherShowingOrNot(1)) {
 			app.getEuclidianView2(1).updateBackground();
 		}
-		GeoGebraPreferencesD.getPref().saveDefaultLocale(app.getLocale());
+		AppPrefs.getPref().saveDefaultLocale(app.getLocale());
 	}
 }

@@ -20,12 +20,14 @@
 package org.geogebra.desktop;
 import java.util.Scanner;
 
+import org.geogebra.desktop.geogebra3D.App3D;
 import org.geogebra.desktop.gui.app.GeoGebraFrame3D;
 import org.geogebra.desktop.util.LoggerD;
 import org.geogebra.common.util.debug.Log;
 import org.geogebra.common.util.debug.Log.LogDestination;
 import org.geogebra.common.GeoGebraConstants;
-import org.geogebra.desktop.main.GeoGebraPreferencesD;
+import org.geogebra.desktop.main.AppD;
+import org.geogebra.desktop.main.AppPrefs;
 
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
@@ -35,6 +37,9 @@ public class GeoGebra3D extends GeoGebra {
 	// Defaults
 	static boolean interactiveEh = true;
 	static String logLevel = "debug";
+	static String modPath;
+	static String objCfg;
+	static AppPrefs prefs;
 
 	public static void main(String[] args) {
 		LoggerD logger = new LoggerD();
@@ -58,10 +63,10 @@ public class GeoGebra3D extends GeoGebra {
     	while ((c = g.getopt()) != -1) {
     	    switch (c) {
     	        case 'm':
-					GeoGebraPreferencesD.modPath = g.getOptarg();
+					modPath = g.getOptarg();
     	        	break;
     	        case 'c':
-					GeoGebraPreferencesD.objCfg = g.getOptarg();
+					objCfg = g.getOptarg();
     	        	break;
     	        case 'i':
 					interactiveEh = true;
@@ -91,8 +96,22 @@ public class GeoGebra3D extends GeoGebra {
 			readStdinEh = readStdinEh || fileName.equals("-");
 			fileArgs[i] = args[i];
 		}
-	
-		GeoGebraFrame3D wnd = new GeoGebraFrame3D(fileArgs);
+
+		prefs = new AppPrefs(objCfg, modPath);
+		GeoGebraFrame3D wnd = new GeoGebraFrame3D();
+		App3D app = new App3D(fileArgs, wnd, prefs);
+		app.getGuiManager().initMenubar();
+
+		wnd.app = app;
+		wnd.getContentPane().add(app.buildApplicationPanel());
+		/* dropTargetListener = new FileDropTargetListener(app); */
+		/* wnd.setGlassPane(((GuiManagerD) app.getGuiManager()).getLayout() */
+		/* 		.getDockManager().getGlassPane()); */
+		/* wnd.setDropTarget(new DropTarget(wnd, dropTargetListener)); */
+		/* updateAllTitles(); */
+		wnd.addWindowFocusListener(wnd);
+		app.updateMenubar();
+		wnd.setVisible(true);
 
 		if (!interactiveEh)
 			return;

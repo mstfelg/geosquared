@@ -408,7 +408,7 @@ public class GlobalKeyDispatcherD extends GlobalKeyDispatcher
 	protected void createNewWindow() {
 		if (newWindowAllowed) {
 			app.setWaitCursor();
-			GeoGebra3D.newInstance();
+			GeoGebra3D.newInstance(null);
 			app.setDefaultCursor();
 			newWindowAllowed = false;
 		}

@@ -20,6 +20,7 @@
 package org.geogebra.desktop;
 import java.util.Scanner;
 
+import org.geogebra.desktop.geogebra3D.App3D;
 import org.geogebra.desktop.gui.app.GeoGebraFrame3D;
 import org.geogebra.desktop.util.LoggerD;
 import org.geogebra.common.util.debug.Log;
@@ -95,7 +96,7 @@ public class GeoGebra3D extends GeoGebra {
 			fileArgs[i] = fileName;
 		}
 
-		AppD app = newInstance();
+		AppD app = newInstance(fileArgs);
 
 		if (!interactiveEh)
 			return;
@@ -110,9 +111,9 @@ public class GeoGebra3D extends GeoGebra {
 	}
 	
 	// Deprecates GeoGebraFrame.createNewWindow
-	public static AppD newInstance() {
+	public static AppD newInstance(String[] fileArgs) {
 		GeoGebraFrame3D wnd = new GeoGebraFrame3D();
-		AppD app = new AppD(new String[] {""}, new AppPrefs(objCfg, modPath), wnd);
+		App3D app = new App3D(fileArgs, new AppPrefs(objCfg, modPath), wnd);
 		wnd.init(app);
 		wnd.setVisible(true);
 		return app;

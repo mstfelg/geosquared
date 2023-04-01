@@ -35,13 +35,13 @@ import org.geogebra.desktop.util.UtilD;
  * @version May 16, 2007
  */
 
-public class GeoGebraPreferencesD {
-	public static String configHome;
-	public static String layoutCfg;
-	public static String objCfg;
+public class AppPrefs {
+	public String configHome;
+	public String layoutCfg;
+	public String objCfg;
 
-	public static String dataHome;
-	public static String modPath;
+	public String dataHome;
+	public String modPath;
 	public static String propData;
 
 	// Java Preferences
@@ -67,9 +67,15 @@ public class GeoGebraPreferencesD {
 	protected static final String APP_CURRENT_IMAGE_PATH = "app_current_image_path";
 	protected static final String APP_FILE_ = "app_file_";
 
-	private static GeoGebraPreferencesD singleton;
+	private static AppPrefs singleton;
+	
+	public AppPrefs() {
+		this(null, null);
+	}
 
-	protected GeoGebraPreferencesD() {
+	public AppPrefs(String objCfg, String mod) {
+		if (mod != null && !mod.equals(""))
+			modPath = mod;
 		if (configHome == null)
 			configHome = Paths.get(
 					System.getenv("XDG_CONFIG_HOME"), "gsq"
@@ -115,12 +121,9 @@ public class GeoGebraPreferencesD {
 	/**
 	 * @return preferences singleton
 	 */
-	public synchronized static GeoGebraPreferencesD getPref() {
-		if (singleton == null && propData != null) {
-			singleton = GeoGebraPortablePreferences.getPref();
-		}
+	public synchronized static AppPrefs getPref() {
 		if (singleton == null) {
-			singleton = new GeoGebraPreferencesD();
+			singleton = new AppPrefs();
 		}
 		return singleton;
 	}
@@ -149,7 +152,7 @@ public class GeoGebraPreferencesD {
 	 *            type
 	 */
 	public void setInput3DType(String type) {
-		getPref().savePreference(GeoGebraPreferencesD.INPUT_3D, type);
+		getPref().savePreference(AppPrefs.INPUT_3D, type);
 	}
 
 	/**
@@ -157,7 +160,7 @@ public class GeoGebraPreferencesD {
 	 * @return 3D input type currently used, "none" if none
 	 */
 	public String getInput3DType() {
-		return getPref().loadPreference(GeoGebraPreferencesD.INPUT_3D,
+		return getPref().loadPreference(AppPrefs.INPUT_3D,
 				Input3DConstants.PREFS_NONE);
 	}
 
@@ -299,14 +302,15 @@ public class GeoGebraPreferencesD {
 	 * construction in the application. Note: the XML string used is the same as
 	 * for ggb files.
 	 */
-	public void loadXMLPreferences(AppD app) {
+	public void applyTo(AppD app) {
+		Log.debug("Applying style to");
 		app.setWaitCursor();
 		String layoutFile = UtilD.loadFileIntoString(layoutCfg);
 		String objFile = UtilD.loadFileIntoString(objCfg);
 
 		if (modPath != null) {
 			Path root = Paths.get(modPath);
-			try (Stream<Path> stream = Files.walk(root)) {
+			try (Stream<Path> stream = Files.walk(root, 3)) {
 				stream.forEach(p -> {
 					if (Files.isRegularFile(p) && p.toString().endsWith(".gsq"))
 							app.loadModule(p.toString());
@@ -333,32 +337,6 @@ public class GeoGebraPreferencesD {
 
 		app.updateToolBar();
 		app.setDefaultCursor();
-
-		// load this preferences xml file in application
-		// try {
-		// 	// load tools from ggt file (byte array)
-		// 	byte[] ggtFile = getByteArray(TOOLS_FILE_GGT, null);
-		// 	app.loadMacroFileFromByteArray(ggtFile, true);
-		//
-		// 	// load preferences xml
-		// 	String xml = getPref().loadPreference(GeoGebraPreferences.XML_USER_PREFERENCES,
-		// 			factoryDefaultXml);
-		// 	app.setXML(xml, false);
-		//
-		// 	String xmlDef = getPref().loadPreference(
-		// 			GeoGebraPreferences.XML_DEFAULT_OBJECT_PREFERENCES, factoryDefaultXml);
-		// 	if (!xmlDef.equals(factoryDefaultXml)) {
-		// 		boolean eda = app.getKernel().getElementDefaultAllowed();
-		// 		app.getKernel().setElementDefaultAllowed(true);
-		// 		app.setXML(xmlDef, false);
-		// 		app.getKernel().setElementDefaultAllowed(eda);
-		// 	}
-		// 	app.updateToolBar();
-		// } catch (Throwable e) {
-		// 	e.printStackTrace();
-		// }
-		//
-		// app.setDefaultCursor();
 	}
 
 	/**
@@ -390,6 +368,6 @@ public class GeoGebraPreferencesD {
 	public static File getFile() {
 		if (propData == null)
 			return null;
-		return new File(GeoGebraPreferencesD.propData);
+		return new File(AppPrefs.propData);
 	}
 }

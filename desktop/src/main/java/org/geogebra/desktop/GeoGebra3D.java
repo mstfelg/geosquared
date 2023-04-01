@@ -25,7 +25,8 @@ import org.geogebra.desktop.util.LoggerD;
 import org.geogebra.common.util.debug.Log;
 import org.geogebra.common.util.debug.Log.LogDestination;
 import org.geogebra.common.GeoGebraConstants;
-import org.geogebra.desktop.main.GeoGebraPreferencesD;
+import org.geogebra.desktop.main.AppD;
+import org.geogebra.desktop.main.AppPrefs;
 
 import gnu.getopt.Getopt;
 import gnu.getopt.LongOpt;
@@ -35,6 +36,8 @@ public class GeoGebra3D extends GeoGebra {
 	// Defaults
 	static boolean interactiveEh = true;
 	static String logLevel = "debug";
+	static String objCfg;
+	static String modPath;
 
 	public static void main(String[] args) {
 		LoggerD logger = new LoggerD();
@@ -58,10 +61,10 @@ public class GeoGebra3D extends GeoGebra {
     	while ((c = g.getopt()) != -1) {
     	    switch (c) {
     	        case 'm':
-					GeoGebraPreferencesD.modPath = g.getOptarg();
+					modPath = g.getOptarg();
     	        	break;
     	        case 'c':
-					GeoGebraPreferencesD.objCfg = g.getOptarg();
+					objCfg = g.getOptarg();
     	        	break;
     	        case 'i':
 					interactiveEh = true;
@@ -84,15 +87,15 @@ public class GeoGebra3D extends GeoGebra {
     	}
 
 		// Positional arguments: file names
-		CommandLineArguments clArgs = new CommandLineArguments(null);
+		String[] fileArgs = new String[5];
 		boolean readStdinEh = false;
-		for (int i = g.getOptind(); i < args.length; i++) {
+		for (int i = g.getOptind(); i < args.length && i < 5; i++) {
 			String fileName = args[i];
 			readStdinEh = readStdinEh || fileName.equals("-");
-			clArgs.addFile(fileName);
+			fileArgs[i] = fileName;
 		}
-	
-		GeoGebraFrame3D wnd = new GeoGebraFrame3D(clArgs);
+
+		AppD app = newInstance();
 
 		if (!interactiveEh)
 			return;
@@ -100,12 +103,21 @@ public class GeoGebra3D extends GeoGebra {
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            wnd.getApplication().getFullGuiManager()
+            app.getFullGuiManager()
 				.getFullAlgebraInput().sendCmd(line);
         }
         scanner.close();
 	}
 	
+	// Deprecates GeoGebraFrame.createNewWindow
+	public static AppD newInstance() {
+		GeoGebraFrame3D wnd = new GeoGebraFrame3D();
+		AppD app = new AppD(new String[] {""}, new AppPrefs(objCfg, modPath), wnd);
+		wnd.init(app);
+		wnd.setVisible(true);
+		return app;
+	}
+
 	private static void version() {
 		System.out.println(""
 			+ "GeoSquared v" + GeoGebraConstants.VERSION_STRING + " "

@@ -1,7 +1,7 @@
 package org.geogebra.desktop.move.ggtapi.models;
 
 import org.geogebra.common.move.ggtapi.models.AuthenticationModel;
-import org.geogebra.desktop.main.GeoGebraPreferencesD;
+import org.geogebra.desktop.main.AppPrefs;
 
 /**
  * @author stefan

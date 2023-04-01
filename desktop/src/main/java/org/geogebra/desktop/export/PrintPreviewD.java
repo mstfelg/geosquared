@@ -57,7 +57,7 @@ import org.geogebra.desktop.gui.layout.DockPanelD;
 import org.geogebra.desktop.gui.view.Gridable;
 import org.geogebra.desktop.gui.view.consprotocol.ConstructionProtocolViewD;
 import org.geogebra.desktop.main.AppD;
-import org.geogebra.desktop.main.GeoGebraPreferencesD;
+import org.geogebra.desktop.main.AppPrefs;
 import org.geogebra.desktop.util.GuiResourcesD;
 
 public class PrintPreviewD extends JDialog {
@@ -461,23 +461,23 @@ public class PrintPreviewD extends JDialog {
 	private void loadPreferences() {
 		try {
 			// orientation
-			String strOrientation = GeoGebraPreferencesD.getPref()
-					.loadPreference(GeoGebraPreferencesD.PRINT_ORIENTATION,
+			String strOrientation = AppPrefs.getPref()
+					.loadPreference(AppPrefs.PRINT_ORIENTATION,
 							"landscape");
 			m_orientation = "portrait".equals(strOrientation)
 					? PageFormat.PORTRAIT : PageFormat.LANDSCAPE;
 
 			// show printing scale in cm
 			app.getEuclidianView1().setPrintScaleString(Boolean
-					.valueOf(GeoGebraPreferencesD.getPref().loadPreference(
-							GeoGebraPreferencesD.PRINT_SHOW_SCALE, "false"))
+					.valueOf(AppPrefs.getPref().loadPreference(
+							AppPrefs.PRINT_SHOW_SCALE, "false"))
 					.booleanValue());
 			if (app.hasEuclidianView2EitherShowingOrNot(1)) {
 				app.getEuclidianView2(1)
 						.setPrintScaleString(Boolean
-								.valueOf(GeoGebraPreferencesD.getPref()
+								.valueOf(AppPrefs.getPref()
 										.loadPreference(
-												GeoGebraPreferencesD.PRINT_SHOW_SCALE2,
+												AppPrefs.PRINT_SHOW_SCALE2,
 												"false"))
 								.booleanValue());
 			}
@@ -497,15 +497,15 @@ public class PrintPreviewD extends JDialog {
 			strOrientation = "portrait";
 		}
 
-		GeoGebraPreferencesD pref = GeoGebraPreferencesD.getPref();
-		pref.savePreference(GeoGebraPreferencesD.PRINT_ORIENTATION,
+		AppPrefs pref = AppPrefs.getPref();
+		pref.savePreference(AppPrefs.PRINT_ORIENTATION,
 				strOrientation);
 
 		// show printing scale in cm
-		pref.savePreference(GeoGebraPreferencesD.PRINT_SHOW_SCALE,
+		pref.savePreference(AppPrefs.PRINT_SHOW_SCALE,
 				Boolean.toString(app.getEuclidianView1().isPrintScaleString()));
 		if (app.hasEuclidianView2EitherShowingOrNot(1)) {
-			pref.savePreference(GeoGebraPreferencesD.PRINT_SHOW_SCALE2, Boolean
+			pref.savePreference(AppPrefs.PRINT_SHOW_SCALE2, Boolean
 					.toString(app.getEuclidianView2(1).isPrintScaleString()));
 		}
 	}

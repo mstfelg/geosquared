@@ -37,30 +37,21 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import org.geogebra.common.GeoGebraConstants;
 import org.geogebra.common.euclidian.EuclidianView;
-import org.geogebra.common.jre.util.DownloadManager;
 import org.geogebra.common.kernel.Kernel;
 import org.geogebra.common.kernel.Macro;
 import org.geogebra.common.kernel.geos.GeoElement;
 import org.geogebra.common.kernel.geos.GeoNumeric;
-import org.geogebra.common.main.App;
-import org.geogebra.common.main.Localization;
 import org.geogebra.common.util.DoubleUtil;
 import org.geogebra.common.util.StringUtil;
 import org.geogebra.common.util.debug.Log;
-import org.geogebra.desktop.AppId;
 import org.geogebra.desktop.CommandLineArguments;
 import org.geogebra.desktop.awt.GDimensionD;
 import org.geogebra.desktop.euclidianND.EuclidianViewInterfaceD;
@@ -71,7 +62,7 @@ import org.geogebra.desktop.gui.GuiManagerD;
 import org.geogebra.desktop.gui.dialog.DialogManagerD;
 import org.geogebra.desktop.gui.util.AnimatedGifEncoder;
 import org.geogebra.desktop.main.AppD;
-import org.geogebra.desktop.main.GeoGebraPreferencesD;
+import org.geogebra.desktop.main.AppPrefs;
 import org.geogebra.desktop.util.FrameCollector;
 
 import com.himamis.retex.editor.share.util.Unicode;
@@ -104,8 +95,35 @@ public class GeoGebraFrame extends JFrame
 		this.addComponentListener(this);
 	}
 	
-	public GeoGebraFrame(CommandLineArguments args) {
-		createNewWindow(args, this);
+	public GeoGebraFrame(String[] args) {
+		// set Application's size, position and font size
+
+		final AppD app = new AppD(args, null, this);
+		app.getGuiManager().initMenubar();
+
+		// init GUI
+		this.app = app;
+		this.getContentPane().add(app.buildApplicationPanel());
+		dropTargetListener = new FileDropTargetListener(app);
+		this.setGlassPane(((GuiManagerD) app.getGuiManager()).getLayout()
+				.getDockManager().getGlassPane());
+		this.setDropTarget(new DropTarget(this, dropTargetListener));
+		this.addWindowFocusListener(this);
+		updateAllTitles();
+
+		app.updateMenubar();
+
+		this.setVisible(true);
+
+		// init some things in the background
+		Thread runner = GeoGebraFrame.createAppThread(app);
+		runner.start();
+
+		checkCommandLineExport(app);
+
+		for (NewInstanceListener l : instanceListener) {
+			l.newInstance(this);
+		}
 	}
 
 	/**
@@ -160,7 +178,7 @@ public class GeoGebraFrame extends JFrame
 
 	@Override
 	public Locale getLocale() {
-		Locale defLocale = GeoGebraPreferencesD.getPref().getDefaultLocale();
+		Locale defLocale = AppPrefs.getPref().getDefaultLocale();
 		if (defLocale == null) {
 			return super.getLocale();
 		}
@@ -344,6 +362,24 @@ public class GeoGebraFrame extends JFrame
 	protected AppD createApplication(CommandLineArguments args, JFrame frame) {
 		return new AppD(args, frame, true);
 	}
+	
+	public void init(AppD app) {
+		this.app = app;
+		getContentPane().add(app.buildApplicationPanel());
+		dropTargetListener = new FileDropTargetListener(app);
+		setGlassPane(((GuiManagerD) app.getGuiManager()).getLayout()
+				.getDockManager().getGlassPane());
+		setDropTarget(new DropTarget(this, dropTargetListener));
+		addWindowFocusListener(this);
+		updateAllTitles();
+		// init some things in the background
+		Thread runner = GeoGebraFrame.createAppThread(app);
+		runner.start();
+
+		for (NewInstanceListener l : instanceListener) {
+			l.newInstance(this);
+		}
+	}
 
 	protected GeoGebraFrame copy() {
 		return new GeoGebraFrame();
@@ -489,7 +525,7 @@ public class GeoGebraFrame extends JFrame
 
 	private static void checkCommandLineExport(final AppD app) {
 
-		final CommandLineArguments args = app.getCommandLineArgs();
+		final CommandLineArguments args = null;
 
 		if (args != null && args.containsArg("exportAnimation")
 				&& args.containsArg("slider")) {

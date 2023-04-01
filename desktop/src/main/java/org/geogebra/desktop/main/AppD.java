@@ -18,7 +18,6 @@ import java.awt.Component;
 import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Cursor;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -56,7 +55,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -72,14 +70,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.FileHandler;
-import java.util.logging.Handler;
 import java.util.logging.LogManager;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import javax.imageio.ImageIO;
-import javax.naming.OperationNotSupportedException;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
@@ -124,8 +117,6 @@ import org.geogebra.common.gui.toolbar.ToolBar;
 import org.geogebra.common.gui.view.algebra.AlgebraView;
 import org.geogebra.common.io.MyXMLHandler;
 import org.geogebra.common.io.QDParser;
-import org.geogebra.common.io.layout.DockPanelData;
-import org.geogebra.common.io.layout.Perspective;
 import org.geogebra.common.javax.swing.GImageIcon;
 import org.geogebra.common.jre.factory.FormatFactoryJre;
 import org.geogebra.common.jre.gui.MyImageJre;
@@ -146,7 +137,6 @@ import org.geogebra.common.kernel.kernelND.GeoPointND;
 import org.geogebra.common.main.App;
 import org.geogebra.common.main.DialogManager;
 import org.geogebra.common.main.MyError.Errors;
-import org.geogebra.common.main.ProverSettings;
 import org.geogebra.common.main.SpreadsheetTableModel;
 import org.geogebra.common.main.error.ErrorHandler;
 import org.geogebra.common.main.settings.AbstractSettings;
@@ -164,9 +154,7 @@ import org.geogebra.common.util.GTimerListener;
 import org.geogebra.common.util.LowerCaseDictionary;
 import org.geogebra.common.util.NormalizerMinimal;
 import org.geogebra.common.util.StringUtil;
-import org.geogebra.common.util.Util;
 import org.geogebra.common.util.debug.Log;
-import org.geogebra.common.util.debug.Log.LogDestination;
 import org.geogebra.desktop.CommandLineArguments;
 import org.geogebra.desktop.GeoGebra;
 import org.geogebra.desktop.awt.GBufferedImageD;
@@ -199,7 +187,6 @@ import org.geogebra.desktop.gui.dialog.options.OptionsAdvancedD;
 import org.geogebra.desktop.gui.inputbar.AlgebraInputD;
 import org.geogebra.desktop.gui.layout.DockPanelD;
 import org.geogebra.desktop.gui.layout.LayoutD;
-import org.geogebra.desktop.gui.menubar.OptionsMenuController;
 import org.geogebra.desktop.gui.toolbar.ToolbarContainer;
 import org.geogebra.desktop.gui.util.ImageSelection;
 import org.geogebra.desktop.headless.GFileHandler;
@@ -221,10 +208,8 @@ import org.geogebra.desktop.util.GTimerD;
 import org.geogebra.desktop.util.GuiResourcesD;
 import org.geogebra.desktop.util.ImageManagerD;
 import org.geogebra.desktop.util.ImageResourceD;
-import org.geogebra.desktop.util.LoggerD;
 import org.geogebra.desktop.util.Normalizer;
 import org.geogebra.desktop.util.StringUtilD;
-import org.geogebra.desktop.util.UtilD;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -598,76 +583,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	@SuppressFBWarnings({ "DM_EXIT", "" })
 	public static void exit(int i) {
 		System.exit(i);
-	}
-
-	private static void setProverOption(String option) {
-		String[] str = option.split(":", 2);
-		ProverSettings proverSettings = ProverSettings.get();
-		if ("engine".equalsIgnoreCase(str[0])) {
-			if ("OpenGeoProver".equalsIgnoreCase(str[1])
-					|| "Recio".equalsIgnoreCase(str[1])
-					|| "Botana".equalsIgnoreCase(str[1])
-					|| "alternativeBotana".equalsIgnoreCase(str[1])
-					|| "PureSymbolic".equalsIgnoreCase(str[1])
-					|| "Auto".equalsIgnoreCase(str[1])) {
-				proverSettings.proverEngine = str[1].toLowerCase();
-				return;
-			}
-			Log.warn("Option not recognized: ".concat(option));
-			return;
-		}
-		if ("timeout".equalsIgnoreCase(str[0])) {
-			proverSettings.proverTimeout = Integer.parseInt(str[1]);
-			return;
-		}
-		if ("maxTerms".equalsIgnoreCase(str[0])) {
-			proverSettings.setMaxTerms(Integer.parseInt(str[1]));
-			return;
-		}
-		if ("method".equalsIgnoreCase(str[0])) {
-			if ("Groebner".equalsIgnoreCase(str[1])
-					|| "Wu".equalsIgnoreCase(str[1])
-					|| "Area".equalsIgnoreCase(str[1])) {
-				proverSettings.proverMethod = str[1].toLowerCase();
-				return;
-			}
-			Log.warn("Method parameter not recognized: ".concat(option));
-			return;
-		}
-		if ("fpnevercoll".equalsIgnoreCase(str[0])) {
-			proverSettings.freePointsNeverCollinear = Boolean
-					.parseBoolean(str[1]);
-			return;
-		}
-		if ("usefixcoords".equalsIgnoreCase(str[0])) {
-			int fixcoordsP = Integer.parseInt(str[1].substring(0, 1));
-			int fixcoordsPD = Integer.parseInt(str[1].substring(1, 2));
-
-			if (fixcoordsP < 0 || fixcoordsP > 4) {
-				Log.error(
-						"Improper value for usefixcoords for Prove, using default instead");
-			} else {
-				proverSettings.useFixCoordinatesProve = fixcoordsP;
-			}
-
-			if (fixcoordsPD < 0 || fixcoordsPD > 4) {
-				Log.error(
-						"Improper value for usefixcoords for ProveDetails, using default instead");
-			} else {
-				proverSettings.useFixCoordinatesProveDetails = fixcoordsPD;
-			}
-
-			return;
-		}
-		if ("transcext".equalsIgnoreCase(str[0])) {
-			proverSettings.transcext = Boolean.parseBoolean(str[1]);
-			return;
-		}
-		if ("captionalgebra".equalsIgnoreCase(str[0])) {
-			proverSettings.captionAlgebra = Boolean.parseBoolean(str[1]);
-			return;
-		}
-		Log.warn("Prover option not recognized: ".concat(option));
 	}
 
 	// **************************************************************************
@@ -1069,34 +984,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		if (getGuiManager() != null) {
 			setActiveView(this, view);
 		}
-	}
-
-	/**
-	 * @return whether  just the euclidian view is visible in the document just loaded.
-	 *
-	 * @throws OperationNotSupportedException if perspective is not set
-	 */
-	private boolean isJustEuclidianVisible()
-			throws OperationNotSupportedException {
-		Perspective docPerspective = getTmpPerspective();
-
-		if (docPerspective == null) {
-			throw new OperationNotSupportedException();
-		}
-
-		boolean justEuclidianVisible = false;
-
-		for (DockPanelData panel : docPerspective.getDockPanelData()) {
-			if ((panel.getViewId() == App.VIEW_EUCLIDIAN)
-					&& panel.isVisible()) {
-				justEuclidianVisible = true;
-			} else if (panel.isVisible()) {
-				justEuclidianVisible = false;
-				break;
-			}
-		}
-
-		return justEuclidianVisible;
 	}
 
 	@Override
@@ -2887,7 +2774,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	}
 
 	private static URL codebase;
-	private static boolean runningFromJar = false;
 	final private static String packgz = ".pack.gz";
 
 	private static void initCodeBase() {
@@ -4011,8 +3897,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	private ScheduledFuture<?> handler;
 
 	private PrintPreviewD printPreview;
-
-	private OptionsMenuController optionsMenu;
 
 	private static volatile MessageDigest md5EncrypterD;
 

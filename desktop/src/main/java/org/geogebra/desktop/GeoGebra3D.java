@@ -45,7 +45,6 @@ public class GeoGebra3D extends GeoGebra {
 
 		// Argument parsing
     	int c;
-    	String arg;
     	LongOpt[] longopts = new LongOpt[] {
     	    new LongOpt("config", LongOpt.REQUIRED_ARGUMENT, null, 'c'),
     	    new LongOpt("modules", LongOpt.REQUIRED_ARGUMENT, null, 'm'),

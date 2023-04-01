@@ -18,7 +18,6 @@
 
 package org.geogebra.desktop.gui.app;
 
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
@@ -37,11 +36,6 @@ import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -79,8 +73,6 @@ import org.geogebra.desktop.gui.util.AnimatedGifEncoder;
 import org.geogebra.desktop.main.AppD;
 import org.geogebra.desktop.main.GeoGebraPreferencesD;
 import org.geogebra.desktop.util.FrameCollector;
-import org.geogebra.desktop.util.HttpRequestD;
-import org.geogebra.desktop.util.UtilD;
 
 import com.himamis.retex.editor.share.util.Unicode;
 

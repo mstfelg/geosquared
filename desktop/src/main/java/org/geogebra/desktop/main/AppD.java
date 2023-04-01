@@ -58,6 +58,9 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -71,6 +74,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.LogManager;
+import java.util.zip.InflaterInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -382,7 +388,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		// init default preferences if necessary
 		AppPrefs.getPref().initDefaultXML(this);
 
-		boolean fileLoaded = loadModule(args[0]);
+		boolean fileLoaded = loadModule(Paths.get(args[0]));
 
 		// initialize GUI
 		if (isUsingFullGui()) {
@@ -468,7 +474,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		// loadModule clears up previous constructions
 		this.prefs = prefs;
 		this.prefs.applyTo(this);
-		boolean fileLoaded = loadModule(args[0]);
+		boolean fileLoaded = false;
 
 		// initialize GUI
 		if (isUsingFullGui()) {
@@ -2667,15 +2673,46 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		}
 	}
 
-	public boolean loadModule(String modName) {
-		if (modName == null)
+	public String getExt(Path p) {
+		if (p == null || !Files.isRegularFile(p))
+			return null;
+
+		String fileName = p.getFileName().toString();
+		int idx = fileName.lastIndexOf('.');
+		if (idx == -1)
+			return "";
+		return fileName.substring(idx + 1);
+	}
+
+	public boolean loadModule(Path p) {
+		String ext = getExt(p);
+		if (ext == null || ext.equals(""))
 			return false;
-		
-		Reader modReader = null;
+
+		InputStream fstream;
 		try {
-			modReader = new InputStreamReader(
-				new FileInputStream(modName)
-			);
+			fstream = new FileInputStream(p.toFile());
+		} catch (Exception e) {return false;}
+
+		// Decompress first
+		if (ext.equals("ggb")) {
+			ZipInputStream zstream = new ZipInputStream(fstream);
+			ZipEntry entry;
+			try {
+				while ((entry = zstream.getNextEntry()) != null) {
+					// Construction file
+					if (entry.getName().equals("geogebra.xml")) {
+						fstream = new InflaterInputStream(zstream);
+						break;
+					}
+				}
+			}
+			catch (Exception e) {}
+		}
+
+		Reader freader = null;
+		try {
+			freader = new InputStreamReader(fstream);
 		} catch (Exception e) {
 			return false;
 		}
@@ -2685,7 +2722,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 
 		kernel.getConstruction().setFileLoading(true);
 		try {
-			xmlParser.parse(xmlHandler, modReader);
+			xmlParser.parse(xmlHandler, freader);
 		} catch (Exception e) { 
 			e.printStackTrace();
 			return false;

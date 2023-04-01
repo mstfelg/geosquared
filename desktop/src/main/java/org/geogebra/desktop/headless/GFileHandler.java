@@ -1,16 +1,12 @@
 package org.geogebra.desktop.headless;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import org.geogebra.common.jre.headless.AppDI;
 import org.geogebra.common.jre.io.MyXMLioJre;
-import org.geogebra.common.jre.util.Base64;
 import org.geogebra.common.main.App;
 import org.geogebra.common.main.MyError;
-import org.geogebra.common.util.Charsets;
 
 public class GFileHandler {
 	/**

@@ -290,7 +290,7 @@ public class AppPrefs {
 			try (Stream<Path> stream = Files.walk(root, 3)) {
 				stream.forEach(p -> {
 					if (Files.isRegularFile(p) && p.toString().endsWith(".gsq"))
-							app.loadModule(p.toString());
+							app.loadModule(p);
 				});
 			} catch (Exception e) {
 				e.printStackTrace();

@@ -25,8 +25,7 @@ import org.geogebra.desktop.main.AppD;
 import org.geogebra.desktop.main.GeoGebraServer;
 
 public class GeoGebra {
-	public static void main(String[] cmdArgs) {
-		CommandLineArguments args = new CommandLineArguments(cmdArgs);
+	public static void main(String[] args) {
 		GeoGebraFrame.main(args);
 	}
 }

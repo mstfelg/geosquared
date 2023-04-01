@@ -55,7 +55,6 @@ import org.geogebra.common.main.AppCompanion;
 import org.geogebra.common.main.settings.EuclidianSettings3D;
 import org.geogebra.common.main.settings.updater.SettingsUpdaterBuilder;
 import org.geogebra.common.util.debug.Log;
-import org.geogebra.desktop.CommandLineArguments;
 import org.geogebra.desktop.euclidian.event.MouseEventD;
 import org.geogebra.desktop.geogebra3D.euclidian3D.EuclidianController3DD;
 import org.geogebra.desktop.geogebra3D.euclidian3D.EuclidianView3DD;
@@ -93,7 +92,7 @@ public class App3D extends AppD {
 	 * @param args arguments
 	 * @param frame frame
 	 */
-	public App3D(CommandLineArguments args, JFrame frame) {
+	public App3D(String[] args, JFrame frame) {
 
 		super(args, frame, null, true, new LocalizationD(3));
 
@@ -104,7 +103,7 @@ public class App3D extends AppD {
 	 * @param args arguments
 	 * @param comp frame
 	 */
-	public App3D(CommandLineArguments args, Container comp) {
+	public App3D(String[] args, Container comp) {
 		super(args, null, comp, true, new LocalizationD(3));
 
 		runThreadForCheckInput3D();
@@ -657,7 +656,7 @@ public class App3D extends AppD {
 
 	@Override
 	public void createNewWindow() {
-		GeoGebraFrame3D.createNewWindow3D(cmdArgs.getGlobalArguments());
+		GeoGebraFrame3D.createNewWindow3D(cmdArgs);
 	}
 
 	@Override
@@ -727,7 +726,7 @@ public class App3D extends AppD {
 
 	@Override
 	protected AppD newAppForTemplateOrInsertFile() {
-		return new App3D(new CommandLineArguments(null), new JPanel());
+		return new App3D(new String[] {}, new JPanel());
 	}
 
 	@Override

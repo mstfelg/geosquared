@@ -84,15 +84,15 @@ public class GeoGebra3D extends GeoGebra {
     	}
 
 		// Positional arguments: file names
-		CommandLineArguments clArgs = new CommandLineArguments(null);
+		String[] fileArgs = new String[5];
 		boolean readStdinEh = false;
 		for (int i = g.getOptind(); i < args.length; i++) {
 			String fileName = args[i];
 			readStdinEh = readStdinEh || fileName.equals("-");
-			clArgs.addFile(fileName);
+			fileArgs[i] = args[i];
 		}
 	
-		GeoGebraFrame3D wnd = new GeoGebraFrame3D(clArgs);
+		GeoGebraFrame3D wnd = new GeoGebraFrame3D(fileArgs);
 
 		if (!interactiveEh)
 			return;

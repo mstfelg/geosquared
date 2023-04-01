@@ -2,7 +2,6 @@ package org.geogebra.desktop.gui.app;
 
 import javax.swing.JFrame;
 
-import org.geogebra.desktop.CommandLineArguments;
 import org.geogebra.desktop.geogebra3D.App3D;
 import org.geogebra.desktop.main.AppD;
 
@@ -17,14 +16,14 @@ public class GeoGebraFrame3D extends GeoGebraFrame {
 	private static final long serialVersionUID = 1L;
 	
 	public GeoGebraFrame3D() { super(); }
-	public GeoGebraFrame3D(CommandLineArguments args) { super(args); }
+	public GeoGebraFrame3D(String[] args) { super(args); }
 	
-	public static synchronized void main(CommandLineArguments args) {
+	public static synchronized void main(String[] args) {
 		createNewWindow3D(args);
 	}
 
 	@Override
-	protected AppD createApplication(CommandLineArguments args, JFrame frame) {
+	protected AppD createApplication(String[] args, JFrame frame) {
 		return new App3D(args, frame);
 	}
 
@@ -35,7 +34,7 @@ public class GeoGebraFrame3D extends GeoGebraFrame {
 	 *            command line arguments
 	 * @return new geogebra window
 	 */
-	public static synchronized GeoGebraFrame createNewWindow3D(CommandLineArguments args) {
+	public static synchronized GeoGebraFrame createNewWindow3D(String[] args) {
 		return createNewWindow(args, new GeoGebraFrame3D());
 	}
 

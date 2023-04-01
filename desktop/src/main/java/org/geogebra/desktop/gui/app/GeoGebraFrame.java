@@ -61,7 +61,6 @@ import org.geogebra.common.util.DoubleUtil;
 import org.geogebra.common.util.StringUtil;
 import org.geogebra.common.util.debug.Log;
 import org.geogebra.desktop.AppId;
-import org.geogebra.desktop.CommandLineArguments;
 import org.geogebra.desktop.awt.GDimensionD;
 import org.geogebra.desktop.euclidianND.EuclidianViewInterfaceD;
 import org.geogebra.desktop.export.GraphicExportDialog;
@@ -104,8 +103,35 @@ public class GeoGebraFrame extends JFrame
 		this.addComponentListener(this);
 	}
 	
-	public GeoGebraFrame(CommandLineArguments args) {
-		createNewWindow(args, this);
+	public GeoGebraFrame(String[] args) {
+		GeoGebraFrame wnd = this;
+		final AppD app = new AppD(args, wnd, null);
+;
+		app.getGuiManager().initMenubar();
+
+		// init GUI
+		wnd.app = app;
+		wnd.getContentPane().add(app.buildApplicationPanel());
+		dropTargetListener = new FileDropTargetListener(app);
+		wnd.setGlassPane(((GuiManagerD) app.getGuiManager()).getLayout()
+				.getDockManager().getGlassPane());
+		wnd.setDropTarget(new DropTarget(wnd, dropTargetListener));
+		wnd.addWindowFocusListener(wnd);
+		updateAllTitles();
+
+		app.updateMenubar();
+
+		wnd.setVisible(true);
+
+		// init some things in the background
+		Thread runner = GeoGebraFrame.createAppThread(app);
+		runner.start();
+
+		checkCommandLineExport(app);
+
+		for (NewInstanceListener l : instanceListener) {
+			l.newInstance(wnd);
+		}
 	}
 
 	/**
@@ -259,17 +285,17 @@ public class GeoGebraFrame extends JFrame
 	 * @param args
 	 *            file name parameter
 	 */
-	public static synchronized void main(CommandLineArguments args) {
+	public static synchronized void main(String[] args) {
 		createNewWindow(args, new GeoGebraFrame());
 	}
 
 	public static synchronized GeoGebraFrame
-		createNewWindow(CommandLineArguments args) {
+		createNewWindow(String[] args) {
 		return createNewWindow(args, new GeoGebraFrame());
 	}
 
 	public synchronized GeoGebraFrame
-		createNewWindow(CommandLineArguments args, Macro macro) {
+		createNewWindow(String[] args, Macro macro) {
 		return createNewWindow(args, copy());
 	}
 
@@ -282,9 +308,7 @@ public class GeoGebraFrame extends JFrame
 	 * @return the new window
 	 */
 	public static synchronized GeoGebraFrame
-		createNewWindow(final CommandLineArguments args, GeoGebraFrame wnd) {
-		// set Application's size, position and font size
-
+		createNewWindow(final String[] args, GeoGebraFrame wnd) {
 		final AppD app = wnd.createApplication(args, wnd);
 		app.getGuiManager().initMenubar();
 
@@ -341,7 +365,7 @@ public class GeoGebraFrame extends JFrame
 	 * @param frame frame
 	 * @return the application running geogebra
 	 */
-	protected AppD createApplication(CommandLineArguments args, JFrame frame) {
+	protected AppD createApplication(String[] args, JFrame frame) {
 		return new AppD(args, frame, true);
 	}
 
@@ -488,285 +512,6 @@ public class GeoGebraFrame extends JFrame
 	}
 
 	private static void checkCommandLineExport(final AppD app) {
-
-		final CommandLineArguments args = app.getCommandLineArgs();
-
-		if (args != null && args.containsArg("exportAnimation")
-				&& args.containsArg("slider")) {
-
-			String dpiStr = args.getStringValue("dpi");
-
-			final int dpi = Integer
-					.parseInt("".equals(dpiStr) ? "300" : dpiStr);
-
-			final EuclidianView ev = app.getActiveEuclidianView();
-			final String filename0 = args.getStringValue("exportAnimation");
-
-			final String extension = StringUtil.getFileExtensionStr(filename0);
-
-			final String filename = StringUtil.removeFileExtension(filename0);
-
-			GeoElement export1 = app.getKernel()
-					.lookupLabel(EuclidianView.EXPORT1);
-			GeoElement export2 = app.getKernel()
-					.lookupLabel(EuclidianView.EXPORT2);
-
-			if ("gif".equals(extension) && export1 != null && export2 != null) {
-				// maximize window
-				// avoids clipping unless export size is especially large
-				// needed for Animated GIF export from GeoGebraWeb
-				// which runs this server-side
-				Frame frame = app.getFrame();
-				frame.setExtendedState(
-						frame.getExtendedState() | Frame.MAXIMIZED_BOTH);
-			}
-
-			SwingUtilities.invokeLater(() -> {
-
-				String sliderName = args.getStringValue("slider");
-				GeoElement slider = app.getKernel().lookupLabel(sliderName);
-
-				if (slider == null || !slider.isGeoNumeric()
-						|| !((GeoNumeric) slider).isSlider()) {
-					Log.error(sliderName + " is not a slider");
-					AppD.exit(0);
-				}
-
-				app.getKernel().getAnimatonManager().stopAnimation();
-				GeoNumeric num = (GeoNumeric) slider;
-
-				int type = num.getAnimationType();
-				double min = num.getIntervalMin();
-				double max = num.getIntervalMax();
-
-				double val;
-
-				double step;
-				int n;
-
-				switch (type) {
-				case GeoElement.ANIMATION_DECREASING:
-					step = -num.getAnimationStep();
-					n = (int) ((max - min) / -step);
-					if (DoubleUtil.isZero(((max - min) / -step) - n)) {
-						n++;
-					}
-					if (n == 0) {
-						n = 1;
-					}
-					val = max;
-					break;
-				case GeoElement.ANIMATION_OSCILLATING:
-					step = num.getAnimationStep();
-					n = (int) ((max - min) / step) * 2;
-					if (DoubleUtil.isZero(((max - min) / step * 2) - n)) {
-						n++;
-					}
-					if (n == 0) {
-						n = 1;
-					}
-					val = min;
-					break;
-				default: // GeoElement.ANIMATION_INCREASING:
-					// GeoElement.ANIMATION_INCREASING_ONCE:
-					step = num.getAnimationStep();
-					n = (int) ((max - min) / step);
-					if (DoubleUtil.isZero(((max - min) / step) - n)) {
-						n++;
-					}
-					if (n == 0) {
-						n = 1;
-					}
-					val = min;
-				}
-
-				if ("gif".equals(extension)) {
-
-					// "true" (default) or "false"
-					String loop = args.getStringValue("loop");
-
-					// time between frames in ms
-					String delayStr = args.getStringValue("delay");
-
-					final int delay = Integer.parseInt(
-							"".equals(delayStr) ? "10" : delayStr);
-
-					final AnimatedGifEncoder gifEncoder = new AnimatedGifEncoder();
-					gifEncoder.setQuality(1);
-					gifEncoder.start(new File(filename + ".gif"));
-
-					gifEncoder.setDelay(delay); // miliseconds
-					if (!"false".equals(loop)) {
-						// repeat forever
-						gifEncoder.setRepeat(0);
-					}
-
-					FrameCollector collector = new FrameCollector() {
-
-						@Override
-						public void addFrame(BufferedImage img) {
-							gifEncoder.addFrame(img);
-
-						}
-
-						@Override
-						public void finish() {
-							gifEncoder.finish();
-
-						}
-					};
-
-					app.exportAnimatedGIF(ev, collector, num, n, val, min,
-							max, step);
-
-					Log.debug("animated GIF exported successfully");
-
-					AppD.exit(0);
-				}
-
-				double printingScale = ev.getPrintingScale();
-				double exportScale = (printingScale * dpi) / 2.54
-						/ ev.getXscale();
-				boolean textAsShapes = true;
-				boolean transparent = true;
-				boolean useEMFplus = true;
-
-				int pixelWidth = (int) Math
-						.floor(ev.getExportWidth() * exportScale);
-				int pixelHeight = (int) Math
-						.floor(ev.getExportHeight() * exportScale);
-
-				for (int i = 0; i < n; i++) {
-
-					Log.debug("exporting frame " + i + "of " + n);
-
-					// avoid values like 14.399999999999968
-					val = DoubleUtil.checkDecimalFraction(val);
-
-					num.setValue(val);
-					num.updateRepaint();
-
-					File file = new File(filename + i + "." + extension);
-
-					GraphicExportDialog.export(extension,
-							(EuclidianViewInterfaceD) ev, file, transparent,
-							dpi, exportScale, textAsShapes, useEMFplus,
-							pixelWidth, pixelHeight, app);
-
-					val += step;
-
-					if (val > max + Kernel.STANDARD_PRECISION
-							|| val < min - Kernel.STANDARD_PRECISION) {
-						val -= 2 * step;
-						step *= -1;
-					}
-
-				}
-
-				AppD.exit(0);
-			});
-
-		}
-
-		if (args != null && args.containsArg("export")) {
-			final String filename = args.getStringValue("export");
-			final String extension = StringUtil.getFileExtensionStr(filename);
-			String dpiStr = args.getStringValue("dpi");
-
-			final int dpi = Integer
-					.parseInt("".equals(dpiStr) ? "300" : dpiStr);
-
-			Log.debug("attempting to export: " + filename + " at " + dpiStr
-					+ "dpi");
-
-			// wait for EuclidianView etc to initialize before export
-			SwingUtilities.invokeLater(() -> {
-
-				EuclidianViewInterfaceD ev = (EuclidianViewInterfaceD) app
-						.getActiveEuclidianView();
-				try {
-
-					boolean export3D = false;
-
-					// if 3D view exists, assume that we should export
-					// that
-					// (only PNG supported right now for 3D)
-					if (app.isEuclidianView3Dinited()) {
-
-						if ("png".equals(extension)) {
-							Log.debug("exporting 3D View");
-							ev = (EuclidianView3DD) app
-									.getEuclidianView3D();
-
-							export3D = true;
-						}
-					}
-
-					double printingScale = ev.getPrintingScale();
-					double exportScale = (printingScale * dpi) / 2.54
-							/ ev.getXscale();
-					final boolean transparent = true;
-					final boolean textAsShapes = true;
-					final boolean useEMFplus = true;
-					int pixelWidth = (int) Math
-							.floor(ev.getExportWidth() * exportScale);
-					int pixelHeight = (int) Math
-							.floor(ev.getExportHeight() * exportScale);
-
-					int dpi2 = dpi;
-
-					String maxSizeStr = args.getStringValue("maxSize");
-
-					if (maxSizeStr != null && !"".equals(maxSizeStr)) {
-
-						// ************************
-						double maxSize = Integer.parseInt(maxSizeStr);
-						Log.debug("desiredSize = " + maxSize);
-						double size = Math.max(ev.getExportWidth(),
-								ev.getExportHeight());
-						Log.debug("size = " + size);
-
-						exportScale = Math.min(
-								maxSize / Math.floor(ev.getExportWidth()),
-								maxSize / Math.floor(ev.getExportHeight()));
-						Log.debug("exportScale = " + exportScale);
-						pixelWidth = (int) Math
-								.floor(ev.getExportWidth() * exportScale);
-						Log.debug("pixelWidth = " + pixelWidth);
-						pixelHeight = (int) Math
-								.floor(ev.getExportHeight() * exportScale);
-						Log.debug("pixelHeight = " + pixelHeight);
-
-						dpi2 = (int) (exportScale * ev.getXscale() * 2.54
-								/ printingScale);
-						Log.debug("dpi2 = " + dpi2);
-					}
-
-					final File file = new File(filename);
-
-					GraphicExportDialog.export(extension, ev, file,
-							transparent, dpi2, exportScale, textAsShapes,
-							useEMFplus, pixelWidth, pixelHeight, app);
-
-					// HACK
-					// do it again for 3D, first call initializes JOGL
-					if (export3D) {
-						GraphicExportDialog.export(extension, ev, file,
-								transparent, dpi2, exportScale,
-								textAsShapes, useEMFplus, pixelWidth,
-								pixelHeight, app);
-					}
-
-					Log.debug("Graphics View exported successfully to "
-							+ file.getAbsolutePath());
-
-				} catch (Throwable t) {
-					t.printStackTrace();
-				}
-				AppD.exit(0);
-			});
-
-		}
 	}
 
 	@Override

@@ -78,7 +78,6 @@ import org.geogebra.common.util.FileExtensions;
 import org.geogebra.common.util.StringUtil;
 import org.geogebra.common.util.Util;
 import org.geogebra.common.util.debug.Log;
-import org.geogebra.desktop.CommandLineArguments;
 import org.geogebra.desktop.awt.GColorD;
 import org.geogebra.desktop.cas.view.CASViewD;
 import org.geogebra.desktop.euclidian.EuclidianControllerD;
@@ -2012,8 +2011,8 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 									String[] args = { file.getCanonicalPath() };
 									GeoGebraFrame wnd = GeoGebraFrame
 											.createNewWindow(
-													new CommandLineArguments(
-															args));
+													new String[] {}
+													);
 									wnd.toFront();
 									wnd.requestFocus();
 								} catch (Exception e) {

@@ -89,7 +89,7 @@ public class GeoGebraPanel extends JPanel {
 		}
 
 		// create GeoGebra application
-		app = new AppD(new CommandLineArguments(args), this, false);
+		app = new AppD(new String[] {}, this, false);
 	}
 
 	/**

@@ -178,7 +178,6 @@ import org.geogebra.desktop.factories.LaTeXFactoryD;
 import org.geogebra.desktop.factories.UtilFactoryD;
 import org.geogebra.desktop.gui.GuiManagerD;
 import org.geogebra.desktop.gui.MyImageD;
-import org.geogebra.desktop.gui.app.GeoGebraFrame;
 import org.geogebra.desktop.gui.dialog.AxesStyleListRenderer;
 import org.geogebra.desktop.gui.dialog.DashListRenderer;
 import org.geogebra.desktop.gui.dialog.DecorationListRenderer;
@@ -222,8 +221,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class AppD extends App implements KeyEventDispatcher, AppDI {
 	public static final String LICENSE_FILE = "/org/geogebra/desktop/_license.txt";
 
-	protected CommandLineArguments cmdArgs;
 	private DefaultSettings defaultSettings;
+	private AppPrefs prefs;
 
 	// ==============================================================
 	// FILE fields
@@ -238,7 +237,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	// RESOURCE fields
 	// ==============================================================
 
-	private final LocalizationD loc;
+	private LocalizationD loc;
 
 	// ==============================================================
 	// GUI fields
@@ -287,7 +286,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	// MODEL & MANAGER fields
 	// ==============================================================
 
-	private final FontManagerD fontManager;
+	private FontManagerD fontManager;
 
 	/** GUI manager */
 	protected GuiManagerInterfaceD guiManager;
@@ -350,7 +349,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 
 		this.loc = loc;
 		loc.setApp(this);
-		this.cmdArgs = null;
 
 		setFileVersion(GeoGebraConstants.VERSION_STRING,
 				getConfig().getAppCode());
@@ -396,10 +394,10 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		boolean ggtloading = isLoadingTool(args);
 
 		// init default preferences if necessary
-		GeoGebraPreferencesD.getPref().initDefaultXML(this);
+		AppPrefs.getPref().initDefaultXML(this);
 
 		if (ggtloading) {
-			GeoGebraPreferencesD.getPref().loadXMLPreferences(this);
+			AppPrefs.getPref().applyTo(this);
 		}
 
 		boolean fileLoaded = handleFileArg(args.getStringValue("file0"));
@@ -414,12 +412,12 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		}
 
 		// load XML preferences
-		currentPath = GeoGebraPreferencesD.getPref().getDefaultFilePath();
-		currentImagePath = GeoGebraPreferencesD.getPref()
+		currentPath = AppPrefs.getPref().getDefaultFilePath();
+		currentImagePath = AppPrefs.getPref()
 				.getDefaultImagePath();
 
 		if (!fileLoaded && !ggtloading) {
-			GeoGebraPreferencesD.getPref().loadXMLPreferences(this);
+			AppPrefs.getPref().applyTo(this);
 			imageManager.setMaxIconSizeAsPt(getFontSize());
 		}
 
@@ -455,12 +453,71 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		}
 
 		// user authentication handling
-		initSignInEventFlow();
 		if (kernel.wantAnimationStarted()) {
 			kernel.getAnimatonManager().startAnimation();
 			kernel.setWantAnimationStarted(false);
 		}
+	}
+	
+	// Deprecate all in favor of this
+	public AppD(String[] args, AppPrefs prefs, JFrame frame) {
+		super(Platform.DESKTOP);
+		if (frame == null || args == null || prefs == null)
+			return;
+		this.prefs = prefs;
+		this.preferredSize = new GDimensionD(800, 600);
+		this.fontManager = new FontManagerD();
+		this.loc = new LocalizationD(2);
+		loc.setApp(this);
+		this.useFullGui = true;
+		this.mainComp = frame;
 
+		setFileVersion(GeoGebraConstants.VERSION_STRING,
+				getConfig().getAppCode());
+		initImageManager(mainComp);
+		setLocale(mainComp.getLocale());
+
+		initFactories();
+		initKernel();
+		kernel.setPrintDecimals(getConfig().getDefaultPrintDecimals());
+		initSettings();
+		initEuclidianViews();
+		
+		this.initing = true;
+
+		String fileName = args[0];
+		if (fileName != null) {
+			Log.debug("Reading file: " + fileName);
+			handleFileArg(fileName);
+		}
+
+		initGuiManager();
+		setFrame(frame);
+
+		// load XML preferences
+		this.prefs.applyTo(this);
+		currentPath = AppPrefs.getPref().getDefaultFilePath();
+		currentImagePath = AppPrefs.getPref()
+				.getDefaultImagePath();
+
+		getGuiManager().getLayout()
+				.setPerspectiveOrDefault(getTmpPerspective());
+
+		setUndoActive(true);
+		this.initing = false;
+
+		// for key listening
+		KeyboardFocusManager.getCurrentKeyboardFocusManager()
+				.addKeyEventDispatcher(this);
+
+		getScriptManager().ggbOnInit();
+		getFactory();
+		setSaved();
+
+		if (kernel.wantAnimationStarted()) {
+			kernel.getAnimatonManager().startAnimation();
+			kernel.setWantAnimationStarted(false);
+		}
 	}
 
 	// **************************************************************************
@@ -687,10 +744,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		return fileList.size();
 	}
 
-	public void createNewWindow() {
-		GeoGebraFrame.createNewWindow(cmdArgs.getGlobalArguments());
-	}
-
 	@Override
 	public void fileNew() {
 
@@ -717,7 +770,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		resetAllToolbars();
 
 		// reload the saved/(default) preferences
-		GeoGebraPreferencesD.getPref().loadXMLPreferences(this);
+		AppPrefs.getPref().applyTo(this);
 		getGuiManager().updateToolbarDefinition();
 		resetUniqueId();
 	}
@@ -956,23 +1009,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	}
 
 	private static String fetchPage(URL url) throws IOException {
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(
-					new InputStreamReader(url.openStream(),
-							Charsets.getUtf8()));
-			StringBuilder page = new StringBuilder();
-			String line;
-			while (null != (line = reader.readLine())) {
-				page.append(line); // page does not contain any line breaks
-				// '\n', '\r' or "\r\n"
-			}
-			return page.toString();
-		} finally {
-			if (reader != null) {
-				reader.close();
-			}
-		}
+		return null;
 	}
 
 	// **************************************************************************
@@ -3484,10 +3521,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	@Override
 	public LowerCaseDictionary newLowerCaseDictionary() {
 		return new LowerCaseDictionary(Normalizer.getInstance());
-	}
-
-	public CommandLineArguments getCommandLineArgs() {
-		return cmdArgs;
 	}
 
 	/**

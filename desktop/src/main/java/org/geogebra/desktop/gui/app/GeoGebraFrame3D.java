@@ -17,7 +17,7 @@ public class GeoGebraFrame3D extends GeoGebraFrame {
 	private static final long serialVersionUID = 1L;
 	
 	public GeoGebraFrame3D() { super(); }
-	public GeoGebraFrame3D(CommandLineArguments args) { super(args); }
+	public GeoGebraFrame3D(String[] args) { super(args); }
 	
 	public static synchronized void main(CommandLineArguments args) {
 		createNewWindow3D(args);

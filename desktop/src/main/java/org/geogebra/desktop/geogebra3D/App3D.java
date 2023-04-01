@@ -74,7 +74,7 @@ import org.geogebra.desktop.gui.GuiManagerD;
 import org.geogebra.desktop.gui.app.GeoGebraFrame3D;
 import org.geogebra.desktop.gui.layout.DockManagerD;
 import org.geogebra.desktop.main.AppD;
-import org.geogebra.desktop.main.GeoGebraPreferencesD;
+import org.geogebra.desktop.main.AppPrefs;
 import org.geogebra.desktop.main.LocalizationD;
 import org.geogebra.desktop.main.settings.updater.FontSettingsUpdaterD;
 import org.geogebra.desktop.util.FrameCollector;
@@ -323,12 +323,12 @@ public class App3D extends AppD {
 	 *            type
 	 */
 	public static void setInput3DType(String type) {
-		GeoGebraPreferencesD.getPref().setInput3DType(type);
+		AppPrefs.getPref().setInput3DType(type);
 	}
 
 	@Override
 	public String getInput3DType() {
-		return GeoGebraPreferencesD.getPref().getInput3DType();
+		return AppPrefs.getPref().getInput3DType();
 	}
 
 	@Override
@@ -653,11 +653,6 @@ public class App3D extends AppD {
 		((App3DCompanion) companion).removeAllEuclidianViewForPlane();
 
 		return loadExistingFile(file, isMacroFile);
-	}
-
-	@Override
-	public void createNewWindow() {
-		GeoGebraFrame3D.createNewWindow3D(cmdArgs.getGlobalArguments());
 	}
 
 	@Override

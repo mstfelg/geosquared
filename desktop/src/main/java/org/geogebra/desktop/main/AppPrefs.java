@@ -69,9 +69,11 @@ public class AppPrefs {
 		this(null, null);
 	}
 
-	public AppPrefs(String o, String mod) {
+	public AppPrefs(String cfg, String mod) {
 		if (mod != null && !mod.equals(""))
 			modPath = mod;
+		if (cfg != null && !cfg.equals(""))
+			objCfg = cfg;
 		if (configHome == null)
 			configHome = Paths.get(
 					System.getenv("XDG_CONFIG_HOME"), "gsq"
@@ -81,7 +83,6 @@ public class AppPrefs {
 					System.getProperty("user.home"), ".config/gsq/"
 				).toString();
 		layoutCfg = Paths.get(configHome, "layout.xml").toString();
-		// objCfg might be given by --config
 		if (objCfg == null)
 			objCfg = Paths.get(configHome, "defaults.xml").toString();
 
@@ -93,18 +94,13 @@ public class AppPrefs {
 			dataHome = Paths.get(
 				System.getProperty("user.home"), ".local/share/gsq/"
 			).toString();
-		// macrosPrefs might be given by --modules
 		if (modPath == null)
 			modPath = Paths.get(dataHome, "modules/").toString();
 		propData = Paths.get(dataHome, "gsq.properties").toString();
 
 		Log.debug(""
-			+ "Reading config from " + configHome
-			+ ", " + dataHome
-			+ ", " + modPath
-			+ ", " + propData
-			+ ", " + layoutCfg
-			+ ", " + objCfg
+			+ "Reading config from: " + configHome
+			+ "\n Reading modules from: " + modPath
 			);
 
 		try {
@@ -249,14 +245,12 @@ public class AppPrefs {
 		app.getKernel().getConstruction().getConstructionDefaults()
 				.getDefaultsXML(sb);
 		String objectPrefsXML = sb.toString();
-		byte[] macros = app.getMacroFileAsByteArray();
 
 		// make sure folder exists
 		UtilD.mkdirs(new File(configHome));
 
 		UtilD.writeStringToFile(userPrefsXML, layoutCfg);
 		UtilD.writeStringToFile(objectPrefsXML, objCfg);
-		UtilD.writeByteArrayToFile(macros, modPath);
 		return;
 	}
 
@@ -274,7 +268,6 @@ public class AppPrefs {
 	 * for ggb files.
 	 */
 	public void applyTo(AppD app) {
-		Log.debug("Applying style");
 		app.setWaitCursor();
 
 		String layoutFile = UtilD.loadFileIntoString(layoutCfg);
@@ -313,23 +306,10 @@ public class AppPrefs {
 	 */
 	public void clearPreferences(App app) {
 		try {
-			UtilD.delete(new File(objCfg));
-			UtilD.delete(new File(layoutCfg));
-			UtilD.delete(new File(modPath));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		try {
 			ggbPrefs.clear();
 			ggbPrefs.flush();
 		} catch (Exception e) {
 			Log.debug(e + "");
 		}
-	}
-
-	public static File getFile() {
-		if (propData == null)
-			return null;
-		return new File(AppPrefs.propData);
 	}
 }

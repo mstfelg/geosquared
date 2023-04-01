@@ -4,7 +4,6 @@ import javax.swing.JFrame;
 
 import org.geogebra.desktop.geogebra3D.App3D;
 import org.geogebra.desktop.main.AppD;
-import org.geogebra.desktop.main.AppPrefs;
 
 /**
  * Frame for geogebra 3D.
@@ -17,7 +16,6 @@ public class GeoGebraFrame3D extends GeoGebraFrame {
 	private static final long serialVersionUID = 1L;
 	
 	public GeoGebraFrame3D() { super(); }
-	public GeoGebraFrame3D(String[] args, AppPrefs prefs) { super(args, prefs); }
 	
 	public static synchronized void main(String[] args) {
 		createNewWindow3D(args);

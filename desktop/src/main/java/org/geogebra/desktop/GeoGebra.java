@@ -12,10 +12,8 @@ the Free Software Foundation.
 
 package org.geogebra.desktop;
 
-import org.geogebra.desktop.gui.app.AppFrame;
-
 public class GeoGebra {
 	public static void main(String[] args) {
-		AppFrame.main(args);
+		GeoGebra3D.main(args);
 	}
 }

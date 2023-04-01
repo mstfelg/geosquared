@@ -24,7 +24,7 @@ import org.geogebra.common.util.CopyPaste;
 import org.geogebra.common.util.FileExtensions;
 import org.geogebra.desktop.euclidian.EuclidianViewD;
 import org.geogebra.desktop.gui.GuiManagerD;
-import org.geogebra.desktop.gui.app.GeoGebraFrame;
+import org.geogebra.desktop.gui.app.AppFrame;
 import org.geogebra.desktop.gui.app.MyFileFilter;
 import org.geogebra.desktop.gui.inputbar.AlgebraInputD;
 import org.geogebra.desktop.gui.layout.LayoutD;
@@ -318,7 +318,7 @@ public class GlobalKeyDispatcherD extends GlobalKeyDispatcher
 
 	@Override
 	protected boolean handleCtrlShiftN(boolean isAltDown) {
-		ArrayList<GeoGebraFrame> ggbInstances = GeoGebraFrame.getInstances();
+		ArrayList<AppFrame> ggbInstances = AppFrame.getInstances();
 		int size = ggbInstances.size();
 		if (size == 1) {
 			// load next file in folder
@@ -368,7 +368,7 @@ public class GlobalKeyDispatcherD extends GlobalKeyDispatcher
 				return true;
 			}
 			for (int i = 0; i < size; i++) {
-				GeoGebraFrame ggb = ggbInstances.get(i);
+				AppFrame ggb = ggbInstances.get(i);
 				AppD application = ggb.getApplication();
 
 				if (app == application) {

@@ -12,10 +12,10 @@ the Free Software Foundation.
 
 package org.geogebra.desktop;
 
-import org.geogebra.desktop.gui.app.GeoGebraFrame;
+import org.geogebra.desktop.gui.app.AppFrame;
 
 public class GeoGebra {
 	public static void main(String[] args) {
-		GeoGebraFrame.main(args);
+		AppFrame.main(args);
 	}
 }

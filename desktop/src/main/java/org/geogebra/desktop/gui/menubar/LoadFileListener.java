@@ -5,7 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 
 import org.geogebra.desktop.gui.GuiManagerD;
-import org.geogebra.desktop.gui.app.GeoGebraFrame;
+import org.geogebra.desktop.gui.app.AppFrame;
 import org.geogebra.desktop.main.AppD;
 
 public class LoadFileListener implements ActionListener {
@@ -26,7 +26,7 @@ public class LoadFileListener implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (file.exists()) {
 			// standard GeoGebra file
-			GeoGebraFrame inst = GeoGebraFrame.getInstanceWithFile(file);
+			AppFrame inst = AppFrame.getInstanceWithFile(file);
 			if (inst == null) {
 				if (app.isSaved() || app.saveCurrentFile()) {
 					// open file in application window

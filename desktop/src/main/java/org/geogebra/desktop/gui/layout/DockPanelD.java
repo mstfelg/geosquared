@@ -42,7 +42,7 @@ import org.geogebra.common.main.App;
 import org.geogebra.common.util.debug.Log;
 import org.geogebra.desktop.awt.GRectangleD;
 import org.geogebra.desktop.gui.GuiManagerD;
-import org.geogebra.desktop.gui.app.GeoGebraFrame;
+import org.geogebra.desktop.gui.app.AppFrame;
 import org.geogebra.desktop.gui.layout.panels.EuclidianDockPanelAbstract;
 import org.geogebra.desktop.gui.toolbar.ToolbarContainer;
 import org.geogebra.desktop.gui.toolbar.ToolbarD;
@@ -945,8 +945,8 @@ public abstract class DockPanelD extends JPanel implements ActionListener,
 				windowTitle.append(" - ");
 				windowTitle.append(app.getCurrentFile().getName());
 			} else {
-				if (GeoGebraFrame.getInstanceCount() > 1) {
-					int nr = ((GeoGebraFrame) app.getFrame())
+				if (AppFrame.getInstanceCount() > 1) {
+					int nr = ((AppFrame) app.getFrame())
 							.getInstanceNumber();
 					windowTitle.append(" - (");
 					windowTitle.append(nr + 1);

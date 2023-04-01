@@ -11,7 +11,7 @@ import org.geogebra.desktop.main.AppD;
  * @author Mathieu
  *
  */
-public class GeoGebraFrame3D extends GeoGebraFrame {
+public class GeoGebraFrame3D extends AppFrame {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -33,12 +33,12 @@ public class GeoGebraFrame3D extends GeoGebraFrame {
 	 *            command line arguments
 	 * @return new geogebra window
 	 */
-	public static synchronized GeoGebraFrame createNewWindow3D(String[] args) {
+	public static synchronized AppFrame createNewWindow3D(String[] args) {
 		return createNewWindow(args, new GeoGebraFrame3D());
 	}
 
 	@Override
-	protected GeoGebraFrame copy() {
+	protected AppFrame copy() {
 		return new GeoGebraFrame3D();
 	}
 

@@ -13,5 +13,5 @@ public interface NewInstanceListener {
 	 * @param frame
 	 *            the new instance
 	 */
-	void newInstance(GeoGebraFrame frame);
+	void newInstance(AppFrame frame);
 }

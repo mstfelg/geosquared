@@ -111,7 +111,7 @@ public class EditMenuD extends BaseMenu {
 
 		if (app.letShowPropertiesDialog()) {
 			mi = add(propertiesAction);
-			setMenuShortCutAccelerator(mi, 'E');
+			setMenuShortCutAccelerator(mi, 'D');
 			addSeparator();
 		}
 

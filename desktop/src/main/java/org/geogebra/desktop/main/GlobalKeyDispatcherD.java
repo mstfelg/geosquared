@@ -12,6 +12,7 @@ import javax.swing.JRootPane;
 import javax.swing.JTable;
 import javax.swing.text.JTextComponent;
 
+import org.geogebra.common.euclidian.EuclidianConstants;
 import org.geogebra.common.euclidian.EuclidianView;
 import org.geogebra.common.gui.inputfield.AutoCompleteTextField;
 import org.geogebra.common.kernel.StringTemplate;
@@ -143,11 +144,18 @@ public class GlobalKeyDispatcherD extends GlobalKeyDispatcher
 		if (ch == 'b') cmd = "PerpendicularBisector";
 		if (ch == 'p') cmd = "PerpendicularLine";
 		if (ch == '.') cmd = "Point";
+		if (ch == '>') {
+			this.app.setMode(EuclidianConstants.MODE_POINT);
+			return true;
+		}
 		if (ch == ',') cmd = "Polar";
 		if (ch == 'g') cmd = "Polygon";
 		if (ch == 'r') cmd = "Reflect";
 		if (ch == 'o') cmd = "Rotate";
-		if (ch == 's') cmd = "Segment";
+		if (ch == 's') { 
+			this.app.setMoveMode();
+			return true;
+		}
 		if (ch == 't') cmd = "Tangent";
 		if (ch == 'y') cmd = "Translate";
 		if (ch == 'c') cmd = "TriangleCenter";

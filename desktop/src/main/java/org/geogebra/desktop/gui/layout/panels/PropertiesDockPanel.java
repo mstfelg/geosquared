@@ -33,7 +33,7 @@ public class PropertiesDockPanel extends DockPanelD
 				null, // toolbar string
 				true, // style bar?
 				-1, // menu order
-				'E' // menu shortcut
+				'D' // menu shortcut
 		);
 
 		this.app = app;

@@ -155,7 +155,6 @@ import org.geogebra.common.util.LowerCaseDictionary;
 import org.geogebra.common.util.NormalizerMinimal;
 import org.geogebra.common.util.StringUtil;
 import org.geogebra.common.util.debug.Log;
-import org.geogebra.desktop.CommandLineArguments;
 import org.geogebra.desktop.GeoGebra;
 import org.geogebra.desktop.awt.GBufferedImageD;
 import org.geogebra.desktop.awt.GDimensionD;
@@ -222,8 +221,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 public class AppD extends App implements KeyEventDispatcher, AppDI {
 	public static final String LICENSE_FILE = "/org/geogebra/desktop/_license.txt";
 
-	protected CommandLineArguments cmdArgs;
+	protected String[] cmdArgs;
 	private DefaultSettings defaultSettings;
+	private GeoGebraPreferencesD prefs;
 
 	// ==============================================================
 	// FILE fields
@@ -318,7 +318,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	 * @param frame frame
 	 * @param undoActive whether undo is active
 	 */
-	public AppD(CommandLineArguments args, JFrame frame, boolean undoActive) {
+	public AppD(String[] args, JFrame frame, boolean undoActive) {
 		this(args, frame, null, undoActive, new LocalizationD(2));
 	}
 
@@ -329,7 +329,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	 * @param comp parent panel
 	 * @param undoActive whether undo is active
 	 */
-	public AppD(CommandLineArguments args, Container comp, boolean undoActive) {
+	public AppD(String[] args, Container comp, boolean undoActive) {
 		this(args, null, comp, undoActive, new LocalizationD(2));
 	}
 
@@ -342,36 +342,28 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	 * @param undoActive whether undo is active
 	 * @param loc localization
 	 */
-	public AppD(CommandLineArguments args, JFrame frame, Container comp,
+	public AppD(String[] args, JFrame frame, Container comp,
 			boolean undoActive,
 			LocalizationD loc) {
-
 		super(Platform.DESKTOP);
-
+		this.preferredSize = new GDimensionD(800, 600);
+		this.fontManager = new FontManagerD();
 		this.loc = loc;
 		loc.setApp(this);
 		this.cmdArgs = null;
-
-		setFileVersion(GeoGebraConstants.VERSION_STRING,
-				getConfig().getAppCode());
-
 		mainComp = frame;
-		if (frame == null) {
-			mainComp = comp;
-		}
-
 		useFullGui = true;
 
-		// needed for JavaScript getCommandName(), getValueString() to work
-		// (security problem running non-locally)
+		if (frame == null)
+			return;
 
-		preferredSize = new GDimensionD(800, 600);
-
-		fontManager = new FontManagerD();
 		initImageManager(mainComp);
 
 		// set locale
 		setLocale(mainComp.getLocale());
+
+		setFileVersion(GeoGebraConstants.VERSION_STRING,
+				getConfig().getAppCode());
 
 		// init kernel
 		initFactories();
@@ -389,28 +381,15 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		// updateContentPane()
 		initing = true;
 
-		// This is needed because otherwise Exception might come and
-		// GeoGebra may exit. (dockPanel not entirely defined)
-		// This is needed before handleFileArg because
-		// we don't want to redefine the toolbar string from the file.
-		boolean ggtloading = isLoadingTool(args);
-
 		// init default preferences if necessary
 		GeoGebraPreferencesD.getPref().initDefaultXML(this);
 
-		if (ggtloading) {
-			GeoGebraPreferencesD.getPref().loadXMLPreferences(this);
-		}
-
-		boolean fileLoaded = handleFileArg(args.getStringValue("file0"));
+		boolean fileLoaded = loadModule(args[0]);
 
 		// initialize GUI
 		if (isUsingFullGui()) {
 			initGuiManager();
-			// set frame
-			if (frame != null) {
-				setFrame(frame);
-			}
+			setFrame(frame);
 		}
 
 		// load XML preferences
@@ -418,7 +397,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		currentImagePath = GeoGebraPreferencesD.getPref()
 				.getDefaultImagePath();
 
-		if (!fileLoaded && !ggtloading) {
+		if (!fileLoaded) {
 			GeoGebraPreferencesD.getPref().loadXMLPreferences(this);
 			imageManager.setMaxIconSizeAsPt(getFontSize());
 		}
@@ -426,15 +405,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		if (isUsingFullGui()) {
 			getGuiManager().getLayout()
 					.setPerspectiveOrDefault(getTmpPerspective());
-		}
-
-		if (needsSpreadsheetTableModel) {
-			// if tableModel==null, will create one
-			getSpreadsheetTableModel();
-		}
-
-		if (isUsingFullGui() && ggtloading) {
-			getGuiManager().setToolBarDefinition(ToolBar.getAllTools(this));
 		}
 
 		setUndoActive(undoActive);
@@ -450,17 +420,16 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 
 		setSaved();
 
-		if (getCASVersionString().equals("")) {
-			setCASVersionString(loc.getMenu("CASInitializing"));
-		}
-
 		// user authentication handling
-		initSignInEventFlow();
 		if (kernel.wantAnimationStarted()) {
 			kernel.getAnimatonManager().startAnimation();
 			kernel.setWantAnimationStarted(false);
 		}
+	}
 
+	public AppD(String[] args, JFrame frame, GeoGebraPreferencesD prefs) {
+		this(args, frame, null, true, new LocalizationD(2));
+		this.prefs = prefs;			
 	}
 
 	// **************************************************************************
@@ -688,7 +657,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	}
 
 	public void createNewWindow() {
-		GeoGebraFrame.createNewWindow(cmdArgs.getGlobalArguments());
+		GeoGebraFrame.createNewWindow(cmdArgs);
 	}
 
 	@Override
@@ -742,11 +711,11 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	 * 
 	 * @return true if file is loading and is a ggt file
 	 */
-	private static boolean isLoadingTool(CommandLineArguments args) {
-		if ((args == null) || (args.getNoOfFiles() == 0)) {
+	private static boolean isLoadingTool(String[] args) {
+		if ((args == null) || (args.length == 0)) {
 			return false;
 		}
-		String fileArgument = args.getStringValue("file0");
+		String fileArgument = args[0];
 		String lowerCase = StringUtil.toLowerCaseUS(fileArgument);
 		return lowerCase.endsWith(FileExtensions.GEOGEBRA_TOOL.toString());
 	}
@@ -3486,7 +3455,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		return new LowerCaseDictionary(Normalizer.getInstance());
 	}
 
-	public CommandLineArguments getCommandLineArgs() {
+	public String[] getCommandLineArgs() {
 		return cmdArgs;
 	}
 
@@ -3796,7 +3765,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	}
 
 	protected AppD newAppForTemplateOrInsertFile() {
-		return new AppD(new CommandLineArguments(null), new JPanel(), true);
+		return new AppD(new String[] {}, new JPanel(), true);
 	}
 
 	/**

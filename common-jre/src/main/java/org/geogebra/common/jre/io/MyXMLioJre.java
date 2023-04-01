@@ -307,14 +307,6 @@ public abstract class MyXMLioJre extends MyXMLio {
 		zip.close();
 	}
 
-	/**
-	 * Writes all images used in construction to zip.
-	 */
-	private void writeConstructionImages(Construction cons1,
-			ZipOutputStream zip) {
-		writeConstructionImages(cons1, zip, "");
-	}
-
 	private void writeConstructionImages(Construction cons1,
 			ZipOutputStream zip,
 			String filePath) {
@@ -373,30 +365,6 @@ public abstract class MyXMLioJre extends MyXMLio {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Writes thumbnail to zip
-	 */
-	private void writeThumbnail(ZipOutputStream zip, String fileName) {
-
-		// max 128 pixels either way
-		/*
-		 * double exportScale = Math.min(THUMBNAIL_PIXELS_X /
-		 * ev.getSelectedWidth(), THUMBNAIL_PIXELS_X / ev.getSelectedHeight());
-		 */
-
-		try {
-			// BufferedImage img = app.getExportImage(exportScale);
-			MyImageJre img = getExportImage(THUMBNAIL_PIXELS_X,
-					THUMBNAIL_PIXELS_Y);
-			if (img != null) {
-				writeImageToZip(zip, fileName, img);
-			}
-		} catch (Exception e) {
-			// catch error if size is zero
-		}
-
 	}
 
 	/**

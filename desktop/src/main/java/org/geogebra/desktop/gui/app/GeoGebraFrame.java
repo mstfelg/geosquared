@@ -31,47 +31,24 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
-import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-import org.geogebra.common.GeoGebraConstants;
-import org.geogebra.common.euclidian.EuclidianView;
-import org.geogebra.common.jre.util.DownloadManager;
-import org.geogebra.common.kernel.Kernel;
 import org.geogebra.common.kernel.Macro;
-import org.geogebra.common.kernel.geos.GeoElement;
-import org.geogebra.common.kernel.geos.GeoNumeric;
-import org.geogebra.common.main.App;
-import org.geogebra.common.main.Localization;
-import org.geogebra.common.util.DoubleUtil;
-import org.geogebra.common.util.StringUtil;
-import org.geogebra.common.util.debug.Log;
-import org.geogebra.desktop.AppId;
 import org.geogebra.desktop.awt.GDimensionD;
-import org.geogebra.desktop.euclidianND.EuclidianViewInterfaceD;
-import org.geogebra.desktop.export.GraphicExportDialog;
-import org.geogebra.desktop.geogebra3D.euclidian3D.EuclidianView3DD;
 import org.geogebra.desktop.gui.FileDropTargetListener;
 import org.geogebra.desktop.gui.GuiManagerD;
 import org.geogebra.desktop.gui.dialog.DialogManagerD;
-import org.geogebra.desktop.gui.util.AnimatedGifEncoder;
 import org.geogebra.desktop.main.AppD;
 import org.geogebra.desktop.main.AppPrefs;
-import org.geogebra.desktop.util.FrameCollector;
 
 import com.himamis.retex.editor.share.util.Unicode;
 
@@ -103,24 +80,23 @@ public class GeoGebraFrame extends JFrame
 		this.addComponentListener(this);
 	}
 	
-	public GeoGebraFrame(String[] args, AppPrefs prefs) {
-		GeoGebraFrame wnd = this;
-		final AppD app = new AppD(args, wnd, prefs);
+	// Deprecates createNewWindow
+	public void init(AppD app) {
+		this.app = app;
 		app.getGuiManager().initMenubar();
+		this.getContentPane().add(app.buildApplicationPanel());
 
-		// init GUI
-		wnd.app = app;
-		wnd.getContentPane().add(app.buildApplicationPanel());
 		dropTargetListener = new FileDropTargetListener(app);
-		wnd.setGlassPane(((GuiManagerD) app.getGuiManager()).getLayout()
+		this.setGlassPane(((GuiManagerD) app.getGuiManager()).getLayout()
 				.getDockManager().getGlassPane());
-		wnd.setDropTarget(new DropTarget(wnd, dropTargetListener));
-		wnd.addWindowFocusListener(wnd);
+
+		this.setDropTarget(new DropTarget(this, dropTargetListener));
+		this.addWindowFocusListener(this);
 		updateAllTitles();
 
 		app.updateMenubar();
 
-		wnd.setVisible(true);
+		this.setVisible(true);
 
 		// init some things in the background
 		Thread runner = GeoGebraFrame.createAppThread(app);
@@ -129,7 +105,7 @@ public class GeoGebraFrame extends JFrame
 		checkCommandLineExport(app);
 
 		for (NewInstanceListener l : instanceListener) {
-			l.newInstance(wnd);
+			l.newInstance(this);
 		}
 	}
 

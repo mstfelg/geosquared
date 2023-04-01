@@ -20,6 +20,7 @@ import org.geogebra.common.move.ggtapi.TubeAvailabilityCheckEvent;
 import org.geogebra.common.move.views.EventRenderable;
 import org.geogebra.common.util.FileExtensions;
 import org.geogebra.common.util.debug.Log;
+import org.geogebra.desktop.GeoGebra3D;
 import org.geogebra.desktop.export.AnimationExportDialogD;
 import org.geogebra.desktop.export.WorksheetExportDialog;
 import org.geogebra.desktop.export.pstricks.AsymptoteFrame;
@@ -209,9 +210,7 @@ class FileMenuD extends BaseMenu implements EventRenderable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Thread runner = new Thread(() -> {
-					app.setWaitCursor();
-					app.createNewWindow();
-					app.setDefaultCursor();
+					GeoGebra3D.newInstance();
 				});
 				runner.start();
 			}

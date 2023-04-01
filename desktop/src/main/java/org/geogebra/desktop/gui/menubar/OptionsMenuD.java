@@ -22,7 +22,7 @@ import org.geogebra.common.main.App.InputPosition;
 import org.geogebra.common.main.OptionType;
 import org.geogebra.common.util.lang.Language;
 import org.geogebra.desktop.main.AppD;
-import org.geogebra.desktop.main.GeoGebraPreferencesD;
+import org.geogebra.desktop.main.AppPrefs;
 import org.geogebra.desktop.util.GuiResourcesD;
 
 import com.himamis.retex.editor.share.util.Unicode;
@@ -208,7 +208,7 @@ public class OptionsMenuD extends BaseMenu
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				GeoGebraPreferencesD.getPref().saveXMLPreferences(app);
+				AppPrefs.getPref().saveXMLPreferences(app);
 			}
 		};
 
@@ -253,7 +253,7 @@ public class OptionsMenuD extends BaseMenu
 					}
 				}
 
-				GeoGebraPreferencesD.getPref().clearPreferences(app);
+				AppPrefs.getPref().clearPreferences(app);
 				boolean oldAxisX = app.getSettings().getEuclidian(1)
 						.getShowAxis(0);
 				boolean oldAxisY = app.getSettings().getEuclidian(1)
@@ -265,7 +265,7 @@ public class OptionsMenuD extends BaseMenu
 
 				// for geoelement defaults, this will do nothing, so it is
 				// OK here
-				GeoGebraPreferencesD.getPref().loadXMLPreferences(app);
+				AppPrefs.getPref().applyTo(app);
 				app.getSettings().getEuclidian(1).setShowAxes(oldAxisX,
 						oldAxisY);
 				// reset default line thickness etc

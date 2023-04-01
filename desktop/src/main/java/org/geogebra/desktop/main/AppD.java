@@ -113,7 +113,6 @@ import org.geogebra.common.factories.LaTeXFactory;
 import org.geogebra.common.factories.UtilFactory;
 import org.geogebra.common.geogebra3D.io.OFFHandler;
 import org.geogebra.common.geogebra3D.kernel3D.commands.CommandDispatcher3D;
-import org.geogebra.common.gui.toolbar.ToolBar;
 import org.geogebra.common.gui.view.algebra.AlgebraView;
 import org.geogebra.common.io.MyXMLHandler;
 import org.geogebra.common.io.QDParser;
@@ -217,13 +216,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  *
  * @author Markus Hohenwarter
  */
-@SuppressWarnings("javadoc")
 public class AppD extends App implements KeyEventDispatcher, AppDI {
 	public static final String LICENSE_FILE = "/org/geogebra/desktop/_license.txt";
 
 	protected String[] cmdArgs;
 	private DefaultSettings defaultSettings;
-	private GeoGebraPreferencesD prefs;
+	private AppPrefs prefs;
 
 	// ==============================================================
 	// FILE fields
@@ -382,7 +380,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		initing = true;
 
 		// init default preferences if necessary
-		GeoGebraPreferencesD.getPref().initDefaultXML(this);
+		AppPrefs.getPref().initDefaultXML(this);
 
 		boolean fileLoaded = loadModule(args[0]);
 
@@ -393,12 +391,12 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		}
 
 		// load XML preferences
-		currentPath = GeoGebraPreferencesD.getPref().getDefaultFilePath();
-		currentImagePath = GeoGebraPreferencesD.getPref()
+		currentPath = AppPrefs.getPref().getDefaultFilePath();
+		currentImagePath = AppPrefs.getPref()
 				.getDefaultImagePath();
 
 		if (!fileLoaded) {
-			GeoGebraPreferencesD.getPref().loadXMLPreferences(this);
+			prefs.applyTo(this);
 			imageManager.setMaxIconSizeAsPt(getFontSize());
 		}
 
@@ -427,9 +425,88 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		}
 	}
 
-	public AppD(String[] args, JFrame frame, GeoGebraPreferencesD prefs) {
-		this(args, frame, null, true, new LocalizationD(2));
-		this.prefs = prefs;			
+	// Deprecate all in favor of this
+	public AppD(String[] args, JFrame frame, AppPrefs prefs) {
+		super(Platform.DESKTOP);
+
+		this.preferredSize = new GDimensionD(800, 600);
+		this.fontManager = new FontManagerD();
+		this.loc = new LocalizationD(2);
+		loc.setApp(this);
+		this.cmdArgs = args;
+		mainComp = frame;
+		useFullGui = true;
+
+		if (frame == null)
+			return;
+
+		initImageManager(mainComp);
+
+		// set locale
+		setLocale(mainComp.getLocale());
+
+		setFileVersion(GeoGebraConstants.VERSION_STRING,
+				getConfig().getAppCode());
+
+		// init kernel
+		initFactories();
+		initKernel();
+		kernel.setPrintDecimals(getConfig().getDefaultPrintDecimals());
+
+		// init settings
+		initSettings();
+
+		// init euclidian view
+		initEuclidianViews();
+
+		// load file on startup and set fonts
+		// set flag to avoid multiple calls of setLabels() and
+		// updateContentPane()
+		initing = true;
+
+		// Applying style and loading a file both use loadModule
+		// loadModule clears up previous constructions
+		this.prefs = prefs;
+		this.prefs.applyTo(this);
+		boolean fileLoaded = loadModule(args[0]);
+
+		// initialize GUI
+		if (isUsingFullGui()) {
+			initGuiManager();
+			setFrame(frame);
+		}
+
+		// load XML preferences
+		currentPath = AppPrefs.getPref().getDefaultFilePath();
+		currentImagePath = AppPrefs.getPref().getDefaultImagePath();
+
+		if (!fileLoaded) {
+			imageManager.setMaxIconSizeAsPt(getFontSize());
+		}
+
+		if (isUsingFullGui()) {
+			getGuiManager().getLayout()
+					.setPerspectiveOrDefault(getTmpPerspective());
+		}
+
+		setUndoActive(true);
+
+		initing = false;
+
+		// for key listening
+		KeyboardFocusManager.getCurrentKeyboardFocusManager()
+				.addKeyEventDispatcher(this);
+
+		getScriptManager().ggbOnInit();
+		getFactory();
+
+		setSaved();
+
+		// user authentication handling
+		if (kernel.wantAnimationStarted()) {
+			kernel.getAnimatonManager().startAnimation();
+			kernel.setWantAnimationStarted(false);
+		}
 	}
 
 	// **************************************************************************
@@ -686,7 +763,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		resetAllToolbars();
 
 		// reload the saved/(default) preferences
-		GeoGebraPreferencesD.getPref().loadXMLPreferences(this);
+		prefs.applyTo(this);
 		getGuiManager().updateToolbarDefinition();
 		resetUniqueId();
 	}
@@ -703,42 +780,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		}
 
 		gm.setToolBarDefinition(gm.getDefaultToolbarString());
-	}
-
-	/**
-	 * This function helps determine if a ggt file was loaded because if a ggt
-	 * file was loaded we will need to load something instead of the ggb
-	 * 
-	 * @return true if file is loading and is a ggt file
-	 */
-	private static boolean isLoadingTool(String[] args) {
-		if ((args == null) || (args.length == 0)) {
-			return false;
-		}
-		String fileArgument = args[0];
-		String lowerCase = StringUtil.toLowerCaseUS(fileArgument);
-		return lowerCase.endsWith(FileExtensions.GEOGEBRA_TOOL.toString());
-	}
-
-	/**
-	 * Opens a file specified as last command line argument
-	 * 
-	 * @return true if a file was loaded successfully
-	 */
-	private boolean handleFileArg(String fileName) {
-		if (fileName == null || fileName.equals(""))
-			return false;
-
-		FileExtensions ext = StringUtil.getFileExtension(fileName);
-		boolean isMacroFile = ext.equals(FileExtensions.GEOGEBRA_TOOL);
-		File f = new File(fileName);
-		try {
-			f = f.getCanonicalFile();
-		} catch(Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-		return loadFile(f, isMacroFile);
 	}
 
 	/**
@@ -3055,7 +3096,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	public ErrorHandler getDefaultErrorHandler() {
 		if (defaultErrorHandler == null) {
 			defaultErrorHandler = new ErrorHandler() {
-
 				@Override
 				public void showError(final String msg) {
 					// don't remove, useful
@@ -3071,8 +3111,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 					// correct
 					// (=GUI) thread.
 					SwingUtilities.invokeLater(() -> {
-						// TODO investigate why this freezes Firefox
-						// sometimes
 						JOptionPane.showConfirmDialog(mainComp, msgDisplay,
 								GeoGebraConstants.APPLICATION_NAME + " - "
 										+ getLocalization()
@@ -3081,7 +3119,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 								JOptionPane.WARNING_MESSAGE);
 						isErrorDialogShowing = false;
 					});
-
 				}
 
 				@Override
@@ -3277,7 +3314,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		((ScriptManagerD) getScriptManager()).evalJavaScript(app, script, arg);
 	}
 
-	// TODO: should be moved to ApplicationSettings
 	@Override
 	public void setTooltipTimeout(int ttt) {
 		if (ttt > 0) {
@@ -3851,8 +3887,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 
 	@Override
 	public void closePopups() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override

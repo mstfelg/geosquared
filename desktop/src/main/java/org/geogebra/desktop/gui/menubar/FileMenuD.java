@@ -105,20 +105,6 @@ class FileMenuD extends BaseMenu implements EventRenderable {
 		mi = add(loadAction);
 		setMenuShortCutAccelerator(mi, 'O'); // open
 
-		LoginOperationD signIn = (LoginOperationD) app.getLoginOperation();
-
-		if (signIn.isTubeAvailable() || !signIn.isTubeCheckDone()) {
-			loadURLMenuItem = add(loadURLAction);
-
-			// If GeoGebraTube is not available we disable the item and
-			// listen to the event that tube becomes available
-			if (!signIn.isTubeAvailable()) {
-				loadURLAction.setEnabled(false);
-				signIn.getView().add(this);
-			}
-
-		}
-
 		addSeparator();
 		mi = add(saveAction);
 		setMenuShortCutAccelerator(mi, 'S');
@@ -137,7 +123,7 @@ class FileMenuD extends BaseMenu implements EventRenderable {
 		setMenuShortCutShiftAccelerator(mi, 'W');
 
 		mi = submenu.add(exportGraphicAction);
-		setMenuShortCutShiftAccelerator(mi, 'U');
+		setMenuShortCutShiftAccelerator(mi, 'E');
 
 		submenu.add(exportAnimationAction);
 

@@ -26,7 +26,6 @@ import org.geogebra.desktop.util.LoggerD;
 import org.geogebra.common.util.debug.Log;
 import org.geogebra.common.util.debug.Log.LogDestination;
 import org.geogebra.common.GeoGebraConstants;
-import org.geogebra.desktop.main.AppD;
 import org.geogebra.desktop.main.AppPrefs;
 
 import gnu.getopt.Getopt;
@@ -100,18 +99,7 @@ public class GeoGebra3D extends GeoGebra {
 		prefs = new AppPrefs(objCfg, modPath);
 		GeoGebraFrame3D wnd = new GeoGebraFrame3D();
 		App3D app = new App3D(fileArgs, wnd, prefs);
-		app.getGuiManager().initMenubar();
-
-		wnd.app = app;
-		wnd.getContentPane().add(app.buildApplicationPanel());
-		/* dropTargetListener = new FileDropTargetListener(app); */
-		/* wnd.setGlassPane(((GuiManagerD) app.getGuiManager()).getLayout() */
-		/* 		.getDockManager().getGlassPane()); */
-		/* wnd.setDropTarget(new DropTarget(wnd, dropTargetListener)); */
-		/* updateAllTitles(); */
-		wnd.addWindowFocusListener(wnd);
-		app.updateMenubar();
-		wnd.setVisible(true);
+		wnd.init(app);
 
 		if (!interactiveEh)
 			return;
@@ -145,5 +133,4 @@ public class GeoGebra3D extends GeoGebra {
 							+ "(EMERGENCY|ALERT|CRITICAL|ERROR|WARN|NOTICE|INFO|DEBUG|TRACE)\n"
 		);
 	}
-
 }

@@ -12,17 +12,7 @@ the Free Software Foundation.
 
 package org.geogebra.desktop;
 
-import java.awt.Frame;
-import java.awt.Toolkit;
-import java.net.URL;
-
-import org.geogebra.common.GeoGebraConstants;
-import org.geogebra.common.main.GeoGebraPreferencesXML;
-import org.geogebra.common.util.Util;
-import org.geogebra.common.util.debug.Log;
 import org.geogebra.desktop.gui.app.GeoGebraFrame;
-import org.geogebra.desktop.main.AppD;
-import org.geogebra.desktop.main.GeoGebraServer;
 
 public class GeoGebra {
 	public static void main(String[] args) {

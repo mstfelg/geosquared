@@ -70,7 +70,7 @@ import org.geogebra.desktop.gui.GuiManagerD;
 import org.geogebra.desktop.gui.dialog.DialogManagerD;
 import org.geogebra.desktop.gui.util.AnimatedGifEncoder;
 import org.geogebra.desktop.main.AppD;
-import org.geogebra.desktop.main.GeoGebraPreferencesD;
+import org.geogebra.desktop.main.AppPrefs;
 import org.geogebra.desktop.util.FrameCollector;
 
 import com.himamis.retex.editor.share.util.Unicode;
@@ -89,7 +89,7 @@ public class GeoGebraFrame extends JFrame
 	private static Object lock = new Object();
 
 	private static FileDropTargetListener dropTargetListener;
-	protected AppD app;
+	public AppD app;
 	private Timer timer;
 	private long born;
 
@@ -103,10 +103,9 @@ public class GeoGebraFrame extends JFrame
 		this.addComponentListener(this);
 	}
 	
-	public GeoGebraFrame(String[] args) {
+	public GeoGebraFrame(String[] args, AppPrefs prefs) {
 		GeoGebraFrame wnd = this;
-		final AppD app = new AppD(args, wnd, null);
-;
+		final AppD app = new AppD(args, wnd, prefs);
 		app.getGuiManager().initMenubar();
 
 		// init GUI
@@ -186,7 +185,7 @@ public class GeoGebraFrame extends JFrame
 
 	@Override
 	public Locale getLocale() {
-		Locale defLocale = GeoGebraPreferencesD.getPref().getDefaultLocale();
+		Locale defLocale = AppPrefs.getPref().getDefaultLocale();
 		if (defLocale == null) {
 			return super.getLocale();
 		}

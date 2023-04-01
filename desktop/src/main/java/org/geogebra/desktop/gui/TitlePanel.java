@@ -35,7 +35,7 @@ import org.geogebra.common.main.App;
 import org.geogebra.desktop.gui.inputfield.MyFormattedTextField;
 import org.geogebra.desktop.gui.inputfield.MyTextFieldD;
 import org.geogebra.desktop.main.AppD;
-import org.geogebra.desktop.main.GeoGebraPreferencesD;
+import org.geogebra.desktop.main.AppPrefs;
 import org.geogebra.desktop.main.LocalizationD;
 
 import com.himamis.retex.editor.share.util.Unicode;
@@ -184,8 +184,8 @@ public class TitlePanel extends JPanel {
 	public String loadAuthor() {
 		String author = cons.getAuthor();
 		if ("".equals(author)) {
-			author = GeoGebraPreferencesD.getPref()
-					.loadPreference(GeoGebraPreferencesD.AUTHOR, "");
+			author = AppPrefs.getPref()
+					.loadPreference(AppPrefs.AUTHOR, "");
 			cons.setAuthor(author);
 		}
 		return author;
@@ -195,8 +195,8 @@ public class TitlePanel extends JPanel {
 		boolean kernelChanged = !author.equals(cons.getAuthor());
 		if (kernelChanged) {
 			cons.setAuthor(author);
-			GeoGebraPreferencesD.getPref()
-					.savePreference(GeoGebraPreferencesD.AUTHOR, author);
+			AppPrefs.getPref()
+					.savePreference(AppPrefs.AUTHOR, author);
 		}
 		return kernelChanged;
 	}

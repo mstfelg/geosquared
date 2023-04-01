@@ -20,11 +20,8 @@ import java.util.Locale;
 import java.util.prefs.Preferences;
 import java.util.stream.Stream;
 
-import org.geogebra.common.GeoGebraConstants;
 import org.geogebra.common.euclidian3D.Input3DConstants;
 import org.geogebra.common.main.App;
-import org.geogebra.common.main.GeoGebraPreferences;
-import org.geogebra.common.main.GeoGebraPreferencesXML;
 import org.geogebra.common.util.debug.Log;
 import org.geogebra.desktop.util.UtilD;
 
@@ -35,13 +32,13 @@ import org.geogebra.desktop.util.UtilD;
  * @version May 16, 2007
  */
 
-public class GeoGebraPreferencesD {
-	public static String configHome;
-	public static String layoutCfg;
-	public static String objCfg;
+public class AppPrefs {
+	public String configHome;
+	public String layoutCfg;
+	public String objCfg;
 
-	public static String dataHome;
-	public static String modPath;
+	public String dataHome;
+	public String modPath;
 	public static String propData;
 
 	// Java Preferences
@@ -60,16 +57,21 @@ public class GeoGebraPreferencesD {
 	public static String VERSION = "version";
 	public static String INPUT_3D = "input_3d";
 
-	protected String factoryDefaultXml; // see loadPreferences()
 	protected static final String XML_FACTORY_DEFAULT = "xml_factory_default";
 	protected static final String TOOLS_FILE_GGT = "tools_file_ggt";
 	protected static final String APP_LOCALE = "app_locale";
 	protected static final String APP_CURRENT_IMAGE_PATH = "app_current_image_path";
 	protected static final String APP_FILE_ = "app_file_";
 
-	private static GeoGebraPreferencesD singleton;
+	private static AppPrefs singleton;
+	
+	public AppPrefs() {
+		this(null, null);
+	}
 
-	protected GeoGebraPreferencesD() {
+	public AppPrefs(String o, String mod) {
+		if (mod != null && !mod.equals(""))
+			modPath = mod;
 		if (configHome == null)
 			configHome = Paths.get(
 					System.getenv("XDG_CONFIG_HOME"), "gsq"
@@ -96,8 +98,14 @@ public class GeoGebraPreferencesD {
 			modPath = Paths.get(dataHome, "modules/").toString();
 		propData = Paths.get(dataHome, "gsq.properties").toString();
 
-		Log.debug("Reading config from " + configHome);
-		Log.debug("Reading modules from " + modPath);
+		Log.debug(""
+			+ "Reading config from " + configHome
+			+ ", " + dataHome
+			+ ", " + modPath
+			+ ", " + propData
+			+ ", " + layoutCfg
+			+ ", " + objCfg
+			);
 
 		try {
 			ggbPrefs = Preferences.userRoot().node(PREF_ROOT);
@@ -115,12 +123,9 @@ public class GeoGebraPreferencesD {
 	/**
 	 * @return preferences singleton
 	 */
-	public synchronized static GeoGebraPreferencesD getPref() {
-		if (singleton == null && propData != null) {
-			singleton = GeoGebraPortablePreferences.getPref();
-		}
+	public synchronized static AppPrefs getPref() {
 		if (singleton == null) {
-			singleton = new GeoGebraPreferencesD();
+			singleton = new AppPrefs();
 		}
 		return singleton;
 	}
@@ -149,7 +154,7 @@ public class GeoGebraPreferencesD {
 	 *            type
 	 */
 	public void setInput3DType(String type) {
-		getPref().savePreference(GeoGebraPreferencesD.INPUT_3D, type);
+		getPref().savePreference(AppPrefs.INPUT_3D, type);
 	}
 
 	/**
@@ -157,7 +162,7 @@ public class GeoGebraPreferencesD {
 	 * @return 3D input type currently used, "none" if none
 	 */
 	public String getInput3DType() {
-		return getPref().loadPreference(GeoGebraPreferencesD.INPUT_3D,
+		return getPref().loadPreference(AppPrefs.INPUT_3D,
 				Input3DConstants.PREFS_NONE);
 	}
 
@@ -233,36 +238,6 @@ public class GeoGebraPreferencesD {
 	 * virgin application.
 	 */
 	public void initDefaultXML(AppD app) {
-		// already initialized?
-		if (factoryDefaultXml != null) {
-			return;
-		}
-
-		// when applet unsigned this may be null
-		if (ggbPrefs != null) {
-			// get the GeoGebra version with which the preferences were saved
-			// (the version number is stored since version 3.9.41)
-			String oldVersion = getPref().loadPreference(VERSION, null);
-
-			// current factory defaults possibly available?
-			if (oldVersion != null
-					&& oldVersion.equals(GeoGebraConstants.VERSION_STRING)) {
-				factoryDefaultXml = getPref()
-						.loadPreference(XML_FACTORY_DEFAULT, null);
-			}
-		}
-
-		// if this is an old version or the factory defaults were not saved in
-		// the
-		// preferences for some reasons, create and store them now (plus: store
-		// version string)
-		if (factoryDefaultXml == null) {
-			factoryDefaultXml = getDefaultPreferences(app);
-			if (ggbPrefs != null) {
-				ggbPrefs.put(XML_FACTORY_DEFAULT, factoryDefaultXml);
-				ggbPrefs.put(VERSION, GeoGebraConstants.VERSION_STRING);
-			}
-		}
 	}
 
 	/**
@@ -289,8 +264,7 @@ public class GeoGebraPreferencesD {
 	 * @return XML preferences
 	 */
 	public String getXMLPreferences() {
-		return getPref().loadPreference(GeoGebraPreferences.XML_USER_PREFERENCES,
-				factoryDefaultXml);
+		return null;
 	}
 
 	/**
@@ -299,14 +273,28 @@ public class GeoGebraPreferencesD {
 	 * construction in the application. Note: the XML string used is the same as
 	 * for ggb files.
 	 */
-	public void loadXMLPreferences(AppD app) {
+	public void applyTo(AppD app) {
+		Log.debug("Applying style");
 		app.setWaitCursor();
+
 		String layoutFile = UtilD.loadFileIntoString(layoutCfg);
+		if (layoutFile != null) {
+			app.setXML(layoutFile, false);
+		}
+
 		String objFile = UtilD.loadFileIntoString(objCfg);
+		if (objFile != null) {
+			boolean eda = app.getKernel().getElementDefaultAllowed();
+			app.getKernel().setElementDefaultAllowed(true);
+			app.getKernel().getConstruction().setIgnoringNewTypes(true);
+			app.setXML(objFile, false);
+			app.getKernel().getConstruction().setIgnoringNewTypes(false);
+			app.getKernel().setElementDefaultAllowed(eda);
+		}
 
 		if (modPath != null) {
 			Path root = Paths.get(modPath);
-			try (Stream<Path> stream = Files.walk(root)) {
+			try (Stream<Path> stream = Files.walk(root, 3)) {
 				stream.forEach(p -> {
 					if (Files.isRegularFile(p) && p.toString().endsWith(".gsq"))
 							app.loadModule(p.toString());
@@ -316,49 +304,8 @@ public class GeoGebraPreferencesD {
 			}
 		}
 
-		if (layoutFile != null) {
-			app.setXML(layoutFile, false);
-		} else {
-			app.setXML(factoryDefaultXml, false);
-		}
-
-		if (objFile != null && !objFile.equals(factoryDefaultXml)) {
-			boolean eda = app.getKernel().getElementDefaultAllowed();
-			app.getKernel().setElementDefaultAllowed(true);
-			app.getKernel().getConstruction().setIgnoringNewTypes(true);
-			app.setXML(objFile, false);
-			app.getKernel().getConstruction().setIgnoringNewTypes(false);
-			app.getKernel().setElementDefaultAllowed(eda);
-		}
-
 		app.updateToolBar();
 		app.setDefaultCursor();
-
-		// load this preferences xml file in application
-		// try {
-		// 	// load tools from ggt file (byte array)
-		// 	byte[] ggtFile = getByteArray(TOOLS_FILE_GGT, null);
-		// 	app.loadMacroFileFromByteArray(ggtFile, true);
-		//
-		// 	// load preferences xml
-		// 	String xml = getPref().loadPreference(GeoGebraPreferences.XML_USER_PREFERENCES,
-		// 			factoryDefaultXml);
-		// 	app.setXML(xml, false);
-		//
-		// 	String xmlDef = getPref().loadPreference(
-		// 			GeoGebraPreferences.XML_DEFAULT_OBJECT_PREFERENCES, factoryDefaultXml);
-		// 	if (!xmlDef.equals(factoryDefaultXml)) {
-		// 		boolean eda = app.getKernel().getElementDefaultAllowed();
-		// 		app.getKernel().setElementDefaultAllowed(true);
-		// 		app.setXML(xmlDef, false);
-		// 		app.getKernel().setElementDefaultAllowed(eda);
-		// 	}
-		// 	app.updateToolBar();
-		// } catch (Throwable e) {
-		// 	e.printStackTrace();
-		// }
-		//
-		// app.setDefaultCursor();
 	}
 
 	/**
@@ -380,16 +327,9 @@ public class GeoGebraPreferencesD {
 		}
 	}
 
-	/**
-	 * @return Default preferences
-	 */
-	private static String getDefaultPreferences(App app) {
-		return GeoGebraPreferencesXML.getXML(app);
-	}
-
 	public static File getFile() {
 		if (propData == null)
 			return null;
-		return new File(GeoGebraPreferencesD.propData);
+		return new File(AppPrefs.propData);
 	}
 }

@@ -18,8 +18,6 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
@@ -69,7 +67,7 @@ import org.geogebra.desktop.gui.dialog.Dialog;
 import org.geogebra.desktop.gui.util.FileTransferable;
 import org.geogebra.desktop.main.AppD;
 import org.geogebra.desktop.main.FontManagerD;
-import org.geogebra.desktop.main.GeoGebraPreferencesD;
+import org.geogebra.desktop.main.AppPrefs;
 import org.geogebra.desktop.main.LocalizationD;
 import org.geogebra.desktop.util.UtilD;
 
@@ -500,8 +498,8 @@ public class GraphicExportDialog extends Dialog implements KeyListener {
 		try {
 			// format
 			Format formatID = Format.PNG;
-			String format = GeoGebraPreferencesD.getPref().loadPreference(
-					GeoGebraPreferencesD.EXPORT_PIC_FORMAT, "png");
+			String format = AppPrefs.getPref().loadPreference(
+					AppPrefs.EXPORT_PIC_FORMAT, "png");
 			if ("eps".equals(format)) {
 				formatID = Format.EPS;
 			} else if ("svg".equals(format)) {
@@ -513,8 +511,8 @@ public class GraphicExportDialog extends Dialog implements KeyListener {
 
 			// dpi
 			if (cbDPI.isEnabled()) {
-				String strDPI = GeoGebraPreferencesD.getPref().loadPreference(
-						GeoGebraPreferencesD.EXPORT_PIC_DPI, "300");
+				String strDPI = AppPrefs.getPref().loadPreference(
+						AppPrefs.EXPORT_PIC_DPI, "300");
 				for (int i = 0; i < cbDPI.getItemCount(); i++) {
 					String dpi = cbDPI.getItemAt(i).toString();
 					if (dpi.equals(strDPI)) {
@@ -538,8 +536,8 @@ public class GraphicExportDialog extends Dialog implements KeyListener {
 
 	private void savePreferences() {
 		// dpi
-		GeoGebraPreferencesD.getPref().savePreference(
-				GeoGebraPreferencesD.EXPORT_PIC_DPI,
+		AppPrefs.getPref().savePreference(
+				AppPrefs.EXPORT_PIC_DPI,
 				cbDPI.getSelectedItem().toString());
 
 		// format
@@ -554,8 +552,8 @@ public class GraphicExportDialog extends Dialog implements KeyListener {
 		default:
 			format = "png";
 		}
-		GeoGebraPreferencesD.getPref()
-				.savePreference(GeoGebraPreferencesD.EXPORT_PIC_FORMAT, format);
+		AppPrefs.getPref()
+				.savePreference(AppPrefs.EXPORT_PIC_FORMAT, format);
 
 		/*
 		 * // scale in cm

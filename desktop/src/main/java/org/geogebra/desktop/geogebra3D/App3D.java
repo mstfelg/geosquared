@@ -109,6 +109,10 @@ public class App3D extends AppD {
 
 		runThreadForCheckInput3D();
 	}
+	
+	public App3D(String[] args, AppPrefs prefs, JFrame frame) {
+		super(args, prefs, frame);
+	}
 
 	private class ThreadForCheckInput3D extends Thread {
 

@@ -794,11 +794,6 @@ public abstract class GlobalKeyDispatcher {
 		 * send next instance to front (alt - last)
 		 */
 		case N:
-			if (isShiftDown) {
-				handleCtrlShiftN(false);
-			} else {
-				createNewWindow();
-			}
 			break;
 
 		// needed for detached views and MacOS

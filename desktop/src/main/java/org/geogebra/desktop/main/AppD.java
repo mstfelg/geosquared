@@ -122,7 +122,6 @@ import org.geogebra.common.jre.gui.MyImageJre;
 import org.geogebra.common.jre.headless.AppDI;
 import org.geogebra.common.jre.kernel.commands.CommandDispatcher3DJre;
 import org.geogebra.common.jre.kernel.commands.CommandDispatcherJre;
-import org.geogebra.common.jre.main.TemplateHelper;
 import org.geogebra.common.jre.util.Base64;
 import org.geogebra.common.kernel.Construction;
 import org.geogebra.common.kernel.Kernel;
@@ -176,7 +175,6 @@ import org.geogebra.desktop.factories.LaTeXFactoryD;
 import org.geogebra.desktop.factories.UtilFactoryD;
 import org.geogebra.desktop.gui.GuiManagerD;
 import org.geogebra.desktop.gui.MyImageD;
-import org.geogebra.desktop.gui.app.AppFrame;
 import org.geogebra.desktop.gui.dialog.AxesStyleListRenderer;
 import org.geogebra.desktop.gui.dialog.DashListRenderer;
 import org.geogebra.desktop.gui.dialog.DecorationListRenderer;
@@ -218,7 +216,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 public class AppD extends App implements KeyEventDispatcher, AppDI {
 	public static final String LICENSE_FILE = "/org/geogebra/desktop/_license.txt";
-
 	protected String[] cmdArgs;
 	private DefaultSettings defaultSettings;
 	private AppPrefs prefs;
@@ -243,7 +240,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	// ==============================================================
 
 	private JFrame frame;
-
 	/** Main component */
 	protected Component mainComp;
 
@@ -259,12 +255,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	 * help panel for the input bar.
 	 */
 	private JSplitPane applicationSplitPane;
-
 	protected boolean showAlgebraView = true;
-
-	/**
-	 * Preferred application frame size. Used in case frame size needs updating.
-	 */
 	private GDimension preferredSize;
 
 	/** Horizontal page margin in cm */
@@ -281,151 +272,20 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	 */
 	public static final Color COLOR_SELECTION = new Color(210, 210, 225);
 
-	// ==============================================================
-	// MODEL & MANAGER fields
-	// ==============================================================
-
-	private final FontManagerD fontManager;
-
 	/** GUI manager */
+	private final FontManagerD fontManager;
 	protected GuiManagerInterfaceD guiManager;
-
 	private GlobalKeyDispatcherD globalKeyDispatcher;
-
 	protected ImageManagerD imageManager;
-
 	private GgbAPID ggbapi = null;
 	private SpreadsheetTableModelD tableModel;
 
-	// ==============================================================
-	// MISC FLAGS
-	// ==============================================================
-
 	private boolean allowToolTips = true;
-
 	protected boolean isErrorDialogShowing = false;
-
 	private CopyPasteD copyPaste;
 	private int centerX;
 	private int centerY;
 
-	/*************************************************************
-	 * Construct application within JFrame
-	 * 
-	 * @param args command line arguments
-	 * @param frame frame
-	 * @param undoActive whether undo is active
-	 */
-	public AppD(String[] args, JFrame frame, boolean undoActive) {
-		this(args, frame, null, undoActive, new LocalizationD(2));
-	}
-
-	/*************************************************************
-	 * Construct application within Container (e.g. GeoGebraPanel)
-	 * 
-	 * @param args command line arguments
-	 * @param comp parent panel
-	 * @param undoActive whether undo is active
-	 */
-	public AppD(String[] args, Container comp, boolean undoActive) {
-		this(args, null, comp, undoActive, new LocalizationD(2));
-	}
-
-	/*************************************************************
-	 * GeoGebra application general constructor
-	 *
-	 * @param args command line arguments
-	 * @param comp parent panel
-	 * @param frame frame
-	 * @param undoActive whether undo is active
-	 * @param loc localization
-	 */
-	public AppD(String[] args, JFrame frame, Container comp,
-			boolean undoActive,
-			LocalizationD loc) {
-		super(Platform.DESKTOP);
-		this.preferredSize = new GDimensionD(800, 600);
-		this.fontManager = new FontManagerD();
-		this.loc = loc;
-		loc.setApp(this);
-		this.cmdArgs = null;
-		mainComp = frame;
-		useFullGui = true;
-
-		if (frame == null)
-			return;
-
-		initImageManager(mainComp);
-
-		// set locale
-		setLocale(mainComp.getLocale());
-
-		setFileVersion(GeoGebraConstants.VERSION_STRING,
-				getConfig().getAppCode());
-
-		// init kernel
-		initFactories();
-		initKernel();
-		kernel.setPrintDecimals(getConfig().getDefaultPrintDecimals());
-
-		// init settings
-		initSettings();
-
-		// init euclidian view
-		initEuclidianViews();
-
-		// load file on startup and set fonts
-		// set flag to avoid multiple calls of setLabels() and
-		// updateContentPane()
-		initing = true;
-
-		// init default preferences if necessary
-		AppPrefs.getPref().initDefaultXML(this);
-
-		boolean fileLoaded = loadModule(args[0]);
-
-		// initialize GUI
-		if (isUsingFullGui()) {
-			initGuiManager();
-			setFrame(frame);
-		}
-
-		// load XML preferences
-		currentPath = AppPrefs.getPref().getDefaultFilePath();
-		currentImagePath = AppPrefs.getPref()
-				.getDefaultImagePath();
-
-		if (!fileLoaded) {
-			prefs.applyTo(this);
-			imageManager.setMaxIconSizeAsPt(getFontSize());
-		}
-
-		if (isUsingFullGui()) {
-			getGuiManager().getLayout()
-					.setPerspectiveOrDefault(getTmpPerspective());
-		}
-
-		setUndoActive(undoActive);
-
-		initing = false;
-
-		// for key listening
-		KeyboardFocusManager.getCurrentKeyboardFocusManager()
-				.addKeyEventDispatcher(this);
-
-		getScriptManager().ggbOnInit();
-		getFactory();
-
-		setSaved();
-
-		// user authentication handling
-		if (kernel.wantAnimationStarted()) {
-			kernel.getAnimatonManager().startAnimation();
-			kernel.setWantAnimationStarted(false);
-		}
-	}
-
-	// Deprecate all in favor of this
 	public AppD(String[] args, JFrame frame, AppPrefs prefs) {
 		super(Platform.DESKTOP);
 
@@ -731,10 +591,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 
 	public static int getFileListSize() {
 		return fileList.size();
-	}
-
-	public void createNewWindow() {
-		AppFrame.createNewWindow(cmdArgs);
 	}
 
 	@Override
@@ -3750,82 +3606,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	public void set1rstMode() {
 		setMode(((GuiManagerD) this.getGuiManager()).getToolbarPanel()
 				.getFirstToolbar().getFirstMode());
-	}
-
-	/**
-	 * @param file file to insert
-	 */
-	final public void insertFile(File file) {
-
-		// using code from newWindowAction, combined with
-		// Michael's suggestion
-		AppD ad = newAppForTemplateOrInsertFile();
-
-		// now, we have to load the file into AppD
-		ad.getGuiManager().loadFile(file, false);
-
-		// now we have to copy the macros from ad to app
-		// in order to make some advanced constructions work
-		// as it was hard to copy macro classes, let's use
-		// strings, but how to load them into the application?
-		try {
-			getXMLio().processXMLString(ad.getAllMacrosXML(), false, true);
-
-			// alternative solution
-			// app.addMacroXML(ad.getKernel().getMacroXML(
-			// ad.getKernel().getAllMacros()));
-		} catch (Exception ex) {
-			Log.debug("Could not load any macros at \"Insert File\"");
-			ex.printStackTrace();
-		}
-
-		// afterwards, the file is loaded into "ad" in theory,
-		// so we have to use the CopyPaste class to copy it
-
-		getCopyPaste()
-				.copyToXML(ad,
-						new ArrayList<>(ad.getKernel()
-				.getConstruction().getGeoSetWithCasCellsConstructionOrder()),
-				true);
-
-		// and paste
-		getCopyPaste().pasteFromXML(this, true);
-
-		// forgotten something important!
-		// ad should be closed!
-		ad.exit();
-		// this is also needed to make it possible
-		// to load the same file once again
-		ad.getFrame().dispose();
-
-	}
-
-	protected AppD newAppForTemplateOrInsertFile() {
-		return new AppD(new String[] {}, new JPanel(), true);
-	}
-
-	/**
-	 * @param file template file
-	 */
-	final public void applyTemplate(File file) {
-
-		// using code from newWindowAction, combined with
-		// Michael's suggestion
-		// true as undo info is necessary for copy-paste!
-		AppD ad = newAppForTemplateOrInsertFile();
-
-		// now, we have to load the file into AppD
-		ad.loadFile(file, false);
-
-		new TemplateHelper(this).applyTemplate(ad);
-
-		// almost forgotten something important!
-		// ad should be closed!
-		ad.exit();
-		// this is also needed to make it possible
-		// to load the same style file once again
-		ad.getFrame().dispose();
-
 	}
 
 	public void showPopUps() {

@@ -11,6 +11,7 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.UIManager;
 
 import org.geogebra.desktop.gui.app.AppFrame;
+import org.geogebra.desktop.GeoGebra3D;
 import org.geogebra.desktop.main.AppD;
 import org.geogebra.desktop.util.GuiResourcesD;
 
@@ -110,9 +111,7 @@ class WindowMenuD extends BaseMenu {
 				Thread runner = new Thread() {
 					@Override
 					public void run() {
-						app.setWaitCursor();
-						app.createNewWindow();
-						app.setDefaultCursor();
+						GeoGebra3D.appInstance(null);
 					}
 				};
 				runner.start();

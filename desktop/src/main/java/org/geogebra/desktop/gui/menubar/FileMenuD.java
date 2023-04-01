@@ -1,10 +1,8 @@
 package org.geogebra.desktop.gui.menubar;
 
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.io.File;
 
 import javax.swing.AbstractAction;
 import javax.swing.JMenu;
@@ -20,6 +18,7 @@ import org.geogebra.common.move.ggtapi.TubeAvailabilityCheckEvent;
 import org.geogebra.common.move.views.EventRenderable;
 import org.geogebra.common.util.FileExtensions;
 import org.geogebra.common.util.debug.Log;
+import org.geogebra.desktop.GeoGebra3D;
 import org.geogebra.desktop.export.AnimationExportDialogD;
 import org.geogebra.desktop.export.WorksheetExportDialog;
 import org.geogebra.desktop.export.pstricks.AsymptoteFrame;
@@ -30,7 +29,6 @@ import org.geogebra.desktop.export.pstricks.PgfFrame;
 import org.geogebra.desktop.export.pstricks.PstricksFrame;
 import org.geogebra.desktop.gui.app.AppFrame;
 import org.geogebra.desktop.main.AppD;
-import org.geogebra.desktop.move.ggtapi.models.LoginOperationD;
 import org.geogebra.desktop.util.GuiResourcesD;
 
 import com.himamis.retex.editor.share.util.Unicode;
@@ -195,9 +193,7 @@ class FileMenuD extends BaseMenu implements EventRenderable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Thread runner = new Thread(() -> {
-					app.setWaitCursor();
-					app.createNewWindow();
-					app.setDefaultCursor();
+					GeoGebra3D.appInstance(null);
 				});
 				runner.start();
 			}
@@ -338,7 +334,6 @@ class FileMenuD extends BaseMenu implements EventRenderable {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			@SuppressWarnings("unused")
 			public void actionPerformed(ActionEvent e) {
 				try {
 					new AnimationExportDialogD(app);
@@ -369,7 +364,6 @@ class FileMenuD extends BaseMenu implements EventRenderable {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			@SuppressWarnings("unused")
 			public void actionPerformed(ActionEvent e) {
 				try {
 					GeoGebraToPgfD export = new GeoGebraToPgfD(app);
@@ -387,7 +381,6 @@ class FileMenuD extends BaseMenu implements EventRenderable {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			@SuppressWarnings("unused")
 			public void actionPerformed(ActionEvent e) {
 				try {
 					GeoGebraToAsymptote export = new GeoGebraToAsymptoteD(app);

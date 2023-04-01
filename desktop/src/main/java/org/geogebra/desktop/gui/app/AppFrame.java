@@ -42,7 +42,6 @@ import java.util.Locale;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
-import org.geogebra.common.kernel.Macro;
 import org.geogebra.desktop.awt.GDimensionD;
 import org.geogebra.desktop.gui.FileDropTargetListener;
 import org.geogebra.desktop.gui.GuiManagerD;
@@ -79,8 +78,7 @@ public class AppFrame extends JFrame
 		born = System.currentTimeMillis();
 		this.addComponentListener(this);
 	}
-	
-	// Deprecates createNewWindow
+
 	public void init(AppD app) {
 		this.app = app;
 		app.getGuiManager().initMenubar();
@@ -255,66 +253,6 @@ public class AppFrame extends JFrame
 	}
 
 	/**
-	 * Main method to create initial GeoGebra window.
-	 * 
-	 * @param args
-	 *            file name parameter
-	 */
-	public static synchronized void main(String[] args) {
-		createNewWindow(args, new AppFrame());
-	}
-
-	public static synchronized AppFrame
-		createNewWindow(String[] args) {
-		return createNewWindow(args, new AppFrame());
-	}
-
-	public synchronized AppFrame
-		createNewWindow(String[] args, Macro macro) {
-		return createNewWindow(args, copy());
-	}
-
-	/**
-	 * Creates new GeoGebra window
-	 * 
-	 * @param args
-	 *            Command line arguments
-	 * @param wnd frame
-	 * @return the new window
-	 */
-	public static synchronized AppFrame
-		createNewWindow(final String[] args, AppFrame wnd) {
-		final AppD app = wnd.createApplication(args, wnd);
-		app.getGuiManager().initMenubar();
-
-		// init GUI
-		wnd.app = app;
-		wnd.getContentPane().add(app.buildApplicationPanel());
-		dropTargetListener = new FileDropTargetListener(app);
-		wnd.setGlassPane(((GuiManagerD) app.getGuiManager()).getLayout()
-				.getDockManager().getGlassPane());
-		wnd.setDropTarget(new DropTarget(wnd, dropTargetListener));
-		wnd.addWindowFocusListener(wnd);
-		updateAllTitles();
-
-		app.updateMenubar();
-
-		wnd.setVisible(true);
-
-		// init some things in the background
-		Thread runner = AppFrame.createAppThread(app);
-		runner.start();
-
-		checkCommandLineExport(app);
-
-		for (NewInstanceListener l : instanceListener) {
-			l.newInstance(wnd);
-		}
-
-		return wnd;
-	}
-
-	/**
 	 * Returns the active GeoGebra window.
 	 * 
 	 * @return the active GeoGebra window.
@@ -331,21 +269,6 @@ public class AppFrame extends JFrame
 
 	private static void addNewInstanceListener(NewInstanceListener l) {
 		instanceListener.add(l);
-	}
-
-	/**
-	 * return the application running geogebra
-	 * 
-	 * @param args command line args
-	 * @param frame frame
-	 * @return the application running geogebra
-	 */
-	protected AppD createApplication(String[] args, JFrame frame) {
-		return new AppD(args, frame, true);
-	}
-
-	protected AppFrame copy() {
-		return new AppFrame();
 	}
 
 	private static AppThread createAppThread(AppD app) {

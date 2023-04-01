@@ -22,6 +22,7 @@ import org.geogebra.common.main.GlobalKeyDispatcher;
 import org.geogebra.common.main.GuiManagerInterface;
 import org.geogebra.common.util.CopyPaste;
 import org.geogebra.common.util.FileExtensions;
+import org.geogebra.desktop.GeoGebra3D;
 import org.geogebra.desktop.euclidian.EuclidianViewD;
 import org.geogebra.desktop.gui.GuiManagerD;
 import org.geogebra.desktop.gui.app.AppFrame;
@@ -414,11 +415,7 @@ public class GlobalKeyDispatcherD extends GlobalKeyDispatcher
 	@Override
 	protected void createNewWindow() {
 		if (newWindowAllowed) {
-			app.setWaitCursor();
-			if (app instanceof AppD) {
-				((AppD) app).createNewWindow();
-			}
-			app.setDefaultCursor();
+			GeoGebra3D.appInstance(null);
 			newWindowAllowed = false;
 		}
 	}

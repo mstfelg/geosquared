@@ -78,6 +78,7 @@ import org.geogebra.common.util.FileExtensions;
 import org.geogebra.common.util.StringUtil;
 import org.geogebra.common.util.Util;
 import org.geogebra.common.util.debug.Log;
+import org.geogebra.desktop.GeoGebra3D;
 import org.geogebra.desktop.awt.GColorD;
 import org.geogebra.desktop.cas.view.CASViewD;
 import org.geogebra.desktop.euclidian.EuclidianControllerD;
@@ -141,7 +142,6 @@ import com.himamis.retex.editor.share.util.Unicode;
  * This is done to be able to put class files of geogebra.gui.* packages into a
  * separate gui jar file.
  */
-@SuppressWarnings("javadoc")
 public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 
 	public static final DataFlavor urlFlavor = getFlavor(
@@ -1839,7 +1839,6 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 			fileChooser.addChoosableFileFilter(templateFilter);
 
 			MyFileFilter offFilter = new MyFileFilter(FileExtensions.OFF);
-			// TODO: Localization
 			offFilter.setDescription("OFF file");
 			fileChooser.addChoosableFileFilter(offFilter);
 
@@ -1859,62 +1858,23 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 			if (returnVal == JFileChooser.APPROVE_OPTION) {
 				files = fileChooser.getSelectedFiles();
 			}
+			if (files == null)
+				return;
 
 			FileFilter filter = fileChooser.getFileFilter();
 
 			if (filter == fileFilter) {
 				fileFilter = (MyFileFilter) fileChooser.getFileFilter();
 				doOpenFiles(files, true, fileFilter.getExtension());
-			} else if (filter == templateFilter) {
-				// #4403
-				getApp().setWaitCursor();
-				getApp().setMoveMode();
-
-				for (int i = 0; i < files.length; i++) {
-
-					File file0 = files[i];
-
-					if (!file0.exists()) {
-						file0 = addExtension(file0, FileExtensions.GEOGEBRA);
-					}
-
-					getApp().applyTemplate(file0);
-
-				}
-
-				getApp().setDefaultCursor();
-
-			} else if (filter == insertFilter) {
-
-				getApp().setWaitCursor();
-				getApp().setMoveMode();
-
-				for (int i = 0; i < files.length; i++) {
-
-					File file0 = files[i];
-
-					if (!file0.exists()) {
-						file0 = addExtension(file0, FileExtensions.GEOGEBRA);
-					}
-
-					getApp().insertFile(file0);
-				}
-
-				getApp().setDefaultCursor();
-
 			} else if (filter == offFilter) {
 
 				getApp().setWaitCursor();
 				getApp().setMoveMode();
 
-				for (int i = 0; i < files.length; i++) {
-
-					File file0 = files[i];
-
-					if (!file0.exists()) {
-						file0 = addExtension(file0, FileExtensions.OFF);
+				for (File f : files) {
+					if (!f.exists()) {
+						f = addExtension(f, FileExtensions.OFF);
 					}
-
 				}
 
 				doOpenFiles(files, true);
@@ -2009,12 +1969,7 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 								// create new window for file
 								try {
 									String[] args = { file.getCanonicalPath() };
-									AppFrame wnd = AppFrame
-											.createNewWindow(
-													new String[] {}
-													);
-									wnd.toFront();
-									wnd.requestFocus();
+									GeoGebra3D.appInstance(args);
 								} catch (Exception e) {
 									e.printStackTrace();
 								}

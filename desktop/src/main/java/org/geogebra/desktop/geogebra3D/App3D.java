@@ -70,11 +70,9 @@ import org.geogebra.desktop.geogebra3D.input3D.Input3DFactory.Input3DException;
 import org.geogebra.desktop.geogebra3D.input3D.Input3DFactory.Input3DExceptionType;
 import org.geogebra.desktop.geogebra3D.util.ImageManager3D;
 import org.geogebra.desktop.gui.GuiManagerD;
-import org.geogebra.desktop.gui.app.GeoGebraFrame3D;
 import org.geogebra.desktop.gui.layout.DockManagerD;
 import org.geogebra.desktop.main.AppD;
 import org.geogebra.desktop.main.AppPrefs;
-import org.geogebra.desktop.main.LocalizationD;
 import org.geogebra.desktop.main.settings.updater.FontSettingsUpdaterD;
 import org.geogebra.desktop.util.FrameCollector;
 
@@ -88,26 +86,6 @@ public class App3D extends AppD {
 	private EuclidianView3D euclidianView3D;
 	private EuclidianController3D euclidianController3D;
 
-	/**
-	 * @param args arguments
-	 * @param frame frame
-	 */
-	public App3D(String[] args, JFrame frame) {
-
-		super(args, frame, null, true, new LocalizationD(3));
-
-		runThreadForCheckInput3D();
-	}
-
-	/**
-	 * @param args arguments
-	 * @param comp frame
-	 */
-	public App3D(String[] args, Container comp) {
-		super(args, null, comp, true, new LocalizationD(3));
-
-		runThreadForCheckInput3D();
-	}
 	public App3D(String[] args, JFrame frame, AppPrefs prefs) {
 		super(args, frame, prefs);
 	}
@@ -658,11 +636,6 @@ public class App3D extends AppD {
 	}
 
 	@Override
-	public void createNewWindow() {
-		GeoGebraFrame3D.createNewWindow3D(cmdArgs);
-	}
-
-	@Override
 	public GBufferedImage getActiveEuclidianViewExportImage(double maxX,
 			double maxY) {
 
@@ -684,20 +657,6 @@ public class App3D extends AppD {
 	 */
 	@Override
 	public void uploadToGeoGebraTubeOnCallback() {
-
-		if (!isEuclidianView3Dinited()) {
-			uploadToGeoGebraTube();
-			return;
-		}
-
-		EuclidianView3D ev3D = getEuclidianView3D();
-
-		if (ev3D.isShowing()) {
-			ev3D.getRenderer().uploadToGeoGebraTube();
-		} else {
-			uploadToGeoGebraTube();
-		}
-
 	}
 
 	@Override
@@ -725,11 +684,6 @@ public class App3D extends AppD {
 	@Override
 	public boolean useShaders() {
 		return useShaders;
-	}
-
-	@Override
-	protected AppD newAppForTemplateOrInsertFile() {
-		return new App3D(new String[] {}, new JPanel());
 	}
 
 	@Override

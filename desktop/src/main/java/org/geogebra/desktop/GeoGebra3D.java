@@ -112,6 +112,13 @@ public class GeoGebra3D extends GeoGebra {
         }
         scanner.close();
 	}
+
+	public static App3D appInstance(String[] fileArgs) {
+		GeoGebraFrame3D wnd = new GeoGebraFrame3D();
+		App3D app = new App3D(fileArgs, wnd, new AppPrefs(objCfg, modPath));
+		wnd.init(app);
+		return app;
+	}
 	
 	private static void version() {
 		System.out.println(""

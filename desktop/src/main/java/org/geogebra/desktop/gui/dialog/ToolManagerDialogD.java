@@ -42,7 +42,7 @@ import org.geogebra.common.kernel.Macro;
 import org.geogebra.common.util.FileExtensions;
 import org.geogebra.desktop.gui.MyImageD;
 import org.geogebra.desktop.gui.ToolNameIconPanelD;
-import org.geogebra.desktop.gui.app.GeoGebraFrame;
+import org.geogebra.desktop.gui.app.AppFrame;
 import org.geogebra.desktop.main.AppD;
 import org.geogebra.desktop.main.LocalizationD;
 
@@ -271,8 +271,8 @@ public class ToolManagerDialogD extends Dialog
 				app.setWaitCursor();
 				// avoid deadlock with current app
 				SwingUtilities.invokeLater(() -> {
-					GeoGebraFrame newFrame =
-							((GeoGebraFrame) app.getFrame()).createNewWindow(null, macro);
+					AppFrame newFrame =
+							((AppFrame) app.getFrame()).createNewWindow(null, macro);
 					newFrame.setTitle(macro.getCommandName());
 					byte[] byteArray = app.getMacrosBefore(macro);
 					newFrame.getApplication()

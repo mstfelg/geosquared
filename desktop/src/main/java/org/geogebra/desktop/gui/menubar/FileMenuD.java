@@ -28,7 +28,7 @@ import org.geogebra.desktop.export.pstricks.GeoGebraToPgfD;
 import org.geogebra.desktop.export.pstricks.GeoGebraToPstricksD;
 import org.geogebra.desktop.export.pstricks.PgfFrame;
 import org.geogebra.desktop.export.pstricks.PstricksFrame;
-import org.geogebra.desktop.gui.app.GeoGebraFrame;
+import org.geogebra.desktop.gui.app.AppFrame;
 import org.geogebra.desktop.main.AppD;
 import org.geogebra.desktop.move.ggtapi.models.LoginOperationD;
 import org.geogebra.desktop.util.GuiResourcesD;
@@ -164,7 +164,7 @@ class FileMenuD extends BaseMenu implements EventRenderable {
 		}
 
 		// close all
-		if (GeoGebraFrame.getInstanceCount() > 1) {
+		if (AppFrame.getInstanceCount() > 1) {
 			add(exitAllAction);
 		}
 

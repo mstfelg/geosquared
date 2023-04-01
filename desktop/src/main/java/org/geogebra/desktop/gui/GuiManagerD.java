@@ -88,7 +88,7 @@ import org.geogebra.desktop.export.GraphicExportDialog;
 import org.geogebra.desktop.export.WorksheetExportDialog;
 import org.geogebra.desktop.export.pstricks.GeoGebraToPstricksD;
 import org.geogebra.desktop.export.pstricks.PstricksFrame;
-import org.geogebra.desktop.gui.app.GeoGebraFrame;
+import org.geogebra.desktop.gui.app.AppFrame;
 import org.geogebra.desktop.gui.app.MyFileFilter;
 import org.geogebra.desktop.gui.color.GeoGebraColorChooser;
 import org.geogebra.desktop.gui.dialog.DialogManagerD;
@@ -1468,8 +1468,8 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 		}
 		// use null component for iconified frame
 		Component comp = getApp().getMainComponent();
-		if (getApp().getFrame() instanceof GeoGebraFrame) {
-			GeoGebraFrame frame = (GeoGebraFrame) getApp().getFrame();
+		if (getApp().getFrame() instanceof AppFrame) {
+			AppFrame frame = (AppFrame) getApp().getFrame();
 			comp = frame != null && !frame.isIconified() ? frame : null;
 		}
 
@@ -1998,7 +1998,7 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 						loadOffFile(file);
 					} else {
 						// standard GeoGebra file
-						GeoGebraFrame inst = GeoGebraFrame
+						AppFrame inst = AppFrame
 								.getInstanceWithFile(file);
 						if (inst == null) {
 							counter++;
@@ -2009,7 +2009,7 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 								// create new window for file
 								try {
 									String[] args = { file.getCanonicalPath() };
-									GeoGebraFrame wnd = GeoGebraFrame
+									AppFrame wnd = AppFrame
 											.createNewWindow(
 													new String[] {}
 													);
@@ -2048,7 +2048,7 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 	 * @return whether ggb/ggt files were found in transferable
 	 */
 	public boolean handleGGBFileDrop(Transferable t) {
-		FileDropTargetListener dtl = ((GeoGebraFrame) getApp().getFrame())
+		FileDropTargetListener dtl = ((AppFrame) getApp().getFrame())
 				.getDropTargetListener();
 		return dtl.handleFileDrop(t);
 	}
@@ -2338,19 +2338,19 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 	@Override
 	public void updateFrameSize() {
 		JFrame fr = getApp().getFrame();
-		if (fr instanceof GeoGebraFrame) {
-			((GeoGebraFrame) fr).updateSize();
+		if (fr instanceof AppFrame) {
+			((AppFrame) fr).updateSize();
 			getApp().validateComponent();
 		}
 	}
 
 	@Override
 	public void updateFrameTitle() {
-		if (!(getApp().getFrame() instanceof GeoGebraFrame)) {
+		if (!(getApp().getFrame() instanceof AppFrame)) {
 			return;
 		}
 
-		GeoGebraFrame frame = (GeoGebraFrame) getApp().getFrame();
+		AppFrame frame = (AppFrame) getApp().getFrame();
 
 		StringBuilder sb = new StringBuilder();
 		if (getApp().getCurrentFile() != null) {
@@ -2358,7 +2358,7 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 		} else {
 			sb.append(GeoGebraConstants.APPLICATION_NAME);
 			sb.append(" Classic 5");
-			if (GeoGebraFrame.getInstanceCount() > 1) {
+			if (AppFrame.getInstanceCount() > 1) {
 				int nr = frame.getInstanceNumber();
 				sb.append(" (");
 				sb.append(nr + 1);
@@ -2372,7 +2372,7 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 	 * @return app frame
 	 */
 	public JFrame createFrame() {
-		GeoGebraFrame wnd = new GeoGebraFrame();
+		AppFrame wnd = new AppFrame();
 		wnd.setGlassPane(layout.getDockManager().getGlassPane());
 		wnd.setApplication(getApp());
 
@@ -2383,13 +2383,13 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 	 * Close all apps
 	 */
 	public static synchronized void exitAll() {
-		ArrayList<GeoGebraFrame> insts = GeoGebraFrame.getInstances();
-		GeoGebraFrame[] instsCopy = new GeoGebraFrame[insts.size()];
+		ArrayList<AppFrame> insts = AppFrame.getInstances();
+		AppFrame[] instsCopy = new AppFrame[insts.size()];
 		for (int i = 0; i < instsCopy.length; i++) {
 			instsCopy[i] = insts.get(i);
 		}
 
-		for (GeoGebraFrame geoGebraFrame : instsCopy) {
+		for (AppFrame geoGebraFrame : instsCopy) {
 			geoGebraFrame.getApplication().exit();
 		}
 	}
@@ -2822,8 +2822,8 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 	public boolean checkAutoCreateSliders(String s,
 			AsyncOperation<String[]> callback) {
 		Component comp = getApp().getMainComponent();
-		if (getApp().getFrame() instanceof GeoGebraFrame) {
-			GeoGebraFrame frame = (GeoGebraFrame) getApp().getFrame();
+		if (getApp().getFrame() instanceof AppFrame) {
+			AppFrame frame = (AppFrame) getApp().getFrame();
 			comp = frame != null && !frame.isIconified() ? frame : null;
 		}
 

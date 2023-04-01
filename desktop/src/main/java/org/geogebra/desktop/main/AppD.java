@@ -462,7 +462,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	// Deprecate all in favor of this
 	public AppD(String[] args, AppPrefs prefs, JFrame frame) {
 		super(Platform.DESKTOP);
-		if (frame == null || args == null || prefs == null)
+		if (frame == null || prefs == null)
 			return;
 		this.prefs = prefs;
 		this.preferredSize = new GDimensionD(800, 600);
@@ -485,8 +485,10 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		
 		this.initing = true;
 
-		String fileName = args[0];
-		if (fileName != null) {
+		String fileName = null;
+		if (args != null)
+			fileName = args[0];
+		if (fileName != null && !fileName.equals("")) {
 			Log.debug("Reading file: " + fileName);
 			handleFileArg(fileName);
 		}
@@ -813,8 +815,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		if (fileName == null || fileName.equals(""))
 			return false;
 
-		FileExtensions ext = StringUtil.getFileExtension(fileName);
-		boolean isMacroFile = ext.equals(FileExtensions.GEOGEBRA_TOOL);
 		File f = new File(fileName);
 		try {
 			f = f.getCanonicalFile();
@@ -822,7 +822,8 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 			e.printStackTrace();
 			return false;
 		}
-		return loadFile(f, isMacroFile);
+		Log.debug("file canon: " + f);
+		return loadFile(f, false);
 	}
 
 	/**
@@ -2417,6 +2418,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	public boolean loadFile(File file, boolean isMacroFile) {
 
 		if (!checkFileExistsAndShowFileNotFound(file)) {
+			Log.debug("File does not exist");
 			return false;
 		}
 

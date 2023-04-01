@@ -111,7 +111,7 @@ class WindowMenuD extends BaseMenu {
 				Thread runner = new Thread() {
 					@Override
 					public void run() {
-						GeoGebra3D.newInstance();
+						GeoGebra3D.newInstance(null);
 					}
 				};
 				runner.start();

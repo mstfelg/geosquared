@@ -210,7 +210,7 @@ class FileMenuD extends BaseMenu implements EventRenderable {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Thread runner = new Thread(() -> {
-					GeoGebra3D.newInstance();
+					GeoGebra3D.newInstance(null);
 				});
 				runner.start();
 			}

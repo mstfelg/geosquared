@@ -176,7 +176,7 @@ import org.geogebra.desktop.factories.LaTeXFactoryD;
 import org.geogebra.desktop.factories.UtilFactoryD;
 import org.geogebra.desktop.gui.GuiManagerD;
 import org.geogebra.desktop.gui.MyImageD;
-import org.geogebra.desktop.gui.app.GeoGebraFrame;
+import org.geogebra.desktop.gui.app.AppFrame;
 import org.geogebra.desktop.gui.dialog.AxesStyleListRenderer;
 import org.geogebra.desktop.gui.dialog.DashListRenderer;
 import org.geogebra.desktop.gui.dialog.DecorationListRenderer;
@@ -734,7 +734,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	}
 
 	public void createNewWindow() {
-		GeoGebraFrame.createNewWindow(cmdArgs);
+		AppFrame.createNewWindow(cmdArgs);
 	}
 
 	@Override

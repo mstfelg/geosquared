@@ -55,14 +55,14 @@ import com.himamis.retex.editor.share.util.Unicode;
 /**
  * GeoGebra's main window.
  */
-public class GeoGebraFrame extends JFrame
+public class AppFrame extends JFrame
 		implements WindowFocusListener, Printable, ComponentListener {
 
 	private static final long serialVersionUID = 1L;
 
 	private static List<NewInstanceListener> instanceListener = new ArrayList<>();
-	private static ArrayList<GeoGebraFrame> instances = new ArrayList<>();
-	private static GeoGebraFrame activeInstance;
+	private static ArrayList<AppFrame> instances = new ArrayList<>();
+	private static AppFrame activeInstance;
 	private static Object lock = new Object();
 
 	private static FileDropTargetListener dropTargetListener;
@@ -73,7 +73,7 @@ public class GeoGebraFrame extends JFrame
 	/**
 	 * New frame
 	 */
-	public GeoGebraFrame() {
+	public AppFrame() {
 		instances.add(this);
 		setActiveInstance(this);
 		born = System.currentTimeMillis();
@@ -99,7 +99,7 @@ public class GeoGebraFrame extends JFrame
 		this.setVisible(true);
 
 		// init some things in the background
-		Thread runner = GeoGebraFrame.createAppThread(app);
+		Thread runner = AppFrame.createAppThread(app);
 		runner.start();
 
 		checkCommandLineExport(app);
@@ -177,7 +177,7 @@ public class GeoGebraFrame extends JFrame
 			int instanceID = instances.size() - 1;
 			if (instanceID > 0) {
 				// move right and down of last instance
-				GeoGebraFrame prevInstance = getInstance(instanceID - 1);
+				AppFrame prevInstance = getInstance(instanceID - 1);
 				Point loc = prevInstance.getLocation();
 
 				// make sure we stay on screen
@@ -261,15 +261,15 @@ public class GeoGebraFrame extends JFrame
 	 *            file name parameter
 	 */
 	public static synchronized void main(String[] args) {
-		createNewWindow(args, new GeoGebraFrame());
+		createNewWindow(args, new AppFrame());
 	}
 
-	public static synchronized GeoGebraFrame
+	public static synchronized AppFrame
 		createNewWindow(String[] args) {
-		return createNewWindow(args, new GeoGebraFrame());
+		return createNewWindow(args, new AppFrame());
 	}
 
-	public synchronized GeoGebraFrame
+	public synchronized AppFrame
 		createNewWindow(String[] args, Macro macro) {
 		return createNewWindow(args, copy());
 	}
@@ -282,8 +282,8 @@ public class GeoGebraFrame extends JFrame
 	 * @param wnd frame
 	 * @return the new window
 	 */
-	public static synchronized GeoGebraFrame
-		createNewWindow(final String[] args, GeoGebraFrame wnd) {
+	public static synchronized AppFrame
+		createNewWindow(final String[] args, AppFrame wnd) {
 		final AppD app = wnd.createApplication(args, wnd);
 		app.getGuiManager().initMenubar();
 
@@ -302,7 +302,7 @@ public class GeoGebraFrame extends JFrame
 		wnd.setVisible(true);
 
 		// init some things in the background
-		Thread runner = GeoGebraFrame.createAppThread(app);
+		Thread runner = AppFrame.createAppThread(app);
 		runner.start();
 
 		checkCommandLineExport(app);
@@ -319,11 +319,11 @@ public class GeoGebraFrame extends JFrame
 	 * 
 	 * @return the active GeoGebra window.
 	 */
-	public static synchronized GeoGebraFrame getActiveInstance() {
+	public static synchronized AppFrame getActiveInstance() {
 		return activeInstance;
 	}
 
-	private static void setActiveInstance(GeoGebraFrame frame) {
+	private static void setActiveInstance(AppFrame frame) {
 		synchronized (lock) {
 			activeInstance = frame;
 		}
@@ -344,8 +344,8 @@ public class GeoGebraFrame extends JFrame
 		return new AppD(args, frame, true);
 	}
 
-	protected GeoGebraFrame copy() {
-		return new GeoGebraFrame();
+	protected AppFrame copy() {
+		return new AppFrame();
 	}
 
 	private static AppThread createAppThread(AppD app) {
@@ -392,11 +392,11 @@ public class GeoGebraFrame extends JFrame
 		return instances.size();
 	}
 
-	public static ArrayList<GeoGebraFrame> getInstances() {
+	public static ArrayList<AppFrame> getInstances() {
 		return instances;
 	}
 
-	static GeoGebraFrame getInstance(int i) {
+	static AppFrame getInstance(int i) {
 		return instances.get(i);
 	}
 
@@ -417,7 +417,7 @@ public class GeoGebraFrame extends JFrame
 	 * @param file ggb file
 	 * @return GeoGebra instance with file open or null
 	 */
-	public static GeoGebraFrame getInstanceWithFile(File file) {
+	public static AppFrame getInstanceWithFile(File file) {
 		if (file == null)
 			return null;
 
@@ -430,7 +430,7 @@ public class GeoGebraFrame extends JFrame
 		if (absPath == null)
 			return null;
 
-		for (GeoGebraFrame inst : instances) {
+		for (AppFrame inst : instances) {
 			AppD app = inst.app;
 			if (app == null)
 				continue;

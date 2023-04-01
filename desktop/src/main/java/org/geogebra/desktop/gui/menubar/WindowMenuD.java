@@ -10,7 +10,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.UIManager;
 
-import org.geogebra.desktop.gui.app.GeoGebraFrame;
+import org.geogebra.desktop.gui.app.AppFrame;
 import org.geogebra.desktop.main.AppD;
 import org.geogebra.desktop.util.GuiResourcesD;
 
@@ -42,7 +42,7 @@ class WindowMenuD extends BaseMenu {
 		JMenuItem mit = add(newWindowAction);
 		setMenuShortCutAccelerator(mit, 'N');
 
-		ArrayList<GeoGebraFrame> ggbInstances = GeoGebraFrame.getInstances();
+		ArrayList<AppFrame> ggbInstances = AppFrame.getInstances();
 		int size = ggbInstances.size();
 		if (size == 1) {
 			return;
@@ -56,7 +56,7 @@ class WindowMenuD extends BaseMenu {
 		int current = -1;
 
 		for (int i = 0; i < size; i++) {
-			GeoGebraFrame ggb = ggbInstances.get(i);
+			AppFrame ggb = ggbInstances.get(i);
 			AppD application = ggb.getApplication();
 			if (app == application) {
 				current = i;
@@ -64,7 +64,7 @@ class WindowMenuD extends BaseMenu {
 		}
 
 		for (int i = 0; i < size; i++) {
-			GeoGebraFrame ggb = ggbInstances.get(i);
+			AppFrame ggb = ggbInstances.get(i);
 			AppD application = ggb.getApplication();
 
 			sb.setLength(0);

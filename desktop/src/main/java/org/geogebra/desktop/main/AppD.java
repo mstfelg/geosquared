@@ -400,7 +400,8 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 			AppPrefs.getPref().applyTo(this);
 		}
 
-		boolean fileLoaded = handleFileArg(args.getStringValue("file0"));
+		boolean fileLoaded = false;
+
 
 		// initialize GUI
 		if (isUsingFullGui()) {
@@ -488,10 +489,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		String fileName = null;
 		if (args != null)
 			fileName = args[0];
-		if (fileName != null && !fileName.equals("")) {
-			Log.debug("Reading file: " + fileName);
-			handleFileArg(fileName);
-		}
+		loadModule(fileName);
 
 		initGuiManager();
 		setFrame(frame);
@@ -804,26 +802,6 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		String fileArgument = args.getStringValue("file0");
 		String lowerCase = StringUtil.toLowerCaseUS(fileArgument);
 		return lowerCase.endsWith(FileExtensions.GEOGEBRA_TOOL.toString());
-	}
-
-	/**
-	 * Opens a file specified as last command line argument
-	 * 
-	 * @return true if a file was loaded successfully
-	 */
-	private boolean handleFileArg(String fileName) {
-		if (fileName == null || fileName.equals(""))
-			return false;
-
-		File f = new File(fileName);
-		try {
-			f = f.getCanonicalFile();
-		} catch(Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-		Log.debug("file canon: " + f);
-		return loadFile(f, false);
 	}
 
 	/**
@@ -2416,14 +2394,10 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	 * @return success
 	 */
 	public boolean loadFile(File file, boolean isMacroFile) {
-
 		if (!checkFileExistsAndShowFileNotFound(file)) {
-			Log.debug("File does not exist");
 			return false;
 		}
-
 		return loadExistingFile(file, isMacroFile);
-
 	}
 
 	private OFFHandler offHandler;
@@ -2498,13 +2472,9 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 
 			// pretend we're initializing the application to prevent unnecessary
 			// update
-			if (!initing) {
-				initing = true;
-				success = GFileHandler.loadXML(this, fis, isMacroFile, isGsq);
-				initing = false;
-			} else {
-				success = GFileHandler.loadXML(this, fis, isMacroFile, isGsq);
-			}
+			initing = true;
+			success = GFileHandler.loadXML(this, fis, isMacroFile, isGsq);
+			initing = false;
 
 			if (success && !isMacroFile) {
 				setCurrentFile(file);
@@ -2697,6 +2667,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	}
 
 	public boolean loadModule(String modName) {
+		Log.debug("Loading: " + modName);
 		if (modName == null)
 			return false;
 		
@@ -2706,6 +2677,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 				new FileInputStream(modName)
 			);
 		} catch (Exception e) {
+			Log.debug("Error opening");
 			return false;
 		}
 
@@ -2716,6 +2688,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		try {
 			xmlParser.parse(xmlHandler, modReader);
 		} catch (Exception e) { 
+			Log.debug(" == Error opening");
 			e.printStackTrace();
 			return false;
 		}

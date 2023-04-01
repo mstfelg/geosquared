@@ -57,6 +57,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -121,6 +122,8 @@ import org.geogebra.common.geogebra3D.io.OFFHandler;
 import org.geogebra.common.geogebra3D.kernel3D.commands.CommandDispatcher3D;
 import org.geogebra.common.gui.toolbar.ToolBar;
 import org.geogebra.common.gui.view.algebra.AlgebraView;
+import org.geogebra.common.io.MyXMLHandler;
+import org.geogebra.common.io.QDParser;
 import org.geogebra.common.io.layout.DockPanelData;
 import org.geogebra.common.io.layout.Perspective;
 import org.geogebra.common.javax.swing.GImageIcon;
@@ -2767,6 +2770,34 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		}
 	}
 
+	public boolean loadModule(String modName) {
+		if (modName == null)
+			return false;
+		
+		Reader modReader = null;
+		try {
+			modReader = new InputStreamReader(
+				new FileInputStream(modName)
+			);
+		} catch (Exception e) {
+			return false;
+		}
+
+		QDParser xmlParser = new QDParser();
+		MyXMLHandler xmlHandler = kernel.newMyXMLHandler(kernel.getConstruction());
+
+		kernel.getConstruction().setFileLoading(true);
+		try {
+			xmlParser.parse(xmlHandler, modReader);
+		} catch (Exception e) { 
+			e.printStackTrace();
+			return false;
+		}
+		kernel.getConstruction().setFileLoading(false);
+
+		return true;
+	}
+
 	@Override
 	final public MyXMLioD getXMLio() {
 		return (MyXMLioD) super.getXMLio();
@@ -3906,32 +3937,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 
 	}
 
-	private boolean popupsDone = false;
-
 	public void showPopUps() {
-		LoginOperationD signIn = (LoginOperationD) getLoginOperation();
-		if (!signIn.isTubeCheckDone()) {
-			return;
-		}
-
-		if (isAllowPopups()) {
-
-			// Show login popup
-			if (!popupsDone) {
-				popupsDone = true;
-
-				EventQueue.invokeLater(() -> {
-					boolean showDockPopup = true;
-
-					LoginOperationD signInOp = (LoginOperationD) getLoginOperation();
-					if (signInOp.isTubeAvailable()
-							&& !signInOp.isLoggedIn()) {
-						showDockPopup = showTubeLogin();
-					}
-
-				});
-			}
-		}
 	}
 
 	protected boolean showTubeLogin() {

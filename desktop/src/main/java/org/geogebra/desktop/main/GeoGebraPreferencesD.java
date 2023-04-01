@@ -12,11 +12,13 @@
 
 package org.geogebra.desktop.main;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.prefs.Preferences;
+import java.util.stream.Stream;
 
 import org.geogebra.common.GeoGebraConstants;
 import org.geogebra.common.euclidian3D.Input3DConstants;
@@ -39,13 +41,12 @@ public class GeoGebraPreferencesD {
 	public static String objCfg;
 
 	public static String dataHome;
-	public static String macrosPrefs;
+	public static String modPath;
 	public static String propData;
 
 	// Java Preferences
 	public final static String PREF_ROOT = "/gsq";
 	private Preferences ggbPrefs;
-	private Preferences ggbPrefsSystem;
 
 	// Picture export dialog
 	public static String EXPORT_PIC_FORMAT = "export_pic_format";
@@ -91,12 +92,12 @@ public class GeoGebraPreferencesD {
 				System.getProperty("user.home"), ".local/share/gsq/"
 			).toString();
 		// macrosPrefs might be given by --modules
-		if (macrosPrefs == null)
-			macrosPrefs = Paths.get(dataHome, "macros.ggt").toString();
+		if (modPath == null)
+			modPath = Paths.get(dataHome, "modules/").toString();
 		propData = Paths.get(dataHome, "gsq.properties").toString();
 
 		Log.debug("Reading config from " + configHome);
-		Log.debug("Reading modules from " + macrosPrefs);
+		Log.debug("Reading modules from " + modPath);
 
 		try {
 			ggbPrefs = Preferences.userRoot().node(PREF_ROOT);
@@ -280,121 +281,8 @@ public class GeoGebraPreferencesD {
 
 		UtilD.writeStringToFile(userPrefsXML, layoutCfg);
 		UtilD.writeStringToFile(objectPrefsXML, objCfg);
-		UtilD.writeByteArrayToFile(macros, macrosPrefs);
+		UtilD.writeByteArrayToFile(macros, modPath);
 		return;
-
-		// ggbPrefs.put(GeoGebraPreferences.XML_USER_PREFERENCES, userPrefsXML);
-
-		// store current tools including icon images as ggt file (byte array)
-		// putByteArray(TOOLS_FILE_GGT, app.getMacroFileAsByteArray());
-		//
-		// try {
-		// 	ggbPrefs.flush();
-		// } catch (Exception e) {
-		// 	Log.debug(e + "");
-		// }
-	}
-
-	/**
-	 * Breaks up byte array value into pieces and calls
-	 * prefs.putByteArray(prefs, key+k, piece_k) for every piece.
-	 */
-	private void putByteArray(String key, byte[] value) {
-		// byte array must not be longer than 3/4 of max value length
-		int max_length = (int) Math.floor(Preferences.MAX_VALUE_LENGTH * 0.75);
-
-		// value array is small enough
-		if (value == null || value.length < max_length) {
-			ggbPrefs.putByteArray(key, value);
-
-			// remove possible old part keys
-			int partCount = 0;
-			while (true) {
-				byte[] temp = ggbPrefs.getByteArray(key + partCount, null);
-				if (temp != null) {
-					ggbPrefs.remove(key + partCount);
-					partCount++;
-				} else {
-					break;
-				}
-			}
-		}
-
-		// break value array up into smaller pieces
-		else {
-			// delete key value
-			ggbPrefs.remove(key);
-
-			byte[] bytePart = new byte[max_length];
-			int pos = 0;
-			int partCount = 0;
-			while (pos + max_length <= value.length) {
-				for (int k = 0; k < max_length; k++, pos++) {
-					bytePart[k] = value[pos];
-				}
-
-				// put piece key + partCount
-				partCount++;
-				ggbPrefs.putByteArray(key + partCount, bytePart);
-			}
-
-			// write last part
-			if (pos < value.length) {
-				bytePart = new byte[value.length - pos];
-
-				for (int k = 0; pos < value.length; k++, pos++) {
-					bytePart[k] = value[pos];
-				}
-
-				// put piece key + partCount
-				partCount++;
-				ggbPrefs.putByteArray(key + partCount, bytePart);
-			}
-		}
-
-		try {
-			ggbPrefs.flush();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Breaks up byte array value into pieces and calls
-	 * prefs.putByteArray(prefs, key+k, piece_k) for every piece.
-	 */
-	private byte[] getByteArray(String key, byte[] def) {
-		byte[] ret = ggbPrefs.getByteArray(key, null);
-
-		if (ret != null) {
-			// no parts: return byte array
-			return ret;
-		}
-		try {
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			int partCount = 1;
-			while (true) {
-				ret = ggbPrefs.getByteArray(key + partCount, null);
-				if (ret != null) {
-					bos.write(ret);
-					partCount++;
-				} else {
-					break;
-				}
-			}
-			bos.flush();
-			if (bos.size() > 0) {
-				ret = bos.toByteArray();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			ret = null;
-		}
-
-		if (ret != null) {
-			return ret;
-		}
-		return def;
 	}
 
 	/**
@@ -412,30 +300,33 @@ public class GeoGebraPreferencesD {
 	 * for ggb files.
 	 */
 	public void loadXMLPreferences(AppD app) {
-
 		app.setWaitCursor();
-		String userPrefsXML = UtilD.loadFileIntoString(layoutCfg);
-		String objectPrefsXML = UtilD
-				.loadFileIntoString(objCfg);
+		String layoutFile = UtilD.loadFileIntoString(layoutCfg);
+		String objFile = UtilD.loadFileIntoString(objCfg);
 
-		byte[] ggtFile = UtilD.loadFileIntoByteArray(macrosPrefs);
-
-		if (ggtFile != null) {
-			app.loadMacroFileFromByteArray(ggtFile, true);
+		if (modPath != null) {
+			Path root = Paths.get(modPath);
+			try (Stream<Path> stream = Files.walk(root)) {
+				stream.forEach(p -> {
+					if (Files.isRegularFile(p) && p.toString().endsWith(".gsq"))
+							app.loadModule(p.toString());
+				});
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
-		if (userPrefsXML != null) {
-			app.setXML(userPrefsXML, false);
+		if (layoutFile != null) {
+			app.setXML(layoutFile, false);
 		} else {
 			app.setXML(factoryDefaultXml, false);
 		}
 
-		if (objectPrefsXML != null
-				&& !objectPrefsXML.equals(factoryDefaultXml)) {
+		if (objFile != null && !objFile.equals(factoryDefaultXml)) {
 			boolean eda = app.getKernel().getElementDefaultAllowed();
 			app.getKernel().setElementDefaultAllowed(true);
 			app.getKernel().getConstruction().setIgnoringNewTypes(true);
-			app.setXML(objectPrefsXML, false);
+			app.setXML(objFile, false);
 			app.getKernel().getConstruction().setIgnoringNewTypes(false);
 			app.getKernel().setElementDefaultAllowed(eda);
 		}
@@ -477,7 +368,7 @@ public class GeoGebraPreferencesD {
 		try {
 			UtilD.delete(new File(objCfg));
 			UtilD.delete(new File(layoutCfg));
-			UtilD.delete(new File(macrosPrefs));
+			UtilD.delete(new File(modPath));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

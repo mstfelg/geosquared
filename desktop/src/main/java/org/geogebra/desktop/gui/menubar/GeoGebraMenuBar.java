@@ -424,7 +424,6 @@ public class GeoGebraMenuBar extends JMenuBar implements EventRenderable {
 		sb.append(app.getKernel().getLibraryJavaScript());
 
 		sb.append("\n\nPreferences:\n");
-		sb.append(GeoGebraPreferencesD.getPref().getXMLPreferences());
 		sb.append("[/pre]");
 		Toolkit.getDefaultToolkit().getSystemClipboard()
 				.setContents(new StringSelection(sb.toString()), null);

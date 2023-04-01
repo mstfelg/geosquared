@@ -18,8 +18,6 @@
  */
 
 package org.geogebra.desktop;
-
-import java.util.logging.Logger;
 import java.util.Scanner;
 
 import org.geogebra.desktop.gui.app.GeoGebraFrame3D;
@@ -27,8 +25,6 @@ import org.geogebra.desktop.util.LoggerD;
 import org.geogebra.common.util.debug.Log;
 import org.geogebra.common.util.debug.Log.LogDestination;
 import org.geogebra.common.GeoGebraConstants;
-import org.geogebra.common.GeoGebraConstants.Platform;
-import org.geogebra.desktop.gui.inputbar.AlgebraInputD;
 import org.geogebra.desktop.main.GeoGebraPreferencesD;
 
 import gnu.getopt.Getopt;
@@ -63,7 +59,7 @@ public class GeoGebra3D extends GeoGebra {
     	while ((c = g.getopt()) != -1) {
     	    switch (c) {
     	        case 'm':
-					GeoGebraPreferencesD.macrosPrefs = g.getOptarg();
+					GeoGebraPreferencesD.modPath = g.getOptarg();
     	        	break;
     	        case 'c':
 					GeoGebraPreferencesD.objCfg = g.getOptarg();
@@ -127,7 +123,7 @@ public class GeoGebra3D extends GeoGebra {
 					+ "  -V --version\t\tprint version\n"
 					+ "  -c --config=FILENAME\tread settings FILENAME\n"
 					+ "  -m --modules=FILENAME\tread modules from FILENAME\n"
-					+ "  --debug=LEVEL\tset logging level "
+					+ "  -d --debug=LEVEL\tset logging level "
 							+ "(EMERGENCY|ALERT|CRITICAL|ERROR|WARN|NOTICE|INFO|DEBUG|TRACE)\n"
 		);
 	}

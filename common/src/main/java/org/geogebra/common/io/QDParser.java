@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.util.Stack;
 
 import org.geogebra.common.util.StringUtil;
+import org.geogebra.common.util.debug.Log;
 
 /**
  * Quick and Dirty xml parser. This parser is, like the SAX parser, an event

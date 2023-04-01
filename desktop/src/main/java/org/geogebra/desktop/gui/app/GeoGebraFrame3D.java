@@ -5,7 +5,6 @@ import javax.swing.JFrame;
 import org.geogebra.desktop.CommandLineArguments;
 import org.geogebra.desktop.geogebra3D.App3D;
 import org.geogebra.desktop.main.AppD;
-import org.geogebra.desktop.main.GeoGebraPreferencesD;
 
 /**
  * Frame for geogebra 3D.
@@ -21,16 +20,6 @@ public class GeoGebraFrame3D extends GeoGebraFrame {
 	public GeoGebraFrame3D(CommandLineArguments args) { super(args); }
 	
 	public static synchronized void main(CommandLineArguments args) {
-		GeoGebraFrame wnd = new GeoGebraFrame();
-
-		// Set GeoGebraPreferences mode (system properties or property file)
-		// before it is called for the first time
-		// String settingsFile = args.getStringValue("settingsfile");
-		// if (settingsFile.length() > 0) {
-		// 	GeoGebraPreferencesD.setPropertyFileName(settingsFile);
-		// }
-
-		// create first window and show it
 		createNewWindow3D(args);
 	}
 

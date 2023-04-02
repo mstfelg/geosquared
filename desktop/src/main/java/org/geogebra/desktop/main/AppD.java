@@ -43,6 +43,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.MemoryImageSource;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -474,7 +475,15 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		// loadModule clears up previous constructions
 		this.prefs = prefs;
 		this.prefs.applyTo(this);
+
 		boolean fileLoaded = false;
+		if (args != null && args[0] != null && !args[0].equals("")) {
+			fileLoaded = loadModule(Paths.get(args[0]));
+			if (!fileLoaded) {
+				System.out.println("Invalid file");
+				System.exit(1);
+			}
+		}
 
 		// initialize GUI
 		if (isUsingFullGui()) {
@@ -2684,6 +2693,19 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		return fileName.substring(idx + 1);
 	}
 
+	public static InputStream ggb2gsq(Path ggbPath) throws IOException {
+		String target = "geogebra.xml";
+		ZipInputStream zstream = new ZipInputStream(Files.newInputStream(ggbPath));
+		ZipEntry entry;
+
+		while ((entry = zstream.getNextEntry()) != null)
+			if (entry.getName().equals(target))
+				return new BufferedInputStream(zstream);
+
+		zstream.close();
+		return null;
+	}
+
 	public boolean loadModule(Path p) {
 		String ext = getExt(p);
 		if (ext == null || ext.equals(""))
@@ -2691,23 +2713,17 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 
 		InputStream fstream;
 		try {
-			fstream = new FileInputStream(p.toFile());
+			fstream = Files.newInputStream(p);
 		} catch (Exception e) {return false;}
-
 		// Decompress first
 		if (ext.equals("ggb")) {
-			ZipInputStream zstream = new ZipInputStream(fstream);
-			ZipEntry entry;
 			try {
-				while ((entry = zstream.getNextEntry()) != null) {
-					// Construction file
-					if (entry.getName().equals("geogebra.xml")) {
-						fstream = new InflaterInputStream(zstream);
-						break;
-					}
+				fstream = ggb2gsq(p);
+				if (fstream == null) {
+					Log.error("Invalid GGB file");
+					return false;
 				}
-			}
-			catch (Exception e) {}
+			} catch (Exception e) {}
 		}
 
 		Reader freader = null;

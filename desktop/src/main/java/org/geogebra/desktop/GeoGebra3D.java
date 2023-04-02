@@ -96,10 +96,7 @@ public class GeoGebra3D extends GeoGebra {
 			fileArgs[i] = args[i];
 		}
 
-		prefs = new AppPrefs(objCfg, modPath);
-		GeoGebraFrame3D wnd = new GeoGebraFrame3D();
-		App3D app = new App3D(fileArgs, wnd, prefs);
-		wnd.init(app);
+		App3D app = appInstance(fileArgs);
 
 		if (!interactiveEh)
 			return;
@@ -107,12 +104,19 @@ public class GeoGebra3D extends GeoGebra {
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String line = scanner.nextLine();
-            wnd.getApplication().getFullGuiManager()
+            app.getFullGuiManager()
 				.getFullAlgebraInput().sendCmd(line);
         }
         scanner.close();
 	}
-	
+
+	public static App3D appInstance(String[] fileArgs) {
+		GeoGebraFrame3D wnd = new GeoGebraFrame3D();
+		App3D app = new App3D(fileArgs, wnd, new AppPrefs(objCfg, modPath));
+		wnd.init(app);
+		return app;
+	}
+
 	private static void version() {
 		System.out.println(""
 			+ "GeoSquared v" + GeoGebraConstants.VERSION_STRING + " "

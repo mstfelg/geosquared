@@ -137,29 +137,26 @@ public class GlobalKeyDispatcherD extends GlobalKeyDispatcher
 		if (ch == 'k') cmd = "Circle";
 		if (ch == 'h') cmd = "Dilate";
 		if (ch == 'f') cmd = "Foot";
-		if (ch == '\'') cmd = "SetColor";
+		if (ch == '\'')cmd = "SetColor";
 		if (ch == '"') cmd = "SetLineStyle";
 		if (ch == 'i') cmd = "Intersect";
 		if (ch == 'l') cmd = "Line";
 		if (ch == 'b') cmd = "PerpendicularBisector";
 		if (ch == 'p') cmd = "PerpendicularLine";
 		if (ch == '.') cmd = "Point";
-		if (ch == '>') {
-			this.app.setMode(EuclidianConstants.MODE_POINT);
-			return true;
-		}
 		if (ch == ',') cmd = "Polar";
 		if (ch == 'g') cmd = "Polygon";
 		if (ch == 'r') cmd = "Reflect";
 		if (ch == 'o') cmd = "Rotate";
-		if (ch == 's') { 
-			this.app.setMoveMode();
-			return true;
-		}
+		if (ch == 's') cmd = "Segment";
 		if (ch == 't') cmd = "Tangent";
 		if (ch == 'y') cmd = "Translate";
 		if (ch == 'c') cmd = "TriangleCenter";
 		if (ch == 'v') cmd = "Vector";
+		if (ch == '>') {
+			this.app.setMode(EuclidianConstants.MODE_POINT);
+			return true;
+		}
 
 		if (cmd != null) {
 			algIn.insertCommand(cmd);

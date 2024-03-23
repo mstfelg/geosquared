@@ -389,32 +389,23 @@ public abstract class GlobalKeyDispatcher {
 
 		// eventually make an undo point (e.g. after zooming)
 		app.storeUndoInfoIfSetCoordSystemOccured();
-
 		boolean consumed = false;
 
 		// ESC and function keys
 		switch (key) {
 		default:
-			// do nothing
 			break;
+		case ENTER:
+			// set focus to input field
+			if (!fromSpreadsheet)
+				handleEnter();
+			// Fallback to detach focus
 		case ESCAPE:
-
-			// ESC: set move mode
 			handleEscForDropdown();
 			if (!app.isApplet() || app.showToolBar()) {
 				app.setMoveMode();
 			}
 			consumed = true;
-			break;
-
-		case ENTER:
-			// check not spreadsheet
-			if (!fromSpreadsheet) {
-
-				// ENTER: set focus to input field
-				consumed = handleEnter();
-
-			}
 			break;
 
 		// toggle boolean or run script when Spacebar pressed

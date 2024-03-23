@@ -43,6 +43,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.MemoryImageSource;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -58,6 +59,9 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -71,6 +75,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.LogManager;
+import java.util.zip.InflaterInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -286,6 +293,123 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 	private int centerX;
 	private int centerY;
 
+	/*************************************************************
+	 * Construct application within JFrame
+	 * 
+	 * @param args command line arguments
+	 * @param frame frame
+	 * @param undoActive whether undo is active
+	 */
+	public AppD(String[] args, JFrame frame, boolean undoActive) {
+		this(args, frame, null, undoActive, new LocalizationD(2));
+	}
+
+	/*************************************************************
+	 * Construct application within Container (e.g. GeoGebraPanel)
+	 * 
+	 * @param args command line arguments
+	 * @param comp parent panel
+	 * @param undoActive whether undo is active
+	 */
+	public AppD(String[] args, Container comp, boolean undoActive) {
+		this(args, null, comp, undoActive, new LocalizationD(2));
+	}
+
+	/*************************************************************
+	 * GeoGebra application general constructor
+	 *
+	 * @param args command line arguments
+	 * @param comp parent panel
+	 * @param frame frame
+	 * @param undoActive whether undo is active
+	 * @param loc localization
+	 */
+	public AppD(String[] args, JFrame frame, Container comp,
+			boolean undoActive,
+			LocalizationD loc) {
+		super(Platform.DESKTOP);
+		this.preferredSize = new GDimensionD(800, 600);
+		this.fontManager = new FontManagerD();
+		this.loc = loc;
+		loc.setApp(this);
+		this.cmdArgs = null;
+		mainComp = frame;
+		useFullGui = true;
+
+		if (frame == null)
+			return;
+
+		initImageManager(mainComp);
+
+		// set locale
+		setLocale(mainComp.getLocale());
+
+		setFileVersion(GeoGebraConstants.VERSION_STRING,
+				getConfig().getAppCode());
+
+		// init kernel
+		initFactories();
+		initKernel();
+		kernel.setPrintDecimals(getConfig().getDefaultPrintDecimals());
+
+		// init settings
+		initSettings();
+
+		// init euclidian view
+		initEuclidianViews();
+
+		// load file on startup and set fonts
+		// set flag to avoid multiple calls of setLabels() and
+		// updateContentPane()
+		initing = true;
+
+		// init default preferences if necessary
+		AppPrefs.getPref().initDefaultXML(this);
+
+		boolean fileLoaded = loadModule(Paths.get(args[0]));
+
+		// initialize GUI
+		if (isUsingFullGui()) {
+			initGuiManager();
+			setFrame(frame);
+		}
+
+		// load XML preferences
+		currentPath = AppPrefs.getPref().getDefaultFilePath();
+		currentImagePath = AppPrefs.getPref()
+				.getDefaultImagePath();
+
+		if (!fileLoaded) {
+			prefs.applyTo(this);
+			imageManager.setMaxIconSizeAsPt(getFontSize());
+		}
+
+		if (isUsingFullGui()) {
+			getGuiManager().getLayout()
+					.setPerspectiveOrDefault(getTmpPerspective());
+		}
+
+		setUndoActive(undoActive);
+
+		initing = false;
+
+		// for key listening
+		KeyboardFocusManager.getCurrentKeyboardFocusManager()
+				.addKeyEventDispatcher(this);
+
+		getScriptManager().ggbOnInit();
+		getFactory();
+
+		setSaved();
+
+		// user authentication handling
+		if (kernel.wantAnimationStarted()) {
+			kernel.getAnimatonManager().startAnimation();
+			kernel.setWantAnimationStarted(false);
+		}
+	}
+
+	// Deprecate all in favor of this
 	public AppD(String[] args, JFrame frame, AppPrefs prefs) {
 		super(Platform.DESKTOP);
 
@@ -328,7 +452,15 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		// loadModule clears up previous constructions
 		this.prefs = prefs;
 		this.prefs.applyTo(this);
-		boolean fileLoaded = loadModule(args[0]);
+
+		boolean fileLoaded = false;
+		if (args != null && args[0] != null && !args[0].equals("")) {
+			fileLoaded = loadModule(Paths.get(args[0]));
+			if (!fileLoaded) {
+				System.out.println("Invalid file");
+				System.exit(1);
+			}
+		}
 
 		// initialize GUI
 		if (isUsingFullGui()) {
@@ -2523,15 +2655,53 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 		}
 	}
 
-	public boolean loadModule(String modName) {
-		if (modName == null)
+	public String getExt(Path p) {
+		if (p == null || !Files.isRegularFile(p))
+			return null;
+
+		String fileName = p.getFileName().toString();
+		int idx = fileName.lastIndexOf('.');
+		if (idx == -1)
+			return "";
+		return fileName.substring(idx + 1);
+	}
+
+	public static InputStream ggb2gsq(Path ggbPath) throws IOException {
+		String target = "geogebra.xml";
+		ZipInputStream zstream = new ZipInputStream(Files.newInputStream(ggbPath));
+		ZipEntry entry;
+
+		while ((entry = zstream.getNextEntry()) != null)
+			if (entry.getName().equals(target))
+				return new BufferedInputStream(zstream);
+
+		zstream.close();
+		return null;
+	}
+
+	public boolean loadModule(Path p) {
+		String ext = getExt(p);
+		if (ext == null || ext.equals(""))
 			return false;
-		
-		Reader modReader = null;
+
+		InputStream fstream;
 		try {
-			modReader = new InputStreamReader(
-				new FileInputStream(modName)
-			);
+			fstream = Files.newInputStream(p);
+		} catch (Exception e) {return false;}
+		// Decompress first
+		if (ext.equals("ggb")) {
+			try {
+				fstream = ggb2gsq(p);
+				if (fstream == null) {
+					Log.error("Invalid GGB file");
+					return false;
+				}
+			} catch (Exception e) {}
+		}
+
+		Reader freader = null;
+		try {
+			freader = new InputStreamReader(fstream);
 		} catch (Exception e) {
 			return false;
 		}
@@ -2541,7 +2711,7 @@ public class AppD extends App implements KeyEventDispatcher, AppDI {
 
 		kernel.getConstruction().setFileLoading(true);
 		try {
-			xmlParser.parse(xmlHandler, modReader);
+			xmlParser.parse(xmlHandler, freader);
 		} catch (Exception e) { 
 			e.printStackTrace();
 			return false;

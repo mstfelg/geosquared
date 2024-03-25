@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -111,7 +110,6 @@ import org.geogebra.desktop.gui.layout.panels.ProbabilityCalculatorDockPanel;
 import org.geogebra.desktop.gui.layout.panels.PropertiesDockPanel;
 import org.geogebra.desktop.gui.layout.panels.SpreadsheetDockPanel;
 import org.geogebra.desktop.gui.menubar.GeoGebraMenuBar;
-import org.geogebra.desktop.gui.nssavepanel.NSSavePanel;
 import org.geogebra.desktop.gui.toolbar.ToolbarContainer;
 import org.geogebra.desktop.gui.toolbar.ToolbarD;
 import org.geogebra.desktop.gui.util.BrowserLauncher;
@@ -1509,22 +1507,18 @@ public class GuiManagerD extends GuiManager implements GuiManagerInterfaceD {
 
 		// close properties dialog if open
 		getDialogManager().closeAll();
-
-		boolean success;
-		if (getApp().getCurrentFile() != null) {
-			// Mathieu Blossier - 2008-01-04
-			// if the file is read-only, open save as
-			if (!getApp().getCurrentFile().canWrite()) {
-				success = saveAs();
-			} else {
-				success = getApp().saveGeoGebraFile(getApp().getCurrentFile());
-			}
-		} else {
-			success = saveAs();
+		
+		File file = getApp().getCurrentFile();
+		if (file == null) {
+			return saveAs();
 		}
+		FileExtensions ext = StringUtil.getFileExtension(file.getName());
+		Boolean isGsq = FileExtensions.GEOSQUARED.equals(ext);
 
-		getApp().setDefaultCursor();
-		return success;
+		if (!file.canWrite() || !isGsq)
+			return saveAs();
+		
+		return getApp().saveGeoGebraFile(getApp().getCurrentFile());
 	}
 
 	@Override

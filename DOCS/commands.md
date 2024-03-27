@@ -1,6 +1,10 @@
-# How to add a new command
-Markus Hohenwarter, May 5, 2007
+---
+title: Adding a new command
+author: Markus Hohenwarter
+date: 2007-05-05
+---
 
+# How to add a new command
 
 This document describes how to write code for a new command in
 GeoGebra's input field. We will explain this using one very simple
@@ -14,10 +18,14 @@ Add a name and syntax of the command to GGBTrans translation system.
  Midpoint.Syntax=[ <Point>, <Point> ]\n[ <Segment> ]\n[ <Conic> ]
 ```
 
-Once added to GGBTrans, these keys will be added to localization files for all platforms automatically (the update script runs nightly).
+Once added to GGBTrans, these keys will be added to localization files for all
+platforms automatically (the update script runs nightly).
 
 ## 1. Create representation in enums
-First create a value in `geogebra.common.kernel.commands.Commands`; it must be the same as the chosen name of your command (including capitalization). The constructor parameter lets you set in which category the command will appear in input help.
+First create a value in `geogebra.common.kernel.commands.Commands`; it must be
+the same as the chosen name of your command (including capitalization). The
+constructor parameter lets you set in which category the command will appear in
+input help.
 
 ## 2. Create a new algorithm class
 Such classes are located in `geogebra.common.kernel.algos`.
@@ -25,31 +33,36 @@ Such classes are located in `geogebra.common.kernel.algos`.
 The best way to do this, is by copying an existing algorithm
 class and changing it. We will explain the following steps
 using the class geogebra.kernel.AlgoMidpoint as an example.
- * Provide a constructor that takes the label of the resulting object, e.g. "M" for M = Midpoint[P, Q], and the input objects,  e.g. Points P and Q.
- * Within the constructor method make sure to call the methods  setInputOutput() and compute()
- * Change the following methods in your new algorithm class
-   * `getClassName()`: returns the corresponding Commands object
-   * `setInputOutput()`: make sure to call setDependencies() at its end
-   * `compute()`: here the actual work of your algorithm is done, e.g. the midpoint of P and Q is calculated
-   * `toString(StringTemplate tpl)`: for basic commands GeoGebra provides human-readable description (e.g. "Line bisectof segment A, B"). If your command needs this, please override the method
+* Provide a constructor that takes the label of the resulting object, e.g. "M"
+for M = Midpoint[P, Q], and the input objects,  e.g. Points P and Q.
+* Within the constructor method make sure to call the methods  setInputOutput()
+and compute()
+* Change the following methods in your new algorithm class
+* `getClassName()`: returns the corresponding Commands object
+* `setInputOutput()`: make sure to call setDependencies() at its end
+* `compute()`: here the actual work of your algorithm is done, e.g. the midpoint of P and Q is calculated
+* `toString(StringTemplate tpl)`: for basic commands GeoGebra provides
+human-readable description (e.g. "Line bisectof segment A, B"). If your
+command needs this, please override the method
 
-      ```
-	  @Override
-	  final public String toString(StringTemplate tpl) {
-        return getLoc().getPlain("LineBisectorOfA", s.getLabel(tpl));
-	  }
-      ```
+```java
+  @Override
+  final public String toString(StringTemplate tpl) {
+return getLoc().getPlain("LineBisectorOfA", s.getLabel(tpl));
+  }
+```
 
-     If you omit this, the description will default to "Midpoint[A, B]" for this example.
+If you omit this, the description will default to "Midpoint[A, B]" for this example.
 
-   * `getResult()` provide a method that returns the resulting object of the algorithm
+* `getResult()` provide a method that returns the resulting object of the algorithm
 
 ## 3. (Optional) Add a new method for your command to AlgoDispatcher
-__Only do this if necessary -- ie if the command should be used as tool or if it must be handled differently in 3D__
+__Only do this if necessary -- ie if the command should be used as tool or if it
+must be handled differently in 3D__
 
 This method's parameterlist should provide a label for the command's
 result and its input parameters, e.g. for our Midpoint command:
-```
+```java
  final public GeoPoint Midpoint(String label, GeoPoint P, GeoPoint Q) {
    AlgoMidpoint algo = new AlgoMidpoint(cons, label, P, Q);
    GeoPoint M = algo.getPoint();
@@ -62,27 +75,28 @@ in the geometry window when working with the mouse.
 
 ## 4. Create a new command processing class to geogebra.common.kernel.commands
 
-Add a new subclass (a new file!) of CommandProcessor to the geogebra.common.kernel.commands
-package. The first three letters of the new classname should be "Cmd", for example CmdMidpoint.
-Here, the arguments of a command are processed and their types
-are checked in order to call the right variant of a command.
-For example the Midpoint command works for either a conic, a segment
-or two points.
+Add a new subclass (a new file!) of CommandProcessor to the
+geogebra.common.kernel.commands package. The first three letters of the new
+classname should be "Cmd", for example CmdMidpoint. Here, the arguments of a
+command are processed and their types are checked in order to call the right
+variant of a command. For example the Midpoint command works for either a conic,
+a segment or two points.
 
-If step 3) was skipped, this command processor should instantiate the `AlgoElement` object directly and return its results.
+If step 3) was skipped, this command processor should instantiate the
+`AlgoElement` object directly and return its results.
 
-```
+```java
 /*
  * Midpoint[ <GeoConic> ]
  * Midpoint[ <Segment> ]
  * Midpoint[ <GeoPoint>, <GeoPoint> ]
  */
 class CmdMidpoint extends CommandProcessor {
-   
+
     public CmdMidpoint(Kernel kernel) {
         super(kernel);
     }
-   
+
     public GeoElement[] process(Command c) throws MyError {
         int n = c.getArgumentNumber();
         boolean[] ok = new boolean[n];
@@ -123,7 +137,7 @@ class CmdMidpoint extends CommandProcessor {
             default :
                 throw argNumErr(app, c.getName(), n);
         }
-    }   
+    }
 }
 ```
 
@@ -131,14 +145,14 @@ class CmdMidpoint extends CommandProcessor {
 
 Here we use the Commands enum value for our new command
 and associate it with our command processing class.
+```java
+case Midpoint: return new CmdMidpoint(kernel);
 ```
- case Midpoint: return new CmdMidpoint(kernel);
-```
-## 6. Add a test method to CommandsTest 
+## 6. Add a test method to CommandsTest
 
 You need to check out GeoGebraTest project first if you didn't do so before. In `geogebra.commands.CommandsTest` add a simple method that runs all syntaxes of your command (if you test less syntaxes, the test will fail).
 
-```
+```java
 @Test
 	public void cmdMidpoint() {
 		t("Midpoint[ xx+yy=1]", "(0,0)");

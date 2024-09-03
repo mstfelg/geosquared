@@ -1,0 +1,25 @@
+# Maintainer: Mustafa <dev at mstfelg dot com>
+
+pkgname=gsq
+pkgdesc="Geogebra-fork focused on extensibility and support for Euclidean Geometry."
+pkgver=1.0.0
+pkgrel=1
+arch=('x86_64')  # Adjust according to your package's architecture
+url="https://github.com/mstfelg/geosquared"
+license=('GPL3' 'CCPL:by-sa' 'CCPL:by-nc')  # Adjust the license according to the project
+depends=(
+	'hicolor-icon-theme'
+	'java-runtime=11'
+	'xdg-utils'
+)
+source=("https://github.com/mstfelg/geosquared/archive/refs/tags/v${pkgver}.tar.gz")
+sha256sums=('ad044a1baae54f4a6caa9aa3c62402b4627024030a12a2ab97b6201c30d5db59')
+
+package() {
+	cd "${srcdir}/desktop" || return
+	install -Dm755 "${srcdir}/bin/desktop" "${pkgdir}/usr/bin/gsq"
+	install -dm755 "${pkgdir}/usr/share/gsq"
+	install "lib/"* -t "${pkgdir}/usr/share/gsq/"
+}
+
+# Additional functions can be added here if needed

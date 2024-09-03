@@ -1,4 +1,4 @@
-project.description = 'GeoGebra'
+project.description = 'GeoGeobra'
 
 apply from: 'gradle-scripts/dependencies.gradle'
 

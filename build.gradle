@@ -1,4 +1,4 @@
-project.description = 'GeoGebra'
+project.description = 'GeoSquared'
 
 apply from: 'gradle-scripts/dependencies.gradle'
 
@@ -73,6 +73,30 @@ project(':common') {
 	eclipse.project {
  		natures 'sf.eclipse.javacc.javaccnature'
 	}
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            groupId = 'com.mstfelg.geosquared'
+            artifactId = 'package'
+            version = '0.0.1'
+            artifact("$buildDir/desktop/build/distributions/desktop.tar")
+        }
+    }
+    repositories {
+        maven {
+            name = 'GitHubPackages'
+            url = uri("https://maven.pkg.github.com/mstfelg/geosquared")
+
+            credentials {
+                username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+                password = project.findProperty("gpr.token") ?: System.getenv("TOKEN")
+            }
+        }
+    }
 }
 
 // https://gist.github.com/mashimom/891a55878eda510d316e
